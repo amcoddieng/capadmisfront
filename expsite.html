@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capadmis – Admission sans complexité</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome 6 (gratuit) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* Ajustements fins pour les ombres et dégradés */
+    .shadow-blue-200 {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 255, 0.1), 0 4px 6px -2px rgba(0, 0, 255, 0.05);
+    }
+    .bg-slate-50 { background-color: #f8fafc; }
+    .bg-slate-950 { background-color: #020617; }
+    .text-slate-900 { color: #0f172a; }
+    .text-slate-700 { color: #334155; }
+    .text-slate-500 { color: #64748b; }
+    .text-slate-400 { color: #94a3b8; }
+    .text-slate-300 { color: #cbd5e1; }
+    .text-slate-200 { color: #e2e8f0; }
+    .border-slate-100 { border-color: #f1f5f9; }
+    .border-slate-700 { border-color: #334155; }
+    .border-slate-800 { border-color: #1e293b; }
+    .hover\:border-slate-500:hover { border-color: #64748b; }
+    .bg-blue-100 { background-color: #dbeafe; }
+    .text-blue-600 { color: #2563eb; }
+    .bg-blue-600 { background-color: #2563eb; }
+    .hover\:bg-blue-500:hover { background-color: #3b82f6; }
+    .bg-blue-950\/60 { background-color: rgba(23, 37, 84, 0.6); }
+    .backdrop-blur-sm { backdrop-filter: blur(4px); }
+    .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+    .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+    .hover\:-translate-y-0\.5:hover { transform: translateY(-2px); }
+  </style>
+</head>
+<body class="bg-white">
+
+  <!-- ========== SECTION HERO (avec mockup tableau de bord) ========== -->
+  <section class="relative bg-slate-950 overflow-hidden">
+    <!-- Effets de fond flous -->
+    <div class="absolute inset-0">
+      <div class="absolute -top-40 -right-40 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px]"></div>
+      <div class="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-6 lg:px-8 py-32 lg:py-40">
+      <div class="grid lg:grid-cols-2 gap-20 items-center">
+        <!-- Colonne gauche : texte -->
+        <div class="text-center lg:text-left">
+          <div class="inline-flex items-center gap-2 bg-blue-950/60 backdrop-blur-sm border border-blue-800/60 rounded-full px-4 py-1.5 text-sm text-blue-300 mb-8">
+            <i class="fas fa-globe w-4 h-4"></i>
+            <span>France, Canada, Allemagne, Belgique...</span>
+          </div>
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-semibold text-white leading-[1.15] tracking-tight mb-8">
+            Votre admission
+            <span class="block bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent mt-2">sans complexité</span>
+          </h1>
+          <p class="text-lg text-slate-400 leading-relaxed mb-12 max-w-lg mx-auto lg:mx-0">
+            Accompagnement numérique de l'orientation à l'obtention du visa. Transparent, structuré et 3x moins cher qu'une agence.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <a href="#" class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-medium px-7 py-3.5 rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/25 hover:-translate-y-0.5">
+              Commencer ma procédure <i class="fas fa-arrow-right w-5 h-5"></i>
+            </a>
+            <a href="#" class="inline-flex items-center justify-center gap-2 bg-white/5 border border-slate-700 hover:border-slate-500 hover:bg-white/10 text-slate-200 font-medium px-7 py-3.5 rounded-xl transition-all duration-300">
+              Analyser mes chances
+            </a>
+          </div>
+        </div>
+
+        <!-- Colonne droite : mockup tableau de bord -->
+        <div class="relative">
+          <div class="bg-slate-900/70 backdrop-blur border border-slate-800 rounded-2xl p-8 shadow-2xl">
+            <div class="flex items-center gap-3 mb-8 pb-8 border-b border-slate-800">
+              <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <i class="fas fa-medal w-5 h-5 text-white"></i>
+              </div>
+              <div>
+                <div class="text-white font-medium">Tableau de bord</div>
+                <div class="text-slate-500 text-sm">Suivi en temps réel</div>
+              </div>
+              <div class="ml-auto text-xs font-medium text-green-400 bg-green-500/10 px-2.5 py-1 rounded-full">En cours</div>
+            </div>
+            <div class="space-y-5">
+              <div class="flex items-center gap-3">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center bg-green-500/20 text-green-400">
+                  <i class="fas fa-check-circle text-xs"></i>
+                </div>
+                <span class="text-sm text-slate-300">Analyse du profil</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center bg-green-500/20 text-green-400">
+                  <i class="fas fa-check-circle text-xs"></i>
+                </div>
+                <span class="text-sm text-slate-300">Orientation validée</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center bg-green-500/20 text-green-400">
+                  <i class="fas fa-check-circle text-xs"></i>
+                </div>
+                <span class="text-sm text-slate-300">Dossier soumis</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center bg-slate-800 text-slate-600">
+                  <i class="fas fa-check-circle text-xs"></i>
+                </div>
+                <span class="text-sm text-slate-500">Entretien Campus France</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-6 h-6 rounded-full flex items-center justify-center bg-slate-800 text-slate-600">
+                  <i class="fas fa-check-circle text-xs"></i>
+                </div>
+                <span class="text-sm text-slate-500">Préparation visa</span>
+              </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-slate-800">
+              <div class="flex justify-between text-xs text-slate-500 mb-2">
+                <span>Progression</span>
+                <span>60%</span>
+              </div>
+              <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full w-3/5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SECTION STATS ========== -->
+  <section class="py-24 bg-white border-b border-slate-100">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div class="text-center">
+          <div class="text-3xl lg:text-4xl font-semibold text-slate-900 mb-2">500+</div>
+          <div class="text-sm text-slate-500">Étudiants accompagnés</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl lg:text-4xl font-semibold text-slate-900 mb-2">95%</div>
+          <div class="text-sm text-slate-500">Taux de satisfaction</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl lg:text-4xl font-semibold text-slate-900 mb-2">6</div>
+          <div class="text-sm text-slate-500">Pays couverts</div>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl lg:text-4xl font-semibold text-slate-900 mb-2">39 900</div>
+          <div class="text-sm text-slate-500">FCFA pour démarrer</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SECTION FEATURES ========== -->
+  <section class="py-32 bg-white">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="text-center mb-20">
+        <span class="text-blue-600 font-medium text-sm mb-4 block">Pourquoi nous choisir</span>
+        <h2 class="text-3xl font-semibold text-slate-900">Un accompagnement pensé pour vous</h2>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-200 transition-colors">
+          <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-6">
+            <i class="fas fa-bolt text-xl"></i>
+          </div>
+          <h3 class="font-semibold text-slate-900 mb-2 text-lg">Processus digital</h3>
+          <p class="text-sm text-slate-500 leading-relaxed">Tout en ligne, sans déplacement</p>
+        </div>
+        <div class="p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-200 transition-colors">
+          <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-6">
+            <i class="fas fa-chart-line text-xl"></i>
+          </div>
+          <h3 class="font-semibold text-slate-900 mb-2 text-lg">Suivi temps réel</h3>
+          <p class="text-sm text-slate-500 leading-relaxed">Dashboard personnel de votre avancement</p>
+        </div>
+        <div class="p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-200 transition-colors">
+          <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-6">
+            <i class="fas fa-shield-alt text-xl"></i>
+          </div>
+          <h3 class="font-semibold text-slate-900 mb-2 text-lg">Accompagnement total</h3>
+          <p class="text-sm text-slate-500 leading-relaxed">De l'orientation au visa</p>
+        </div>
+        <div class="p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-200 transition-colors">
+          <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-6">
+            <i class="fas fa-chart-simple text-xl"></i>
+          </div>
+          <h3 class="font-semibold text-slate-900 mb-2 text-lg">Tarif accessible</h3>
+          <p class="text-sm text-slate-500 leading-relaxed">Jusqu'à 3x moins cher qu'une agence</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SECTION ÉTAPES ========== -->
+  <section class="py-32 bg-slate-50">
+    <div class="max-w-5xl mx-auto px-6 lg:px-8">
+      <div class="text-center mb-24">
+        <span class="text-blue-600 font-medium text-sm mb-4 block">Comment ça marche</span>
+        <h2 class="text-3xl font-semibold text-slate-900">Votre parcours en 6 étapes</h2>
+      </div>
+      <div class="relative">
+        <div class="hidden lg:block absolute top-8 left-0 right-0 h-0.5 bg-blue-200"></div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+          <div class="relative">
+            <div class="flex flex-col items-center text-center">
+              <div class="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-lg font-semibold mb-6 shadow-lg shadow-blue-200 z-10">1</div>
+              <h3 class="font-semibold text-slate-900 mb-3 text-lg">Analyse du profil</h3>
+              <p class="text-sm text-slate-500 leading-relaxed max-w-xs">Évaluation complète de votre parcours académique et de vos objectifs.</p>
+            </div>
+          </div>
+          <div class="relative">
+            <div class="flex flex-col items-center text-center">
+              <div class="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-lg font-semibold mb-6 shadow-lg shadow-blue-200 z-10">2</div>
+              <h3 class="font-semibold text-slate-900 mb-3 text-lg">Orientation stratégique</h3>
+              <p class="text-sm text-slate-500 leading-relaxed max-w-xs">Recommandation personnalisée des filières et universités adaptées.</p>
+            </div>
+          </div>
+          <div class="relative">
+            <div class="flex flex-col items-center text-center">
+              <div class="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-lg font-semibold mb-6 shadow-lg shadow-blue-200 z-10">3</div>
+              <h3 class="font-semibold text-slate-900 mb-3 text-lg">Constitution du dossier</h3>
+              <p class="text-sm text-slate-500 leading-relaxed max-w-xs">Préparation et vérification de tous vos documents académiques.</p>
+            </div>
+          </div>
+          <div class="relative">
+            <div class="flex flex-col items-center text-center">
+              <div class="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-lg font-semibold mb-6 shadow-lg shadow-blue-200 z-10">4</div>
+              <h3 class="font-semibold text-slate-900 mb-3 text-lg">Candidatures</h3>
+              <p class="text-sm text-slate-500 leading-relaxed max-w-xs">Dépôt de vos candidatures aux universités sélectionnées.</p>
+            </div>
+          </div>
+          <div class="relative">
+            <div class="flex flex-col items-center text-center">
+              <div class="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-lg font-semibold mb-6 shadow-lg shadow-blue-200 z-10">5</div>
+              <h3 class="font-semibold text-slate-900 mb-3 text-lg">Préparation visa</h3>
+              <p class="text-sm text-slate-500 leading-relaxed max-w-xs">Accompagnement complet pour l'entretien et le dossier consulaire.</p>
+            </div>
+          </div>
+          <div class="relative">
+            <div class="flex flex-col items-center text-center">
+              <div class="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-lg font-semibold mb-6 shadow-lg shadow-blue-200 z-10">6</div>
+              <h3 class="font-semibold text-slate-900 mb-3 text-lg">Départ réussi</h3>
+              <p class="text-sm text-slate-500 leading-relaxed max-w-xs">Vous partez étudier avec toutes les assurances nécessaires.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SECTION TÉMOIGNAGES ========== -->
+  <section class="py-32 bg-white">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="text-center mb-20">
+        <span class="text-blue-600 font-medium text-sm mb-4 block">Témoignages</span>
+        <h2 class="text-3xl font-semibold text-slate-900">Ils nous font confiance</h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="p-8 rounded-2xl bg-slate-50 border border-slate-100">
+          <div class="flex gap-1 mb-6">
+            <i class="fas fa-star text-amber-400"></i><i class="fas fa-star text-amber-400"></i><i class="fas fa-star text-amber-400"></i><i class="fas fa-star text-amber-400"></i><i class="fas fa-star text-amber-400"></i>
+          </div>
+          <p class="text-slate-700 mb-6 leading-relaxed">"Admission à Lyon 2 obtenue grâce à un suivi parfait."</p>
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-sm font-semibold text-blue-700">A</div>
+            <div><div class="font-medium text-slate-900">Aminata D.</div><div class="text-sm text-slate-500">Sénégal · Université Lyon 2</div></div>
+          </div>
+        </div>
+        <div class="p-8 rounded-2xl bg-slate-50 border border-slate-100">
+          <div class="flex gap-1 mb-6">
+            <i class="fas fa-star text-amber-400"></i><i class="fas fa-star text-amber-400"></i><i class="fas fa-star text-amber-400"></i><i class="fas fa-star text-amber-400"></i><i class="fas fa-star text-amber-400"></i>
+          </div>
+          <p class="text-slate-700 mb-6 leading-relaxed">"L'analyse m'a dirigé vers la bonne université. Visa en poche !"</p>
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-sm font-semibold text-blue-700">M</div>
+            <div><div class="font-medium text-slate-900">Moussa K.</div><div class="text-sm text-slate-500">Guinée · Université de Bordeaux</div></div>
+          </div>
+        </div>
+        <div class="p-8 rounded-2xl bg-slate-50 border border-slate-100">
+          <div class="flex gap-1 mb-6">
+            <i class="fas fa-star text-amber-400"></i><i class="fas fa-star text-amber-400"></i><i class="fas fa-star text-amber-400"></i><i class="fas fa-star text-amber-400"></i><i class="fas fa-star text-amber-400"></i>
+          </div>
+          <p class="text-slate-700 mb-6 leading-relaxed">"Le dashboard m'a rassurée à chaque étape."</p>
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-sm font-semibold text-blue-700">F</div>
+            <div><div class="font-medium text-slate-900">Fatou S.</div><div class="text-sm text-slate-500">Sénégal · Université Paris-Saclay</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SECTION CTA ========== -->
+  <section class="py-32 bg-slate-950">
+    <div class="max-w-4xl mx-auto px-6 lg:px-8 text-center">
+      <h2 class="text-4xl font-semibold text-white mb-6">Prêt à commencer votre procédure ?</h2>
+      <p class="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
+        Rejoignez plus de 500 étudiants qui ont réussi leur admission avec notre accompagnement.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="#" class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-medium px-8 py-4 rounded-xl transition-colors text-lg">
+          Commencer ma procédure <i class="fas fa-arrow-right w-5 h-5"></i>
+        </a>
+        <a href="#" class="inline-flex items-center justify-center gap-2 border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white font-medium px-8 py-4 rounded-xl transition-colors text-lg">
+          Analyser mes chances
+        </a>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

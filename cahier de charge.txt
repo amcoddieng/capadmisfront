@@ -1,0 +1,489 @@
+
+Cahier des charges — Plateforme Capadmis.1. Présentation du projet
+Capadmis. est une plateforme digitale destinée aux étudiants souhaitant poursuivre leurs études, principalement en France dans un premier temps, puis dans d’autres pays comme l’Allemagne, l’Autriche, les Pays-Bas ou le Canada.
+Le site ne doit pas être uniquement un site vitrine. Il doit combiner :
+une partie publique de présentation de l’offre ;
+une plateforme dynamique avec espace étudiant ;
+un système de téléchargement et d’analyse de documents ;
+un tableau de bord permettant au candidat de suivre l’évolution de sa procédure ;
+une interface administrateur permettant à l’équipe Capadmis. de gérer les dossiers.
+L’objectif est de digitaliser, automatiser et rendre plus transparente la procédure d’admission universitaire et de préparation au visa.
+
+2. Objectifs du site
+Le site doit permettre de :
+Présenter Capadmis., ses services et ses tarifs.
+Expliquer clairement la procédure Campus France étape par étape.
+Permettre aux étudiants de créer un compte personnel.
+Permettre aux étudiants de télécharger leurs documents académiques.
+Analyser les notes, le CV et le projet de l’étudiant afin de suggérer des filières, universités et villes adaptées.
+Permettre à l’étudiant de lancer une procédure d’accompagnement.
+Permettre à l’étudiant de suivre l’état d’avancement de son dossier en temps réel.
+Permettre à l’équipe interne de gérer les candidatures, les documents, les statuts et les notifications.
+Mettre en avant le positionnement très accessible de Capadmis. par rapport aux agences classiques.
+
+3. Charte graphique
+Le design doit s’inspirer de la charte graphique du site EazyVisa :
+https://eazy-visa.com
+Le site doit être :
+moderne ;
+professionnel ;
+rassurant ;
+responsive mobile/tablette/ordinateur ;
+rapide ;
+clair pour des étudiants et parents.
+L’identité visuelle doit refléter : confiance, technologie, accessibilité, accompagnement et sérieux.
+
+4. Partie publique du site
+4.1 Page d’accueil
+La page d’accueil doit présenter clairement :
+Capadmis. ;
+la promesse principale ;
+les tarifs ;
+les étapes de la procédure ;
+les avantages par rapport aux agences traditionnelles ;
+un bouton clair : “Commencer ma procédure” ;
+un bouton : “Analyser mes chances d’admission”.
+Message central à mettre en avant :
+Capadmis. aide les étudiants à choisir la bonne filière, la bonne université et à suivre leur procédure jusqu’à l’obtention du visa.
+
+4.2 Présentation de Capadmis.
+La page doit expliquer que Capadmis. est une plateforme digitale d’accompagnement pour les études à l’étranger, combinant :
+conseil en orientation ;
+optimisation des candidatures ;
+suivi digital du dossier ;
+préparation Campus France ;
+préparation visa ;
+recommandation intelligente basée sur les notes, le projet et le profil.
+
+4.3 Page “Procédure Campus France”
+Cette page doit expliquer toute la procédure de manière pédagogique.
+Étape 1 : Conseil et orientation
+L’étudiant est conseillé sur :
+le choix de filière ;
+le choix d’université ;
+le choix de ville ;
+la cohérence du projet ;
+les chances d’admission selon ses notes.
+Étape 2 : Constitution du dossier
+L’étudiant prépare et télécharge :
+relevés de notes ;
+bulletins de seconde, première, terminale ;
+diplôme ou attestation du bac ;
+CV ;
+lettre de motivation ;
+passeport ;
+autres documents requis.
+Étape 3 : Lancement des demandes d’admission
+L’équipe Capadmis. prépare et soumet les demandes d’admission.
+La plateforme doit permettre de suivre :
+universités ciblées ;
+filières ciblées ;
+statut de chaque candidature ;
+documents manquants ;
+dates importantes.
+Étape 4 : Préparation à l’entretien Campus France
+Après les candidatures, Capadmis. accompagne l’étudiant pour :
+comprendre son projet d’études ;
+préparer ses réponses ;
+expliquer la cohérence de son parcours ;
+éviter les erreurs fréquentes pendant l’entretien.
+Étape 5 : Suivi des admissions
+La plateforme doit afficher :
+admission obtenue ;
+admission refusée ;
+motif du refus si disponible ;
+universités en attente ;
+prochaines étapes.
+Étape 6 : Préparation visa
+Après obtention de l’admission, Capadmis. accompagne l’étudiant dans :
+la préparation du dossier visa ;
+la prise en charge ;
+l’hébergement ;
+les justificatifs financiers ;
+la préparation à l’entretien visa ;
+la vérification finale du dossier.
+Étape 7 : Dépôt de la demande de visa
+La plateforme doit afficher :
+date du rendez-vous ;
+documents à apporter ;
+statut du dossier ;
+notification avant rendez-vous.
+Étape 8 : Résultat visa
+Le système doit afficher :
+visa obtenu ;
+visa refusé ;
+motif du refus si disponible ;
+recommandations en cas de refus.
+
+5. Tarifs à afficher
+Le site doit mettre en avant le prix accessible de Capadmis..
+Offre principale
+39 900 FCFA pour démarrer la procédure de demande d’admission.
+49 900 FCFA après obtention de l’admission.
+Frais Campus France : environ 80 000 FCFA, payés séparément par l’étudiant.
+Le message commercial doit insister sur le fait que Capadmis. est beaucoup plus abordable que les agences traditionnelles, tout en proposant un accompagnement sérieux, digitalisé et structuré.
+
+6. Arguments différenciateurs à mettre en avant
+Le site doit montrer que Capadmis. est différent des agences classiques.
+Points à valoriser :
+processus digital rapide ;
+suivi transparent ;
+tableau de bord personnel ;
+analyse personnalisée du dossier ;
+recommandations basées sur les notes et la cohérence du projet ;
+meilleure répartition du travail entre les conseillers ;
+chaque dossier est traité avec soin ;
+notification à chaque étape ;
+coût accessible ;
+accompagnement jusqu’au visa.
+Message important :
+Contrairement aux agences où un conseiller peut gérer trop de dossiers à la fois, Capadmis. structure le traitement de chaque dossier avec un suivi digital et des étapes clairement visibles par l’étudiant.
+
+7. Partie dynamique — Espace étudiant
+7.1 Création de compte
+L’étudiant doit pouvoir créer un compte avec :
+nom ;
+prénom ;
+email ;
+téléphone ;
+pays ;
+ville ;
+niveau d’études ;
+pays souhaité ;
+filière souhaitée ;
+mot de passe.
+Connexion possible par :
+email + mot de passe ;
+éventuellement Google login.
+
+7.2 Tableau de bord étudiant
+Après connexion, l’étudiant doit accéder à un tableau de bord personnel.
+Le tableau de bord doit afficher :
+profil de l’étudiant ;
+documents téléchargés ;
+documents manquants ;
+recommandations IA ;
+statut de la procédure ;
+pourcentage d’avancement ;
+prochaines actions ;
+notifications ;
+messages de l’équipe Capadmis..
+
+7.3 Téléchargement des documents
+L’étudiant doit pouvoir uploader :
+bulletin de seconde ;
+bulletin de première ;
+bulletin de terminale ;
+relevé de notes du bac ;
+diplôme ou attestation de réussite ;
+CV ;
+lettre de motivation ;
+passeport ;
+photo ;
+autres documents.
+Formats acceptés :
+PDF ;
+JPG ;
+PNG ;
+DOC/DOCX.
+Le système doit permettre à l’admin de valider ou rejeter chaque document.
+Statuts possibles :
+reçu ;
+en cours de vérification ;
+validé ;
+refusé ;
+à remplacer.
+
+8. Module d’analyse intelligente Capadmis.
+Le site doit intégrer un module permettant d’analyser le profil de l’étudiant.
+8.1 Données analysées
+Le module doit analyser :
+notes de seconde, première, terminale ;
+moyenne générale ;
+notes dans les matières principales ;
+filière souhaitée ;
+cohérence du projet ;
+pays souhaité ;
+budget disponible ;
+niveau linguistique ;
+CV ;
+lettre de motivation si disponible.
+
+8.2 Fonctionnement attendu
+Le système doit pouvoir :
+Identifier les points forts du dossier.
+Identifier les points faibles.
+Estimer les chances d’admission.
+Suggérer des filières plus cohérentes.
+Recommander des villes ou universités moins compétitives si le dossier est moyen.
+Recommander des universités plus sélectives si le dossier est excellent.
+Dire à l’étudiant si son choix initial est risqué.
+Proposer des alternatives plus réalistes.
+Exemple :
+Si un étudiant veut faire droit à Paris avec une moyenne faible, le système peut recommander des universités en région où la compétition est moins forte.
+Si un étudiant a de très bonnes notes en mathématiques, le système peut recommander une filière plus alignée avec ses forces académiques.
+
+8.3 Résultat de l’analyse
+Après analyse, l’étudiant doit voir :
+score global du dossier ;
+chances estimées d’admission ;
+filières recommandées ;
+universités recommandées ;
+villes recommandées ;
+points à améliorer ;
+documents à renforcer ;
+suggestion de stratégie.
+Exemple de score :
+Admission très probable ;
+Admission possible ;
+Admission risquée ;
+Admission très faible.
+
+9. Lancement de procédure
+Après l’analyse, l’étudiant doit pouvoir cliquer sur :
+“Lancer ma procédure”
+Le système doit alors :
+Créer un dossier candidat.
+Stocker automatiquement les documents déjà fournis.
+Demander les documents manquants.
+Afficher le montant à payer.
+Déclencher le processus interne côté administrateur.
+Faire passer le dossier au statut : “Procédure lancée”.
+
+10. Paiement
+Le site doit intégrer un système de paiement adapté au Sénégal.
+Moyens possibles :
+Wave ;
+Orange Money ;
+carte bancaire ;
+virement bancaire ;
+paiement manuel validé par l’admin.
+Paiements à gérer :
+39 900 FCFA au lancement ;
+49 900 FCFA après admission ;
+éventuellement autres frais selon services additionnels.
+Après paiement, le statut doit être visible dans le tableau de bord :
+paiement en attente ;
+paiement reçu ;
+paiement refusé ;
+paiement validé.
+
+11. Suivi de la procédure
+Chaque dossier doit avoir un pipeline de suivi.
+Statuts principaux
+Compte créé
+Documents en attente
+Documents reçus
+Analyse du dossier
+Conseil orientation
+Candidatures en préparation
+Candidatures soumises
+En attente de réponse
+Admission obtenue
+Admission refusée
+Préparation entretien Campus France
+Entretien Campus France réalisé
+Préparation dossier visa
+Rendez-vous visa programmé
+Demande de visa déposée
+Visa obtenu
+Visa refusé
+Dossier clôturé
+Chaque statut doit pouvoir être mis à jour par l’admin.
+L’étudiant doit voir clairement où en est son dossier.
+
+12. Notifications
+Le système doit envoyer des notifications :
+par email ;
+éventuellement WhatsApp ;
+éventuellement SMS.
+Notifications à prévoir :
+compte créé ;
+document reçu ;
+document validé ;
+document refusé ;
+paiement reçu ;
+dossier en cours ;
+entretien à préparer ;
+admission obtenue ;
+admission refusée ;
+visa à préparer ;
+rendez-vous visa proche ;
+visa obtenu.
+
+13. Interface administrateur
+L’équipe Capadmis. doit disposer d’un back-office.
+Fonctions admin
+L’admin doit pouvoir :
+voir tous les candidats ;
+filtrer par statut ;
+consulter les documents ;
+valider/refuser les documents ;
+modifier le statut du dossier ;
+ajouter des commentaires internes ;
+envoyer des messages au candidat ;
+assigner un dossier à un conseiller ;
+voir les paiements ;
+voir les universités choisies ;
+ajouter les résultats d’admission ;
+ajouter les motifs de refus ;
+télécharger les dossiers complets ;
+exporter les données.
+
+14. Gestion des conseillers
+Chaque dossier doit pouvoir être attribué à un conseiller.
+Le conseiller doit voir uniquement les dossiers qui lui sont assignés, sauf admin principal.
+Rôles à prévoir :
+Super Admin ;
+Admin ;
+Conseiller admission ;
+Conseiller visa ;
+Étudiant.
+
+15. CRM intégré
+Le site doit aussi servir de mini-CRM.
+Chaque candidat doit avoir une fiche complète :
+informations personnelles ;
+parcours académique ;
+pays cible ;
+filière cible ;
+budget ;
+documents ;
+statut ;
+historique des actions ;
+paiements ;
+messages ;
+commentaires internes.
+
+16. Sécurité et confidentialité
+Les données étudiantes sont sensibles.
+Le développeur doit prévoir :
+connexion sécurisée ;
+mot de passe chiffré ;
+accès limité selon rôles ;
+sauvegardes régulières ;
+protection des documents ;
+certificat SSL ;
+conformité minimale avec les bonnes pratiques de protection des données.
+
+17. Pages à créer
+Pages publiques :
+Accueil
+À propos
+Procédure Campus France
+Tarifs
+Pourquoi Capadmis. ?
+Analyse de mes chances
+Témoignages
+FAQ
+Contact
+Connexion / Inscription
+Pages espace étudiant :
+Tableau de bord
+Mon profil
+Mes documents
+Analyse Capadmis.
+Mes recommandations
+Ma procédure
+Mes paiements
+Messages / Notifications
+Pages admin :
+Dashboard admin
+Liste des candidats
+Fiche candidat
+Documents
+Paiements
+Statuts des dossiers
+Conseillers
+Messages
+Paramètres
+
+18. Technologies recommandées
+Le choix technique est libre, mais la solution doit être robuste, évolutive et facile à maintenir.
+Options possibles :
+Frontend :
+Next.js / React
+ou Laravel Blade
+ou WordPress uniquement si très bien customisé, mais non recommandé pour la partie dynamique avancée.
+Backend :
+Laravel
+Node.js / Express
+Django
+Next.js fullstack
+Base de données :
+PostgreSQL
+MySQL
+Stockage documents :
+AWS S3
+Google Cloud Storage
+ou stockage serveur sécurisé.
+IA :
+API OpenAI ou autre modèle IA ;
+OCR pour lecture des bulletins ;
+extraction automatique des notes ;
+moteur de scoring interne.
+Paiement :
+Wave API si disponible ;
+Orange Money ;
+PayDunya ;
+Stripe si nécessaire.
+
+19. Priorités de développement
+Version 1 — MVP urgent
+À développer en priorité :
+Site public
+Inscription / connexion étudiant
+Upload documents
+Tableau de bord étudiant
+Back-office admin
+Statuts de suivi
+Paiements
+Notifications email
+Analyse manuelle/semi-automatique du dossier
+Recommandations simples
+Version 2
+Analyse IA avancée des notes
+OCR automatique des bulletins
+Recommandation automatique universités/villes
+Système de scoring complet
+Notifications WhatsApp
+Automatisation des lettres de motivation
+Génération de CV
+Statistiques avancées
+Version 3
+Extension à Allemagne, Autriche, Pays-Bas, Canada
+Matching international avancé
+Comparateur de pays
+Analyse du budget
+Prédiction des chances de visa
+Portail partenaires
+Application mobile
+
+20. Livrables attendus
+Le développeur doit livrer :
+maquettes UI/UX ;
+site public responsive ;
+espace étudiant fonctionnel ;
+back-office admin ;
+base de données ;
+module upload documents ;
+module suivi des statuts ;
+module paiement ;
+système de notification ;
+documentation technique ;
+accès administrateur ;
+formation rapide de l’équipe.
+
+21. Résultat attendu
+À la fin du développement, Capadmis. doit permettre à un étudiant de :
+Comprendre la procédure Campus France.
+Créer un compte.
+Télécharger ses documents.
+Obtenir une première analyse de son profil.
+Recevoir des recommandations de filières, villes et universités.
+Payer pour lancer sa procédure.
+Suivre l’avancement de son dossier.
+Recevoir des notifications à chaque étape.
+Être accompagné jusqu’à l’admission et la demande de visa.
+La plateforme doit permettre à l’équipe Capadmis. de gérer efficacement un grand nombre de dossiers sans perdre en qualité d’accompagnement.
+
