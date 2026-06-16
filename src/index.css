@@ -1658,6 +1658,78 @@ a { text-decoration: none; color: inherit; }
 .auth-step-bar--pending { background: var(--slate-200); }
 
 .auth-footer { text-align: center; font-size: .75rem; color: rgba(191,219,254,.6); margin-top: 1.5rem; }
+
+/* Badge espace personnel */
+.auth-card__personnel-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .375rem;
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--blue-700);
+  background: #eff6ff;
+  border-bottom: 1px solid #dbeafe;
+  padding: .625rem 1.25rem;
+  border-radius: .75rem .75rem 0 0;
+}
+
+/* Dashboards stubs */
+.stub-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--slate-50);
+}
+.stub-page__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .75rem;
+  padding: 2.5rem 3rem;
+  background: white;
+  border: 1px solid var(--slate-200);
+  border-radius: 1rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,.06);
+}
+.stub-page__role {
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--blue-600);
+  background: #eff6ff;
+  padding: .25rem .75rem;
+  border-radius: 999px;
+  margin: 0;
+}
+.stub-page__name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--slate-800);
+  margin: 0;
+}
+.stub-page__code {
+  font-size: .875rem;
+  color: var(--slate-400);
+  font-family: monospace;
+}
+.stub-page__logout {
+  margin-top: .5rem;
+  padding: .5rem 1.25rem;
+  background: #fef2f2;
+  color: #b91c1c;
+  border: none;
+  border-radius: .5rem;
+  font-size: .875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+}
+.stub-page__logout:hover { background: #fee2e2; }
 .auth-footer a { text-decoration: underline; }
 .auth-footer a:hover { color: #bfdbfe; }
 

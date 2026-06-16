@@ -11,7 +11,12 @@ import Temoignages from './pages/Temoignages';
 import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
 import Auth from './pages/Auth';
+import AuthPersonnel from './pages/AuthPersonnel';
 import DashboardStudent from './pages/DashboardStudent';
+import DashboardAdmin from './pages/DashboardAdmin';
+import DashboardSuperAdmin from './pages/DashboardSuperAdmin';
+import DashboardConseillerAdmission from './pages/DashboardConseillerAdmission';
+import DashboardConseillerVisa from './pages/DashboardConseillerVisa';
 
 function Layout({ children }) {
   const location = useLocation();
@@ -44,6 +49,11 @@ function App() {
         <Route path="/connexion" element={<Auth />} />
         <Route path="/inscription" element={<Auth />} />
         <Route path="/dashboard" element={<DashboardStudent />} />
+        <Route path="/espace-pro" element={<AuthPersonnel />} />
+        <Route path="/dashboard-admin" element={<DashboardAdmin />} />
+        <Route path="/dashboard-superadmin" element={<DashboardSuperAdmin />} />
+        <Route path="/dashboard-conseiller-admission" element={<DashboardConseillerAdmission />} />
+        <Route path="/dashboard-conseiller-visa" element={<DashboardConseillerVisa />} />
       </Routes>
     </BrowserRouter>
   );

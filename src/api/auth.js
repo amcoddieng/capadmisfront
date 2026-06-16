@@ -165,6 +165,33 @@ export async function apiModifierMdpCode(email, code, nouveau_mdp) {
   return data;
 }
 
+export async function apiPersonnelLogin(email, mdp) {
+  const res = await fetch(`${BASE}/personnel/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, mdp }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Email ou mot de passe incorrect');
+  return data;
+}
+
+export function savePersonnelSession(token, personnel) {
+  localStorage.setItem('cap_p_token', token);
+  localStorage.setItem('cap_personnel', JSON.stringify(personnel));
+}
+
+export function clearPersonnelSession() {
+  localStorage.removeItem('cap_p_token');
+  localStorage.removeItem('cap_personnel');
+}
+
+export function getPersonnelSession() {
+  const token     = localStorage.getItem('cap_p_token');
+  const personnel = JSON.parse(localStorage.getItem('cap_personnel') || 'null');
+  return { token, personnel };
+}
+
 export function saveSession(token, etudiant, codeDossier) {
   localStorage.setItem('cap_token', token);
   localStorage.setItem('cap_etudiant', JSON.stringify(etudiant));
