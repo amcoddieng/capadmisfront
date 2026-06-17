@@ -59,8 +59,8 @@ function TableWrap({ loading, error, children }) {
 }
 
 /* ── Modal assign conseiller ── */
-function ModalAssignConseiller({ token, dossier, onClose, onSuccess }) {
-  const [type, setType] = useState('admission');
+function ModalAssignConseiller({ token, dossier, defaultType = 'admission', onClose, onSuccess }) {
+  const [type, setType] = useState(defaultType);
   const [conseillers, setConseillers] = useState([]);
   const [conseillerId, setConseillerId] = useState('');
   const [loading, setLoading] = useState(true);
@@ -179,32 +179,95 @@ function PageDossiers({ token }) {
   const [error, setError]       = useState('');
   const [assignModal, setAssignModal] = useState(null);
   const [statusModal, setStatusModal] = useState(null);
+  const [search, setSearch] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [filterAdmission, setFilterAdmission] = useState('');
+  const [filterVisa, setFilterVisa] = useState('');
+  const [filterSansConseiller, setFilterSansConseiller] = useState(false);
+
   const fetch = useCallback(async () => {
     setLoading(true); setError('');
     try { setDossiers(await apiListDossiers(token)); } catch (e) { setError(e.message); } finally { setLoading(false); }
   }, [token]);
   useEffect(() => { fetch(); }, [fetch]);
+
+  const filtered = dossiers.filter(d => {
+    const q = search.trim().toLowerCase();
+    const matchSearch = !q ||
+      d.code_dossier?.toLowerCase().includes(q) ||
+      d.etudiant?.prenom?.toLowerCase().includes(q) ||
+      d.etudiant?.nom?.toLowerCase().includes(q) ||
+      d.etudiant?.email?.toLowerCase().includes(q) ||
+      (d.conseiller_admission?.prenom + ' ' + d.conseiller_admission?.nom).toLowerCase().includes(q) ||
+      (d.conseiller_visa?.prenom + ' ' + d.conseiller_visa?.nom).toLowerCase().includes(q);
+    const matchStatus = !filterStatus || d.status === filterStatus;
+    const matchAdm    = !filterAdmission || d.status_admission === filterAdmission;
+    const matchVisa   = !filterVisa || d.status_visa === filterVisa;
+    const matchSansConseiller = !filterSansConseiller || (!d.conseiller_admission && !d.conseiller_visa);
+    return matchSearch && matchStatus && matchAdm && matchVisa && matchSansConseiller;
+  });
+
   return (
     <div className="cons-page">
       <h2 className="cons-page__title">Dossiers</h2>
-      <p className="cons-page__sub">{dossiers.length} dossier(s) au total.</p>
+      <p className="cons-page__sub">{filtered.length} dossier(s) sur {dossiers.length} au total.</p>
+
+      {/* ── Barre de recherche et filtres ── */}
+      <div style={{ display: 'flex', gap: '.75rem', flexWrap: 'wrap', alignItems: 'center', marginBottom: '1.25rem', background: '#fff', padding: '.75rem 1rem', borderRadius: '.5rem', border: '1px solid #e2e8f0' }}>
+        <input
+          type="text"
+          placeholder="Rechercher (code, nom, email...)"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ flex: 1, minWidth: 200, padding: '.4rem .6rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.85rem' }}
+        />
+        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ padding: '.4rem .6rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.85rem' }}>
+          <option value="">Tous statuts</option>
+          {STATUS_OPTIONS.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
+        </select>
+        <select value={filterAdmission} onChange={e => setFilterAdmission(e.target.value)} style={{ padding: '.4rem .6rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.85rem' }}>
+          <option value="">Tous admissions</option>
+          {STATUS_ADM_OPTIONS.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
+        </select>
+        <select value={filterVisa} onChange={e => setFilterVisa(e.target.value)} style={{ padding: '.4rem .6rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.85rem' }}>
+          <option value="">Tous visas</option>
+          {STATUS_VISA_OPTIONS.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
+        </select>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '.35rem', fontSize: '.8rem', color: '#475569', cursor: 'pointer' }}>
+          <input type="checkbox" checked={filterSansConseiller} onChange={e => setFilterSansConseiller(e.target.checked)} />
+          Sans conseiller
+        </label>
+      </div>
+
       <TableWrap loading={loading} error={error}>
         <div className="sa-table-wrap">
           <table className="sa-table">
             <thead><tr><th>Code</th><th>Étudiant</th><th>Statut</th><th>Admission</th><th>Visa</th><th>Cons. Adm.</th><th>Cons. Visa</th><th>Actions</th></tr></thead>
             <tbody>
-              {dossiers.length === 0 && <tr><td colSpan={8} className="sa-empty">Aucun dossier</td></tr>}
-              {dossiers.map(d => (
+              {filtered.length === 0 && <tr><td colSpan={8} className="sa-empty">Aucun dossier trouvé</td></tr>}
+              {filtered.map(d => (
                 <tr key={d.id}>
                   <td><code className="sa-code">{d.code_dossier}</code></td>
                   <td>{d.etudiant ? `${d.etudiant.prenom} ${d.etudiant.nom}` : '—'}</td>
                   <td><StatusBadge value={d.status}/></td>
                   <td><StatusBadge value={d.status_admission}/></td>
                   <td><StatusBadge value={d.status_visa}/></td>
-                  <td>{d.conseiller_admission ? `${d.conseiller_admission.prenom} ${d.conseiller_admission.nom}` : <span style={{color:'#94a3b8'}}>—</span>}</td>
-                  <td>{d.conseiller_visa ? `${d.conseiller_visa.prenom} ${d.conseiller_visa.nom}` : <span style={{color:'#94a3b8'}}>—</span>}</td>
+                  <td>
+                    {d.conseiller_admission ? `${d.conseiller_admission.prenom} ${d.conseiller_admission.nom}` : (
+                      <button className="sa-btn sa-btn--blue" style={{fontSize:'.75rem',padding:'.2rem .5rem'}} onClick={() => setAssignModal({ dossier: d, type: 'admission' })} title="Assigner conseiller admission">
+                        <UserCheck size={12}/> Attribuer
+                      </button>
+                    )}
+                  </td>
+                  <td>
+                    {d.conseiller_visa ? `${d.conseiller_visa.prenom} ${d.conseiller_visa.nom}` : (
+                      <button className="sa-btn sa-btn--blue" style={{fontSize:'.75rem',padding:'.2rem .5rem'}} onClick={() => setAssignModal({ dossier: d, type: 'visa' })} title="Assigner conseiller visa">
+                        <UserCheck size={12}/> Attribuer
+                      </button>
+                    )}
+                  </td>
                   <td><div className="sa-actions">
-                    <button className="sa-btn sa-btn--blue" onClick={() => setAssignModal(d)} title="Assigner conseiller"><UserCheck size={14}/></button>
+                    {/* <button className="sa-btn sa-btn--blue" onClick={() => setAssignModal({ dossier: d, type: 'admission' })} title="Assigner conseiller"><UserCheck size={14}/></button> */}
                     <button className="sa-btn sa-btn--orange" onClick={() => setStatusModal(d)} title="Changer statut"><Pencil size={14}/></button>
                     {d.etudiant?.email && <button className="sa-btn sa-btn--green" onClick={() => openMessageModal(token, d.etudiant.email, `${d.etudiant.prenom} ${d.etudiant.nom}`)} title="Envoyer message"><Send size={14}/></button>}
                   </div></td>
@@ -214,7 +277,7 @@ function PageDossiers({ token }) {
           </table>
         </div>
       </TableWrap>
-      {assignModal && <ModalAssignConseiller token={token} dossier={assignModal} onClose={() => setAssignModal(null)} onSuccess={fetch}/>}
+      {assignModal && <ModalAssignConseiller token={token} dossier={assignModal.dossier} defaultType={assignModal.type} onClose={() => setAssignModal(null)} onSuccess={fetch}/>}
       {statusModal && <ModalDossierStatus token={token} dossier={statusModal} onClose={() => setStatusModal(null)} onSuccess={fetch}/>}
     </div>
   );
