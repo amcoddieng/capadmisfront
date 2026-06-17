@@ -26,7 +26,7 @@ export default function ModalMessage({ token, destinataireEmail, destinataireLab
   return (
     <div style={{
       position:'fixed',inset:0,zIndex:1000,display:'flex',alignItems:'center',justifyContent:'center',
-      background:'rgba(15,23,42,.45)',backdropFilter:'blur(4px)'
+      background:'rgba(12,28,63,.45)',backdropFilter:'blur(4px)'
     }} onClick={onClose}>
       <div style={{
         background:'#fff',borderRadius:'.75rem',width:'100%',maxWidth:480,boxShadow:'0 25px 50px -12px rgba(0,0,0,.25)',
@@ -34,7 +34,7 @@ export default function ModalMessage({ token, destinataireEmail, destinataireLab
       }} onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div style={{
-          background:'linear-gradient(135deg,#2563eb 0%,#1e3a5f 100%)',color:'#fff',
+          background:'#0c1c3f',color:'#fff',
           padding:'1.1rem 1.25rem',display:'flex',alignItems:'center',gap:'.75rem'
         }}>
           <div style={{width:36,height:36,borderRadius:'.5rem',background:'rgba(255,255,255,.2)',display:'flex',alignItems:'center',justifyContent:'center'}}>
@@ -54,7 +54,7 @@ export default function ModalMessage({ token, destinataireEmail, destinataireLab
             <span style={{fontSize:'.8rem',color:'#64748b'}}>À :</span>
             <span style={{
               display:'inline-flex',alignItems:'center',gap:'.35rem',
-              background:'#eff6ff',color:'#1e40af',border:'1px solid #bfdbfe',
+              background:'#f5f0e4',color:'#0c1c3f',border:'1px solid #efe3cb',
               borderRadius:'999px',padding:'.25rem .65rem',fontSize:'.8rem',fontWeight:500
             }}>
               <User size={12}/> {destinataireLabel || destinataireEmail}
@@ -71,13 +71,13 @@ export default function ModalMessage({ token, destinataireEmail, destinataireLab
               <textarea
                 style={{
                   width:'100%',minHeight:120,padding:'.75rem 1rem',
-                  border:'1px solid #e2e8f0',borderRadius:'.5rem',
-                  fontSize:'.9rem',color:'#1e293b',resize:'vertical',
+                  border:'1px solid #d5dce8',borderRadius:'.5rem',
+                  fontSize:'.9rem',color:'#1a2a4a',resize:'vertical',
                   outline:'none',transition:'border .15s,box-shadow .15s',
                   fontFamily:'inherit',lineHeight:1.5
                 }}
-                onFocus={e => { e.target.style.borderColor='#2563eb'; e.target.style.boxShadow='0 0 0 3px rgba(37,99,235,.12)'; }}
-                onBlur={e => { e.target.style.borderColor='#e2e8f0'; e.target.style.boxShadow='none'; }}
+                onFocus={e => { e.target.style.borderColor='#c5a150'; e.target.style.boxShadow='0 0 0 3px rgba(197,161,80,.12)'; }}
+                onBlur={e => { e.target.style.borderColor='#d5dce8'; e.target.style.boxShadow='none'; }}
                 placeholder="Écrivez votre message ici…"
                 value={contenu}
                 onChange={e => setContenu(e.target.value)}
@@ -120,7 +120,7 @@ export default function ModalMessage({ token, destinataireEmail, destinataireLab
             form="msg-modal-form"
             disabled={loading || !contenu.trim()}
             style={{
-              background: loading || !contenu.trim() ? '#cbd5e1' : '#2563eb',
+              background: loading || !contenu.trim() ? '#b3c0d5' : '#c5a150',
               color:'#fff',border:'none',borderRadius:'.5rem',
               padding:'.45rem 1rem',fontSize:'.85rem',fontWeight:500,
               cursor: loading || !contenu.trim() ? 'not-allowed' : 'pointer',

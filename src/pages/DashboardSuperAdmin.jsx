@@ -1,10 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  GraduationCap, LogOut, LayoutDashboard, FolderOpen, Users, UserCheck,
+  LogOut, LayoutDashboard, FolderOpen, Users, UserCheck,
   History, MessageSquare, Bell, Menu, X, CreditCard, Plus, Pencil,
-  Trash2, Lock, Unlock, Loader, AlertCircle, CheckCircle, Send,
+  Trash2, Lock, Unlock, Loader, AlertCircle, CheckCircle, Send, Eye,
 } from 'lucide-react';
+import logoHeader from '../assets/les images du site/logo-horizontal-2x.png';
+import DossierDetailConseiller from '../components/DossierDetailConseiller';
 import {
   getPersonnelSession, clearPersonnelSession,
   apiListPersonnel, apiCreatePersonnel, apiUpdatePersonnel, apiDeletePersonnel, apiToggleBlockPersonnel,
@@ -172,13 +174,14 @@ function ModalDossierStatus({ token, dossier, onClose, onSuccess }) {
 }
 
 /* ── Page Dossiers ── */
-function PageDossiers({ token }) {
+function PageDossiers({ token, personnel }) {
   const { openMessageModal } = useMessageModal();
   const [dossiers, setDossiers] = useState([]);
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState('');
   const [assignModal, setAssignModal] = useState(null);
   const [statusModal, setStatusModal] = useState(null);
+  const [detailDossier, setDetailDossier] = useState(null);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [filterAdmission, setFilterAdmission] = useState('');
@@ -267,7 +270,7 @@ function PageDossiers({ token }) {
                     )}
                   </td>
                   <td><div className="sa-actions">
-                    {/* <button className="sa-btn sa-btn--blue" onClick={() => setAssignModal({ dossier: d, type: 'admission' })} title="Assigner conseiller"><UserCheck size={14}/></button> */}
+                    <button className="sa-btn sa-btn--blue" onClick={() => setDetailDossier(d)} title="Voir le dossier"><Eye size={14}/></button>
                     <button className="sa-btn sa-btn--orange" onClick={() => setStatusModal(d)} title="Changer statut"><Pencil size={14}/></button>
                     {d.etudiant?.email && <button className="sa-btn sa-btn--green" onClick={() => openMessageModal(token, d.etudiant.email, `${d.etudiant.prenom} ${d.etudiant.nom}`)} title="Envoyer message"><Send size={14}/></button>}
                   </div></td>
@@ -279,6 +282,15 @@ function PageDossiers({ token }) {
       </TableWrap>
       {assignModal && <ModalAssignConseiller token={token} dossier={assignModal.dossier} defaultType={assignModal.type} onClose={() => setAssignModal(null)} onSuccess={fetch}/>}
       {statusModal && <ModalDossierStatus token={token} dossier={statusModal} onClose={() => setStatusModal(null)} onSuccess={fetch}/>}
+      {detailDossier && (
+        <DossierDetailConseiller
+          token={token}
+          personnel={personnel}
+          dossier={detailDossier}
+          onClose={() => setDetailDossier(null)}
+          onRefresh={fetch}
+        />
+      )}
     </div>
   );
 }
@@ -343,7 +355,7 @@ function ModalEtudiant({ token, etudiant, onClose, onSuccess }) {
 }
 
 /* ── Page Étudiants ── */
-function PageEtudiants({ token }) {
+function PageEtudiants({ token, personnel }) {
   const { openMessageModal } = useMessageModal();
   const [etudiants, setEtudiants] = useState([]);
   const [loading, setLoading]     = useState(true);
@@ -352,11 +364,37 @@ function PageEtudiants({ token }) {
   const [modal, setModal]         = useState(undefined);
   const [toggling, setToggling]   = useState(null);
   const [deleting, setDeleting]   = useState(null);
+  const [search, setSearch] = useState('');
+  const [filterStatut, setFilterStatut] = useState('');
+  const [detailDossier, setDetailDossier] = useState(null);
+  const [loadingDossier, setLoadingDossier] = useState(false);
   const fetch = useCallback(async () => {
     setLoading(true); setError('');
     try { setEtudiants(await apiListEtudiants(token)); } catch (e) { setError(e.message); } finally { setLoading(false); }
   }, [token]);
   useEffect(() => { fetch(); }, [fetch]);
+
+  const handleVoir = async (etudiant) => {
+    setLoadingDossier(true);
+    try {
+      const dossiers = await apiListDossiers(token);
+      const d = dossiers.find(ds => ds.etudiant?.id === etudiant.id || ds.etudiant?.email === etudiant.email);
+      if (d) { setDetailDossier(d); }
+      else { alert('Cet étudiant n\'a pas encore de dossier.'); }
+    } catch (e) { alert(e.message); } finally { setLoadingDossier(false); }
+  };
+
+  const filtered = etudiants.filter(e => {
+    const q = search.trim().toLowerCase();
+    const matchSearch = !q ||
+      e.prenom?.toLowerCase().includes(q) ||
+      e.nom?.toLowerCase().includes(q) ||
+      e.email?.toLowerCase().includes(q) ||
+      e.ville?.toLowerCase().includes(q) ||
+      e.code_dossier?.toLowerCase().includes(q);
+    const matchStatut = !filterStatut || (filterStatut === 'bloque' ? e.bloque : !e.bloque);
+    return matchSearch && matchStatut;
+  });
   const handleBlock = async (id) => {
     setToggling(id); setActionErr('');
     try { await apiToggleBlockEtudiant(token, id); await fetch(); } catch (e) { setActionErr(e.message); } finally { setToggling(null); }
@@ -372,21 +410,39 @@ function PageEtudiants({ token }) {
         <h2 className="cons-page__title" style={{margin:0}}>Gestion étudiants</h2>
         <button className="form-submit" style={{padding:'.4rem .875rem'}} onClick={() => setModal(null)}><Plus size={14}/> Ajouter</button>
       </div>
-      <p className="cons-page__sub">{etudiants.length} étudiant(s) enregistré(s).</p>
+      <p className="cons-page__sub">{filtered.length} étudiant(s) sur {etudiants.length} enregistré(s).</p>
+
+      {/* ── Recherche et filtres étudiants ── */}
+      <div style={{ display: 'flex', gap: '.75rem', flexWrap: 'wrap', alignItems: 'center', marginBottom: '1.25rem', background: '#fff', padding: '.75rem 1rem', borderRadius: '.5rem', border: '1px solid #e2e8f0' }}>
+        <input
+          type="text"
+          placeholder="Rechercher (prénom, nom, email, ville, code dossier...)"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ flex: 1, minWidth: 200, padding: '.4rem .6rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.85rem' }}
+        />
+        <select value={filterStatut} onChange={e => setFilterStatut(e.target.value)} style={{ padding: '.4rem .6rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.85rem' }}>
+          <option value="">Tous statuts</option>
+          <option value="actif">Actif</option>
+          <option value="bloque">Bloqué</option>
+        </select>
+      </div>
+
       {actionErr && <div className="auth-error" style={{margin:'0 0 .75rem'}}><AlertCircle size={15}/> {actionErr}</div>}
       <TableWrap loading={loading} error={error}>
         <div className="sa-table-wrap">
           <table className="sa-table">
             <thead><tr><th>Prénom</th><th>Nom</th><th>Email</th><th>Ville</th><th>Pays</th><th>Statut</th><th>Actions</th></tr></thead>
             <tbody>
-              {etudiants.length === 0 && <tr><td colSpan={7} className="sa-empty">Aucun étudiant</td></tr>}
-              {etudiants.map(e => (
+              {filtered.length === 0 && <tr><td colSpan={7} className="sa-empty">Aucun étudiant trouvé</td></tr>}
+              {filtered.map(e => (
                 <tr key={e.id}>
                   <td>{e.prenom}</td><td>{e.nom}</td>
                   <td style={{fontSize:'.8rem'}}>{e.email}</td>
                   <td>{e.ville||'—'}</td><td>{e.payes||'—'}</td>
                   <td><span className={`status-badge status-badge--${e.bloque?'red':'green'}`}>{e.bloque?'Bloqué':'Actif'}</span></td>
                   <td><div className="sa-actions">
+                    <button className="sa-btn sa-btn--blue" onClick={() => handleVoir(e)} disabled={loadingDossier} title="Voir le dossier"><Eye size={14}/></button>
                     <button className="sa-btn sa-btn--blue" onClick={() => setModal(e)} title="Modifier"><Pencil size={14}/></button>
                     <button className={`sa-btn ${e.bloque?'sa-btn--green':'sa-btn--orange'}`} onClick={() => handleBlock(e.id)} disabled={toggling===e.id} title={e.bloque?'Débloquer':'Bloquer'}>
                       {toggling===e.id ? <Loader size={14} className="auth-spinner"/> : e.bloque ? <Unlock size={14}/> : <Lock size={14}/>}
@@ -403,6 +459,15 @@ function PageEtudiants({ token }) {
         </div>
       </TableWrap>
       {modal !== undefined && <ModalEtudiant token={token} etudiant={modal} onClose={() => setModal(undefined)} onSuccess={fetch}/>}
+      {detailDossier && (
+        <DossierDetailConseiller
+          token={token}
+          personnel={personnel}
+          dossier={detailDossier}
+          onClose={() => setDetailDossier(null)}
+          onRefresh={fetch}
+        />
+      )}
     </div>
   );
 }
@@ -471,11 +536,40 @@ function PageConseillers({ token }) {
   const [modal, setModal]         = useState(undefined);
   const [toggling, setToggling]   = useState(null);
   const [deleting, setDeleting]   = useState(null);
+  const [search, setSearch] = useState('');
+  const [filterRole, setFilterRole] = useState('');
+  const [filterStatut, setFilterStatut] = useState('');
+  const [dossiersModal, setDossiersModal] = useState(null);
+  const [loadingDossiers, setLoadingDossiers] = useState(false);
   const fetch = useCallback(async () => {
     setLoading(true); setError('');
     try { setPersonnel(await apiListPersonnel(token)); } catch (e) { setError(e.message); } finally { setLoading(false); }
   }, [token]);
   useEffect(() => { fetch(); }, [fetch]);
+
+  const handleVoirDossiers = async (membre) => {
+    setLoadingDossiers(true);
+    try {
+      const all = await apiListDossiers(token);
+      const assigned = all.filter(d =>
+        d.conseiller_admission?.id === membre.id ||
+        d.conseiller_visa?.id === membre.id
+      );
+      setDossiersModal({ membre, dossiers: assigned });
+    } catch (e) { alert(e.message); } finally { setLoadingDossiers(false); }
+  };
+
+  const filtered = personnel.filter(m => {
+    const q = search.trim().toLowerCase();
+    const matchSearch = !q ||
+      m.prenom?.toLowerCase().includes(q) ||
+      m.nom?.toLowerCase().includes(q) ||
+      m.email?.toLowerCase().includes(q) ||
+      m.code?.toLowerCase().includes(q);
+    const matchRole   = !filterRole   || m.role === filterRole;
+    const matchStatut = !filterStatut || (filterStatut === 'bloque' ? m.bloque : !m.bloque);
+    return matchSearch && matchRole && matchStatut;
+  });
   const handleBlock = async (id) => {
     setToggling(id); setActionErr('');
     try { await apiToggleBlockPersonnel(token, id); await fetch(); } catch (e) { setActionErr(e.message); } finally { setToggling(null); }
@@ -491,15 +585,36 @@ function PageConseillers({ token }) {
         <h2 className="cons-page__title" style={{margin:0}}>Gestion des conseillers</h2>
         <button className="form-submit" style={{padding:'.4rem .875rem'}} onClick={() => setModal(null)}><Plus size={14}/> Ajouter</button>
       </div>
-      <p className="cons-page__sub">{personnel.length} membre(s) du personnel.</p>
+      <p className="cons-page__sub">{filtered.length} membre(s) sur {personnel.length} au total.</p>
+
+      {/* ── Recherche et filtres conseillers ── */}
+      <div style={{ display: 'flex', gap: '.75rem', flexWrap: 'wrap', alignItems: 'center', marginBottom: '1.25rem', background: '#fff', padding: '.75rem 1rem', borderRadius: '.5rem', border: '1px solid #e2e8f0' }}>
+        <input
+          type="text"
+          placeholder="Rechercher (prénom, nom, email, code...)"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ flex: 1, minWidth: 200, padding: '.4rem .6rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.85rem' }}
+        />
+        <select value={filterRole} onChange={e => setFilterRole(e.target.value)} style={{ padding: '.4rem .6rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.85rem' }}>
+          <option value="">Tous rôles</option>
+          {ROLES_PERSONNEL.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+        </select>
+        <select value={filterStatut} onChange={e => setFilterStatut(e.target.value)} style={{ padding: '.4rem .6rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.85rem' }}>
+          <option value="">Tous statuts</option>
+          <option value="actif">Actif</option>
+          <option value="bloque">Bloqué</option>
+        </select>
+      </div>
+
       {actionErr && <div className="auth-error" style={{margin:'0 0 .75rem'}}><AlertCircle size={15}/> {actionErr}</div>}
       <TableWrap loading={loading} error={error}>
         <div className="sa-table-wrap">
           <table className="sa-table">
             <thead><tr><th>Prénom</th><th>Nom</th><th>Email</th><th>Code</th><th>Rôle</th><th>Statut</th><th>Actions</th></tr></thead>
             <tbody>
-              {personnel.length === 0 && <tr><td colSpan={7} className="sa-empty">Aucun membre</td></tr>}
-              {personnel.map(m => (
+              {filtered.length === 0 && <tr><td colSpan={7} className="sa-empty">Aucun membre trouvé</td></tr>}
+              {filtered.map(m => (
                 <tr key={m.id}>
                   <td>{m.prenom}</td><td>{m.nom}</td>
                   <td style={{fontSize:'.8rem'}}>{m.email}</td>
@@ -507,6 +622,7 @@ function PageConseillers({ token }) {
                   <td><span className="status-badge status-badge--blue">{ROLE_LABELS_PERS[m.role]||m.role}</span></td>
                   <td><span className={`status-badge status-badge--${m.bloque?'red':'green'}`}>{m.bloque?'Bloqué':'Actif'}</span></td>
                   <td><div className="sa-actions">
+                    <button className="sa-btn sa-btn--blue" onClick={() => handleVoirDossiers(m)} disabled={loadingDossiers} title="Voir les dossiers"><FolderOpen size={14}/></button>
                     <button className="sa-btn sa-btn--blue" onClick={() => setModal(m)} title="Modifier"><Pencil size={14}/></button>
                     <button className={`sa-btn ${m.bloque?'sa-btn--green':'sa-btn--orange'}`} onClick={() => handleBlock(m.id)} disabled={toggling===m.id} title={m.bloque?'Débloquer':'Bloquer'}>
                       {toggling===m.id ? <Loader size={14} className="auth-spinner"/> : m.bloque ? <Unlock size={14}/> : <Lock size={14}/>}
@@ -523,6 +639,40 @@ function PageConseillers({ token }) {
         </div>
       </TableWrap>
       {modal !== undefined && <ModalPersonnel token={token} membre={modal} onClose={() => setModal(undefined)} onSuccess={fetch}/>}
+
+      {/* ── Modal dossiers du conseiller ── */}
+      {dossiersModal && (
+        <div className="modal-overlay" onClick={() => setDossiersModal(null)}>
+          <div className="modal" style={{ maxWidth: 800, width: '92vw', maxHeight: '92vh', overflow: 'auto' }} onClick={e => e.stopPropagation()}>
+            <div className="modal__header">
+              <h3 className="modal__title">Dossiers de {dossiersModal.membre.prenom} {dossiersModal.membre.nom}</h3>
+              <button className="modal__close" onClick={() => setDossiersModal(null)}><X size={18}/></button>
+            </div>
+            <div className="modal__body">
+              {dossiersModal.dossiers.length === 0 ? (
+                <p style={{color:'#94a3b8',textAlign:'center',padding:'1rem'}}>Aucun dossier assigné à ce conseiller.</p>
+              ) : (
+                <div className="sa-table-wrap">
+                  <table className="sa-table">
+                    <thead><tr><th>Code</th><th>Étudiant</th><th>Statut global</th><th>Admission</th><th>Visa</th></tr></thead>
+                    <tbody>
+                      {dossiersModal.dossiers.map(d => (
+                        <tr key={d.id}>
+                          <td><code className="sa-code">{d.code_dossier}</code></td>
+                          <td>{d.etudiant ? `${d.etudiant.prenom} ${d.etudiant.nom}` : '—'}</td>
+                          <td><StatusBadge value={d.status}/></td>
+                          <td><StatusBadge value={d.status_admission}/></td>
+                          <td><StatusBadge value={d.status_visa}/></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -585,8 +735,8 @@ export default function DashboardSuperAdmin() {
   const renderPage = () => {
     switch (activePage) {
       case 'dashboard':     return <PageDashboard />;
-      case 'dossiers':      return <PageDossiers token={token} />;
-      case 'etudiants':     return <PageEtudiants token={token} />;
+      case 'dossiers':      return <PageDossiers token={token} personnel={personnel} />;
+      case 'etudiants':     return <PageEtudiants token={token} personnel={personnel} />;
       case 'conseillers':   return <PageConseillers token={token} />;
       case 'paiement':      return <PagePaiement />;
       case 'historique':    return <PageHistorique />;
@@ -601,8 +751,7 @@ export default function DashboardSuperAdmin() {
       {/* ── Header ── */}
       <header className="cons-header sa-header">
         <div className="cons-header__brand">
-          <GraduationCap size={22} />
-          <span>Capadmis</span>
+          <img src={logoHeader} alt="Capadmis" style={{ height: 28, width: 'auto', display: 'block' }} />
           <span className="cons-header__role-badge sa-badge">Super Admin</span>
         </div>
 

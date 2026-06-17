@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle, Star, BarChart3, Shield, Award, Globe, Zap, TrendingUp } from 'lucide-react';
+import heroImage from '../assets/hero.png';
 
 const steps = [
   { title: 'Analyse du profil', desc: 'Évaluation complète de votre parcours académique et de vos objectifs.' },
@@ -43,66 +44,24 @@ export default function Home() {
     <main>
 
       {/* ── HERO ── */}
-      <section className="hero">
-        <div className="hero__bg">
-          <div className="hero__blob-1" />
-          <div className="hero__blob-2" />
-        </div>
+      <section
+        className="hero"
+        style={{
+          backgroundImage: `url(${heroImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
+        <div className="hero__overlay" />
         <div className="hero__content">
-          <div className="hero__text">
-            <div className="hero__badge">
-              <Globe size={16} />
-              <span>France, Canada, Allemagne, Belgique...</span>
-            </div>
-            <h1 className="hero__title">
-              Votre admission
-              <span className="hero__title-gradient">sans complexité</span>
-            </h1>
-            <p className="hero__desc">
-              Accompagnement numérique de l'orientation à l'obtention du visa.
-              Transparent, structuré et 3x moins cher qu'une agence.
-            </p>
-            <div className="hero__actions">
-              <Link to="/inscription" className="btn btn--hero-primary">
-                Commencer ma procédure <ArrowRight size={18} />
-              </Link>
-              <Link to="/analyse" className="btn btn--hero-secondary">
-                Analyser mes chances
-              </Link>
-            </div>
-          </div>
-
-          <div className="hero__dashboard">
-            <div className="dashboard-card">
-              <div className="dashboard-card__header">
-                <div className="dashboard-card__icon"><Award size={20} /></div>
-                <div>
-                  <div className="dashboard-card__title">Tableau de bord</div>
-                  <div className="dashboard-card__subtitle">Suivi en temps réel</div>
-                </div>
-                <span className="dashboard-card__badge">En cours</span>
-              </div>
-              <div className="dashboard-card__steps">
-                {dashboardItems.map((item) => (
-                  <div key={item.label} className="dashboard-step">
-                    <div className={`dashboard-step__icon ${item.done ? 'dashboard-step__icon--done' : 'dashboard-step__icon--pending'}`}>
-                      <CheckCircle size={13} />
-                    </div>
-                    <span className={item.done ? 'dashboard-step__label--done' : 'dashboard-step__label--pending'}>
-                      {item.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <div className="dashboard-card__progress">
-                <div className="dashboard-card__progress-header">
-                  <span>Progression</span><span>60%</span>
-                </div>
-                <div className="dashboard-card__progress-bar">
-                  <div className="dashboard-card__progress-fill" />
-                </div>
-              </div>
-            </div>
+          <div className="hero__actions">
+            <Link to="/inscription" className="btn btn--hero-primary">
+              Commencer ma procédure <ArrowRight size={18} />
+            </Link>
+            <Link to="/analyse" className="btn btn--hero-secondary">
+              Analyser mes chances
+            </Link>
           </div>
         </div>
       </section>

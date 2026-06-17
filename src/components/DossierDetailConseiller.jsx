@@ -24,7 +24,7 @@ function StatusBadge({ value, size = 'sm' }) {
     green: { bg: '#dcfce7', text: '#166534', border: '#bbf7d0' },
     red:   { bg: '#fee2e2', text: '#991b1b', border: '#fecaca' },
     orange:{ bg: '#ffedd5', text: '#9a3412', border: '#fed7aa' },
-    blue:  { bg: '#dbeafe', text: '#1e40af', border: '#bfdbfe' },
+    blue:  { bg: '#f5f0e4', text: '#0c1c3f', border: '#efe3cb' },
   };
   const style = colors[c];
   const padding = size === 'lg' ? '.5rem 1rem' : '.2rem .55rem';
@@ -41,14 +41,14 @@ function StatusBadge({ value, size = 'sm' }) {
 }
 
 /* ── Modal changer statut ── */
-function ModalChangerStatut({ token, dossier, isAdmission, isVisa, onClose, onSuccess }) {
+function ModalChangerStatut({ token, dossier, isAdmin, isAdmission, isVisa, onClose, onSuccess }) {
   const [status, setStatus] = useState(dossier.status);
   const [statusAdmission, setStatusAdmission] = useState(dossier.status_admission);
   const [statusVisa, setStatusVisa] = useState(dossier.status_visa);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  const isConseiller = isAdmission || isVisa;
+  const isConseiller = isAdmin || isAdmission || isVisa;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,8 +56,8 @@ function ModalChangerStatut({ token, dossier, isAdmission, isVisa, onClose, onSu
     try {
       const payload = {};
       if (!isConseiller) payload.status = status;
-      if (isAdmission) payload.status_admission = statusAdmission;
-      if (isVisa) payload.status_visa = statusVisa;
+      if (isAdmin || isAdmission) payload.status_admission = statusAdmission;
+      if (isAdmin || isVisa) payload.status_visa = statusVisa;
       await apiUpdateDossierStatus(token, dossier.id, payload);
       onSuccess();
     } catch (e) { setError(e.message); } finally { setSaving(false); }
@@ -81,7 +81,7 @@ function ModalChangerStatut({ token, dossier, isAdmission, isVisa, onClose, onSu
                 </select>
               </div>
             )}
-            {isAdmission && (
+            {(isAdmin || isAdmission) && (
               <div className="form-group">
                 <label className="form-label">Statut admission</label>
                 <select className="form-select" value={statusAdmission} onChange={e => setStatusAdmission(e.target.value)}>
@@ -89,7 +89,7 @@ function ModalChangerStatut({ token, dossier, isAdmission, isVisa, onClose, onSu
                 </select>
               </div>
             )}
-            {isVisa && (
+            {(isAdmin || isVisa) && (
               <div className="form-group">
                 <label className="form-label">Statut visa</label>
                 <select className="form-select" value={statusVisa} onChange={e => setStatusVisa(e.target.value)}>
@@ -261,6 +261,82 @@ const PJ_TYPES = [
   { value: 'AUTRE', label: 'Autre document' },
 ];
 
+const NIVEAUX_LISTE    = ['Licence 1', 'Licence 2', 'Licence 3', 'Master 1', 'Master 2', 'Doctorat', 'BTS', 'DUT', 'Prépa', 'Autre'];
+const PAYS_CIBLE_LISTE = ['France', 'Canada', 'Belgique', 'Suisse', 'Espagne', 'Allemagne', 'Royaume-Uni', 'Italie', 'Portugal', 'Maroc', 'Autre'];
+
+/* ── Modal infos académiques ── */
+function ModalInfosAcademiques({ token, codeDossier, infos, onClose, onSuccess }) {
+  const [form, setForm] = useState({
+    niveau_etude:    infos?.niveau_etude || '',
+    pays_souhaite:   infos?.pays_souhaite || '',
+    filieres:        infos?.filieres?.join(', ') || '',
+    nombre_fois_bac: infos?.nombre_fois_bac ?? 1,
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const set = (f, v) => setForm(p => ({ ...p, [f]: v }));
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true); setError('');
+    try {
+      await apiPutInfosDossier(token, codeDossier, {
+        niveau_etude:    form.niveau_etude,
+        pays_souhaite:   form.pays_souhaite,
+        filieres:        form.filieres.split(',').map(s => s.trim()).filter(Boolean),
+        nombre_fois_bac: Number(form.nombre_fois_bac),
+      });
+      await onSuccess();
+      onClose();
+    } catch (e) { setError(e.message); } finally { setSaving(false); }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{ maxWidth: 480 }} onClick={ev => ev.stopPropagation()}>
+        <div className="modal__header">
+          <h3 className="modal__title">Modifier les informations académiques</h3>
+          <button className="modal__close" onClick={onClose}><X size={18}/></button>
+        </div>
+        <div className="modal__body">
+          {error && <div className="auth-error" style={{margin:'0 0 1rem'}}><AlertCircle size={15}/> {error}</div>}
+          <form onSubmit={handleSubmit} style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
+            <div className="form-group">
+              <label className="form-label">Niveau d'étude</label>
+              <select className="form-select" value={form.niveau_etude} onChange={e => set('niveau_etude', e.target.value)} required>
+                <option value="">Sélectionner</option>
+                {NIVEAUX_LISTE.map(n => <option key={n} value={n}>{n}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Pays souhaité</label>
+              <select className="form-select" value={form.pays_souhaite} onChange={e => set('pays_souhaite', e.target.value)} required>
+                <option value="">Sélectionner</option>
+                {PAYS_CIBLE_LISTE.map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">Filières souhaitées <span style={{ color: '#94a3b8', fontWeight: 400 }}>(séparées par des virgules)</span></label>
+              <input className="form-input" value={form.filieres} onChange={e => set('filieres', e.target.value)} placeholder="Ex: Informatique, Génie logiciel" required />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Nombre de fois au bac</label>
+              <input type="number" min={1} className="form-input" value={form.nombre_fois_bac} onChange={e => set('nombre_fois_bac', e.target.value)} required />
+            </div>
+            <div className="modal__footer" style={{marginTop:0}}>
+              <button type="button" className="form-back" onClick={onClose}>Annuler</button>
+              <button type="submit" className="form-submit" disabled={saving}>
+                {saving ? <Loader size={14} className="auth-spinner"/> : <CheckCircle size={14}/>}
+                {saving ? 'Enregistrement…' : 'Enregistrer'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Composant principal ── */
 export default function DossierDetailConseiller({ token, personnel, dossier, onClose, onRefresh, onOpenChat, asPage }) {
   const { openMessageModal } = useMessageModal();
@@ -279,6 +355,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
   const [deletingUniv, setDeletingUniv] = useState(null);
   const [preview, setPreview] = useState(null);
   const [previewLoading, setPreviewLoading] = useState(null);
+  const [infosModal, setInfosModal] = useState(false);
 
   const fetchDetails = useCallback(async () => {
     setLoading(true); setError('');
@@ -313,6 +390,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
     finally { setPreviewLoading(null); }
   };
 
+  const isAdmin     = personnel.role?.includes('admin');
   const isAdmission = personnel.role?.includes('admission');
   const isVisa      = personnel.role?.includes('visa');
 
@@ -360,13 +438,13 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
   const cardBody = { padding:'1.25rem' };
   const infoRow = { display:'flex', alignItems:'center', gap:'.6rem', padding:'.4rem 0', fontSize:'.875rem', color:'#334155' };
   const labelStyle = { color:'#64748b', minWidth:110, fontSize:'.8rem', fontWeight:500 };
-  const btnPrimary = { background:'#2563eb', color:'#fff', border:'none', borderRadius:'.5rem', padding:'.4rem .85rem', fontSize:'.8rem', fontWeight:500, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:'.35rem' };
+  const btnPrimary = { background:'#c5a150', color:'#fff', border:'none', borderRadius:'.5rem', padding:'.4rem .85rem', fontSize:'.8rem', fontWeight:500, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:'.35rem' };
   const btnGhost = { background:'#f1f5f9', color:'#475569', border:'1px solid #e2e8f0', borderRadius:'.5rem', padding:'.4rem .85rem', fontSize:'.8rem', fontWeight:500, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:'.35rem' };
 
   const SectionCard = ({ icon: Icon, title, children, action }) => (
     <section style={cardStyle}>
       <div style={cardHeader}>
-        {Icon && <Icon size={16} color="#2563eb"/>}
+        {Icon && <Icon size={16} color="#c5a150"/>}
         <span style={{flex:1}}>{title}</span>
         {action}
       </div>
@@ -384,7 +462,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
         <div style={{display:'flex',flexDirection:'column',gap:'1.25rem'}}>
 
           {/* ── Header étudiant ── */}
-          <div style={{display:'flex',alignItems:'center',gap:'1.25rem',background:'linear-gradient(135deg,#1e3a5f 0%,#2563eb 100%)',borderRadius:'.75rem',padding:'1.25rem 1.5rem',color:'#fff'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'1.25rem',background:'#0c1c3f',borderRadius:'.75rem',padding:'1.25rem 1.5rem',color:'#fff'}}>
             <div style={{width:56,height:56,borderRadius:'50%',background:'rgba(255,255,255,.2)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.25rem',fontWeight:700}}>
               {dossier.etudiant?.prenom?.charAt(0)}{dossier.etudiant?.nom?.charAt(0)}
             </div>
@@ -440,6 +518,9 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
           {/* ── Infos académiques ── */}
           <SectionCard icon={BookOpen} title="Informations académiques" action={infos && (
             <div style={{display:'flex',alignItems:'center',gap:'.5rem'}}>
+              <button style={{...btnGhost,fontSize:'.75rem',padding:'.2rem .5rem'}} onClick={() => setInfosModal(true)} title="Modifier">
+                <Pencil size={12}/> Modifier
+              </button>
               <span style={{fontSize:'.75rem',color:'#64748b'}}>Statut :</span>
               <select
                 className="form-select"
@@ -469,7 +550,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
           {/* ── Pièces jointes ── */}
           <SectionCard icon={FileText} title={`Pièces jointes (${pieces.length})`} action={
             <div style={{display:'flex',alignItems:'center',gap:'.5rem',flexWrap:'wrap'}}>
-              {/* <select
+              <select
                 className="form-select"
                 style={{fontSize:'.75rem',padding:'.25rem .5rem',borderRadius:'.4rem',minWidth:160}}
                 value={uploadType}
@@ -478,11 +559,11 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
               >
                 <option value="">Type de document…</option>
                 {PJ_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-              </select> */}
-              {/* <label style={{...btnPrimary,cursor:'pointer',opacity:uploadType?1:.6}}>
+              </select>
+              <label style={{...btnPrimary,cursor:'pointer',opacity:uploadType?1:.6}}>
                 <Upload size={12}/> Ajouter
                 <input type="file" style={{display:'none'}} onChange={handleAddPieceJointe} disabled={uploading || !uploadType}/>
-              </label> */}
+              </label>
             </div>
           }>
             {uploading && (
@@ -525,7 +606,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
           </SectionCard>
 
           {/* ── Dossiers université ── */}
-          <SectionCard icon={School} title={`Dossiers université (${dossiersUniv.length})`} action={isAdmission ? (
+          <SectionCard icon={School} title={`Dossiers université (${dossiersUniv.length})`} action={(isAdmin || isAdmission) ? (
             <button style={btnPrimary} onClick={() => setUnivModal({})}><Plus size={12}/> Ajouter</button>
           ) : null}>
             {dossiersUniv.length === 0 ? (
@@ -562,7 +643,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
                         <span style={{fontSize:'.72rem',fontWeight:600,background:stColor.bg,color:stColor.text,border:`1px solid ${stColor.border}`,padding:'.15rem .5rem',borderRadius:'999px'}}>
                           {UNIV_STATUS_OPTIONS.find(s => s.value === u.statut)?.label || u.statut}
                         </span>
-                        {isAdmission && (
+                        {(isAdmin || isAdmission) && (
                           <div style={{display:'flex',gap:'.25rem'}}>
                             <button style={{...btnGhost,padding:'.25rem .4rem',fontSize:'.7rem'}} onClick={() => setUnivModal(u)} title="Modifier"><Pencil size={12}/></button>
                             <button style={{...btnGhost,padding:'.25rem .4rem',fontSize:'.7rem',color:'#dc2626'}} onClick={async () => {
@@ -599,7 +680,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
         </div>
         {content}
         {statusModal && (
-          <ModalChangerStatut token={token} dossier={dossier} isAdmission={isAdmission} isVisa={isVisa}
+          <ModalChangerStatut token={token} dossier={dossier} isAdmin={isAdmin} isAdmission={isAdmission} isVisa={isVisa}
             onClose={() => setStatusModal(false)} onSuccess={() => { setStatusModal(false); if (onRefresh) onRefresh(); }}/>
         )}
         {univModal !== null && (
@@ -608,6 +689,9 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
         )}
         {preview && (
           <ModalPreviewPJ piece={preview.piece} url={preview.url} onClose={() => setPreview(null)} />
+        )}
+        {infosModal && infos && (
+          <ModalInfosAcademiques token={token} codeDossier={dossier.code_dossier} infos={infos} onClose={() => setInfosModal(false)} onSuccess={fetchDetails} />
         )}
       </div>
     );
@@ -618,14 +702,14 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
       <div className="modal" style={{ maxWidth: 800, width: '92vw', maxHeight: '92vh', overflow: 'auto', borderRadius:'.75rem',padding:0 }} onClick={ev => ev.stopPropagation()}>
         <div className="modal__header" style={{background:'#f8fafc',borderBottom:'1px solid #e2e8f0',padding:'1rem 1.25rem'}}>
           <h3 className="modal__title" style={{fontSize:'1.05rem',display:'flex',alignItems:'center',gap:'.5rem'}}>
-            <span style={{background:'#1e3a5f',color:'#fff',padding:'.15rem .6rem',borderRadius:'.4rem',fontSize:'.8rem'}}>{dossier.code_dossier}</span>
+            <span style={{background:'#0c1c3f',color:'#fff',padding:'.15rem .6rem',borderRadius:'.4rem',fontSize:'.8rem'}}>{dossier.code_dossier}</span>
             Dossier étudiant
           </h3>
           <button className="modal__close" onClick={onClose}><X size={18}/></button>
         </div>
         <div className="modal__body" style={{padding:'1.25rem',background:'#f8fafc'}}>{content}</div>
         {statusModal && (
-          <ModalChangerStatut token={token} dossier={dossier} isAdmission={isAdmission} isVisa={isVisa}
+          <ModalChangerStatut token={token} dossier={dossier} isAdmin={isAdmin} isAdmission={isAdmission} isVisa={isVisa}
             onClose={() => setStatusModal(false)} onSuccess={() => { setStatusModal(false); onRefresh(); }}/>
         )}
         {univModal !== null && (
@@ -634,6 +718,9 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
         )}
         {preview && (
           <ModalPreviewPJ piece={preview.piece} url={preview.url} onClose={() => setPreview(null)} />
+        )}
+        {infosModal && infos && (
+          <ModalInfosAcademiques token={token} codeDossier={dossier.code_dossier} infos={infos} onClose={() => setInfosModal(false)} onSuccess={fetchDetails} />
         )}
       </div>
     </div>

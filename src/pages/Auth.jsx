@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, GraduationCap, ArrowRight, CheckCircle, AlertCircle, Loader } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, CheckCircle, AlertCircle, Loader } from 'lucide-react';
 import { apiLogin, apiRegister, apiGetDossier, saveSession } from '../api/auth';
+import logoAuth from '../assets/les images du site/logo-horizontal-white-bg - Copie.png';
 
 const paysOrigine = ['Sénégal', 'Côte d\'Ivoire', 'Mali', 'Guinée', 'Cameroun', 'Maroc', 'Burkina Faso', 'Togo', 'Bénin', 'Niger', 'Autre'];
 
@@ -70,11 +71,8 @@ export default function Auth() {
       <div className="auth-wrapper">
         {/* Logo */}
         <div className="auth-logo">
-          <Link to="/" className="auth-logo__link">
-            <div className="auth-logo__icon">
-              <GraduationCap size={22} color="white" />
-            </div>
-            Capadmis<span className="auth-logo__dot">.</span>
+          <Link to="/" className="auth-logo__link" style={{ padding: '0 .5rem' }}>
+            <img src={logoAuth} alt="Capadmis" style={{ height: 44, width: 'auto', display: 'block', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,.3))' }} />
           </Link>
         </div>
 

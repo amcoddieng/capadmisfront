@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { GraduationCap, Mail, Phone, MapPin, Globe, Share2 } from 'lucide-react';
+import { Mail, Phone, MapPin, Globe, Share2 } from 'lucide-react';
+import logoFooter from '../assets/les images du site/logo-horizontal-2x.png';
 
 const navLinks = [
   { label: 'À propos', path: '/a-propos' },
@@ -25,9 +26,8 @@ export default function Footer() {
       <div className="footer__main">
         {/* Brand */}
         <div>
-          <Link to="/" className="footer__logo">
-            <div className="footer__logo-icon"><GraduationCap size={18} /></div>
-            <span>Capadmis<span className="footer__logo-dot">.</span></span>
+          <Link to="/" className="footer__logo" style={{ display: 'flex', alignItems: 'center' }}>
+            <img src={logoFooter} alt="Capadmis" style={{ height: 32, width: 'auto', display: 'block' }} />
           </Link>
           <p className="footer__desc">
             La plateforme digitale d'accompagnement pour vos études à l'étranger.

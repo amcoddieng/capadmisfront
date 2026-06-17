@@ -1,16 +1,20 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, GraduationCap } from 'lucide-react';
+import {
+  Menu, X, Home, Info, FileText, CreditCard, Star, MessageSquare,
+  HelpCircle, Mail, BarChart3, ArrowRight,
+} from 'lucide-react';
+import logoNavbar from '../assets/les images du site/logo-navbar-dark - Copie.png';
 
 const navLinks = [
-  { label: 'Accueil', path: '/' },
-  { label: 'À propos', path: '/a-propos' },
-  { label: 'Procédure', path: '/procedure' },
-  { label: 'Tarifs', path: '/tarifs' },
-  { label: 'Pourquoi Capadmis.', path: '/pourquoi' },
-  { label: 'Témoignages', path: '/temoignages' },
-  { label: 'FAQ', path: '/faq' },
-  { label: 'Contact', path: '/contact' },
+  { label: 'Accueil', path: '/', icon: Home },
+  { label: 'À propos', path: '/a-propos', icon: Info },
+  { label: 'Procédure', path: '/procedure', icon: FileText },
+  { label: 'Tarifs', path: '/tarifs', icon: CreditCard },
+  { label: 'Pourquoi', path: '/pourquoi', icon: Star },
+  { label: 'Témoignages', path: '/temoignages', icon: MessageSquare },
+  { label: 'FAQ', path: '/faq', icon: HelpCircle },
+  { label: 'Contact', path: '/contact', icon: Mail },
 ];
 
 export default function Navbar() {
@@ -21,30 +25,37 @@ export default function Navbar() {
     <header className="navbar">
       <div className="navbar__inner">
         <Link to="/" className="navbar__logo">
-          <div className="navbar__logo-icon">
-            <GraduationCap size={18} />
-          </div>
-          <span>Capadmis<span className="navbar__logo-dot">.</span></span>
+          <img src={logoNavbar} alt="Capadmis" style={{ height: 36, width: 'auto', display: 'block' }} />
         </Link>
 
         <nav>
           <ul className="navbar__nav">
-            {navLinks.map((link) => (
-              <li key={link.path}>
-                <Link
-                  to={link.path}
-                  className={`navbar__nav-link${location.pathname === link.path ? ' navbar__nav-link--active' : ''}`}
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
+            {navLinks.map((link) => {
+              const Icon = link.icon;
+              return (
+                <li key={link.path}>
+                  <Link
+                    to={link.path}
+                    className={`navbar__nav-link${location.pathname === link.path ? ' navbar__nav-link--active' : ''}`}
+                  >
+                    <Icon size={14} />
+                    <span>{link.label}</span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
         <div className="navbar__actions">
-          <Link to="/analyse" className="btn btn--outline-sm">Analyser mes chances</Link>
-          <Link to="/inscription" className="btn btn--primary-sm">Commencer</Link>
+          <Link to="/analyse" className="btn btn--outline-sm navbar__cta-compact">
+            <BarChart3 size={14} />
+            <span>Analyse</span>
+          </Link>
+          <Link to="/inscription" className="btn btn--primary-sm navbar__cta-compact">
+            <span>Commencer</span>
+            <ArrowRight size={14} />
+          </Link>
         </div>
 
         <button className="navbar__toggle" onClick={() => setOpen(!open)} aria-label="Menu">
@@ -54,22 +65,26 @@ export default function Navbar() {
 
       {open && (
         <div className="navbar__mobile">
-          {navLinks.map((link) => (
-            <Link
-              key={link.path}
-              to={link.path}
-              onClick={() => setOpen(false)}
-              className={`navbar__mobile-link${location.pathname === link.path ? ' navbar__mobile-link--active' : ''}`}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const Icon = link.icon;
+            return (
+              <Link
+                key={link.path}
+                to={link.path}
+                onClick={() => setOpen(false)}
+                className={`navbar__mobile-link${location.pathname === link.path ? ' navbar__mobile-link--active' : ''}`}
+              >
+                <Icon size={16} />
+                <span>{link.label}</span>
+              </Link>
+            );
+          })}
           <div className="navbar__mobile-ctas">
             <Link to="/analyse" onClick={() => setOpen(false)} className="navbar__mobile-cta navbar__mobile-cta--outline">
-              Analyser mes chances
+              <BarChart3 size={14} /> Analyser mes chances
             </Link>
             <Link to="/inscription" onClick={() => setOpen(false)} className="navbar__mobile-cta navbar__mobile-cta--filled">
-              Commencer ma procédure
+              Commencer ma procédure <ArrowRight size={14} />
             </Link>
           </div>
         </div>

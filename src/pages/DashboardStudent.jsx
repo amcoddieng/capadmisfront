@@ -1,11 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  GraduationCap, LogOut, User, FolderOpen,
+  LogOut, User, FolderOpen,
   Bell, MessageSquare, ChevronDown, Pencil, X,
   Loader, AlertCircle, CheckCircle, FolderSearch, Lock, Send,
   Download, Trash2, Upload, RefreshCw, Eye, School,
 } from 'lucide-react';
+import logoHeader from '../assets/les images du site/logo-horizontal-2x.png';
 import {
   getSession, clearSession, apiGetMe, apiUpdateMe,
   apiGetDossier, apiGetInfosDossier, apiPostInfosDossier, apiPutInfosDossier,
@@ -1129,7 +1130,7 @@ function SectionPiecesJointes({ token, codeDossier }) {
             'CV à jour',
           ].map(doc => (
             <li key={doc} style={{ display: 'flex', alignItems: 'flex-start', gap: '.35rem' }}>
-              <span style={{ color: '#2563eb', fontWeight: 700, fontSize: '.9rem', lineHeight: 1.2, flexShrink: 0 }}>•</span>
+              <span style={{ color: '#c5a150', fontWeight: 700, fontSize: '.9rem', lineHeight: 1.2, flexShrink: 0 }}>•</span>
               <span style={{ lineHeight: 1.35 }}>{doc}</span>
             </li>
           ))}
@@ -1269,10 +1270,7 @@ export default function DashboardStudent() {
       {/* ── Header ────────────────────────────────────── */}
       <header className="db-header">
         <div className="db-header__logo">
-          <div className="db-header__logo-icon">
-            <GraduationCap size={18} color="white" />
-          </div>
-          <span className="db-header__logo-name">Capadmis<span className="db-header__logo-dot">.</span></span>
+          <img src={logoHeader} alt="Capadmis" style={{ height: 28, width: 'auto', display: 'block' }} />
         </div>
 
         <nav className="db-nav">

@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  GraduationCap, LogOut, LayoutDashboard, FolderOpen,
+  LogOut, LayoutDashboard, FolderOpen,
   MessageSquare, Bell, ChevronDown, Menu, X,
   Loader, AlertCircle, Eye, Send,
 } from 'lucide-react';
+import logoHeader from '../assets/les images du site/logo-horizontal-2x.png';
 import { getPersonnelSession, clearPersonnelSession, apiGetMesDossiers } from '../api/auth';
 import { useNotifications } from '../hooks/useNotifications';
 import NotificationsPanel from '../components/NotificationsPanel';
@@ -34,18 +35,37 @@ function getRoleLabel(role) {
 }
 
 /* ── Pages placeholder ── */
-function PageDashboard({ personnel }) {
-  const roleLabel = getRoleLabel(personnel.role);
+function PageDashboard({ token, personnel, onOpenChat }) {
+  const { openMessageModal } = useMessageModal();
+  const [dossiers, setDossiers] = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [selected, setSelected] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    apiGetMesDossiers(token).then(list => {
+      if (mounted) setDossiers(list);
+    }).catch(() => {}).finally(() => { if (mounted) setLoading(false); });
+    return () => { mounted = false; };
+  }, [token]);
+
+  const total       = dossiers.length;
+  const enCours     = dossiers.filter(d => d.status === 'EN_COURS_D_ETUDE').length;
+  const valides     = dossiers.filter(d => d.status === 'VALIDE').length;
+  const aCompleter  = dossiers.filter(d => d.status === 'CHANGEMENT_A_APPORTER').length;
+  const roleLabel   = getRoleLabel(personnel.role);
+
   return (
     <div className="cons-page">
       <h2 className="cons-page__title">Dashboard</h2>
       <p className="cons-page__sub">{roleLabel} — {personnel.prenom} {personnel.nom}</p>
       <div className="cons-stats">
         {[
-          { label: 'Dossiers assignés',  value: '—' },
-          { label: 'En cours d\'étude',  value: '—' },
-          { label: 'Validés',            value: '—' },
-          { label: 'À compléter',        value: '—' },
+          { label: 'Dossiers assignés',  value: total },
+          { label: 'En cours d\'étude',  value: enCours },
+          { label: 'Validés',            value: valides },
+          { label: 'À compléter',        value: aCompleter },
         ].map(s => (
           <div key={s.label} className="cons-stat-card">
             <span className="cons-stat-card__value">{s.value}</span>
@@ -53,6 +73,46 @@ function PageDashboard({ personnel }) {
           </div>
         ))}
       </div>
+
+      {/* ── Liste des dossiers assignés ── */}
+      <h3 style={{margin:'1.5rem 0 .75rem',fontSize:'1rem',color:'#1e293b'}}>Mes dossiers assignés</h3>
+      {loading && (
+        <div style={{display:'flex',gap:'.5rem',alignItems:'center',color:'#94a3b8',padding:'1rem 0'}}>
+          <Loader size={16} className="auth-spinner"/> Chargement…
+        </div>
+      )}
+      {!loading && dossiers.length === 0 && (
+        <p style={{color:'#94a3b8',fontSize:'.875rem'}}>Aucun dossier assigné pour le moment.</p>
+      )}
+      {!loading && dossiers.length > 0 && (
+        <div className="sa-table-wrap">
+          <table className="sa-table">
+            <thead><tr><th>Code</th><th>Étudiant</th><th>Statut global</th><th>Admission</th><th>Visa</th><th>Actions</th></tr></thead>
+            <tbody>
+              {dossiers.map(d => (
+                <tr key={d.id}>
+                  <td><code className="sa-code">{d.code_dossier}</code></td>
+                  <td>{d.etudiant ? `${d.etudiant.prenom} ${d.etudiant.nom}` : '—'}</td>
+                  <td><StatusBadge value={d.status}/></td>
+                  <td><StatusBadge value={d.status_admission}/></td>
+                  <td><StatusBadge value={d.status_visa}/></td>
+                  <td>
+                    <div className="sa-actions">
+                      <button className="sa-btn sa-btn--blue" onClick={() => setSelected(d)} title="Voir détails"><Eye size={14}/></button>
+                      {d.etudiant?.email && (
+                        <button className="sa-btn sa-btn--green" onClick={() => openMessageModal(token, d.etudiant.email, `${d.etudiant.prenom} ${d.etudiant.nom}`)} title="Envoyer message"><Send size={14}/></button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      {selected && (
+        <DossierDetailConseiller token={token} personnel={personnel} dossier={selected} onClose={() => setSelected(null)} onRefresh={() => {}} onOpenChat={onOpenChat} />
+      )}
     </div>
   );
 }
@@ -207,7 +267,7 @@ export default function DashboardConseiller() {
         onRefresh={() => {}} onOpenChat={handleOpenChat} />;
     }
     switch (activePage) {
-      case 'dashboard':     return <PageDashboard personnel={personnel} />;
+      case 'dashboard':     return <PageDashboard token={token} personnel={personnel} onOpenChat={handleOpenChat} />;
       case 'dossiers':      return <PageDossiers token={token} personnel={personnel} onOpenChat={handleOpenChat} />;
       case 'messages':      return <PageMessages conversations={msg.conversations} messages={msg.messages} activeChat={msg.activeChat} unreadCount={msg.unreadCount} userEmail={personnel.email} onSelectChat={msg.loadConversation} onSend={msg.send} />;
       case 'notifications': return <PageNotifications notifications={notifications} loading={notifLoading} unread={unread} markRead={markRead} markAllRead={markAllRead} />;
@@ -220,8 +280,7 @@ export default function DashboardConseiller() {
       {/* ── Header ── */}
       <header className="cons-header">
         <div className="cons-header__brand">
-          <GraduationCap size={22} />
-          <span>Capadmis</span>
+          <img src={logoHeader} alt="Capadmis" style={{ height: 28, width: 'auto', display: 'block' }} />
           <span className="cons-header__role-badge">{roleLabel}</span>
         </div>
 

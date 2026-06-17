@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GraduationCap, LogOut } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { getPersonnelSession, clearPersonnelSession } from '../api/auth';
+import logoHeader from '../assets/les images du site/logo-horizontal-2x.png';
 
 const ROLE_LABELS = {
   admin:                'Administrateur',
@@ -50,9 +51,8 @@ export default function DashboardPersonnel() {
         background: '#fff', borderBottom: '1px solid var(--slate-200, #e2e8f0)',
         boxShadow: '0 1px 4px rgba(0,0,0,.04)',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '.625rem', fontWeight: 700, fontSize: '1.1rem', color: 'var(--blue-700, #1d4ed8)' }}>
-          <GraduationCap size={22} />
-          Capadmis
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <img src={logoHeader} alt="Capadmis" style={{ height: 28, width: 'auto', display: 'block' }} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <span style={{ fontSize: '.875rem', color: 'var(--slate-600, #475569)' }}>
@@ -80,7 +80,7 @@ export default function DashboardPersonnel() {
         <div style={{ textAlign: 'center' }}>
           <div style={{
             display: 'inline-block', padding: '.375rem 1rem', borderRadius: '2rem',
-            background: '#eff6ff', color: '#1d4ed8', fontSize: '.8rem', fontWeight: 700,
+            background: '#f5f0e4', color: '#0c1c3f', fontSize: '.8rem', fontWeight: 700,
             letterSpacing: '.04em', textTransform: 'uppercase', marginBottom: '1.25rem',
           }}>
             {roleLabel}
