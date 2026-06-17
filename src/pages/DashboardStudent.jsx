@@ -4,14 +4,19 @@ import {
   GraduationCap, LogOut, User, FolderOpen,
   Bell, MessageSquare, ChevronDown, Pencil, X,
   Loader, AlertCircle, CheckCircle, FolderSearch, Lock, Send,
-  Download, Trash2, Upload, RefreshCw,
+  Download, Trash2, Upload, RefreshCw, Eye, School,
 } from 'lucide-react';
 import {
   getSession, clearSession, apiGetMe, apiUpdateMe,
   apiGetDossier, apiGetInfosDossier, apiPostInfosDossier, apiPutInfosDossier,
   apiListPiecesJointes, apiGetPieceJointeUrl, apiAddPieceJointe, apiReplacePieceJointe, apiDeletePieceJointe,
-  apiGenererCode, apiModifierInfosCode,
+  apiGenererCode, apiModifierInfosCode, apiListDossiersUniversiteByDossier,
 } from '../api/auth';
+import { useNotifications } from '../hooks/useNotifications';
+import NotificationsPanel from '../components/NotificationsPanel';
+import { useMessages } from '../hooks/useMessages';
+import MessagesPanel from '../components/MessagesPanel';
+import { useMessageModal } from '../context/MessageModalContext';
 
 const NAV_ITEMS = [
   { id: 'infos',         label: 'Mes informations', icon: User },
@@ -54,7 +59,7 @@ function formatDate(iso) {
 }
 
 /* ── Composant "Mes informations" ─────────────────── */
-function PageInfos({ token }) {
+function PageInfos({ token, onVoirDossier }) {
   const [profil, setProfil]       = useState(null);
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState('');
@@ -103,6 +108,15 @@ function PageInfos({ token }) {
             <span className="info-dossier-banner__label">Code dossier</span>
             <span className="info-dossier-banner__code">{dossier.code_dossier}</span>
           </div>
+          {onVoirDossier && (
+            <button
+              className="info-card__edit-btn"
+              style={{ marginLeft: 'auto', fontSize: '.8rem', padding: '.3rem .7rem' }}
+              onClick={onVoirDossier}
+            >
+              <Eye size={14} /> Voir mon dossier
+            </button>
+          )}
         </div>
       )}
 
@@ -504,6 +518,8 @@ function PageDossier({ token, email }) {
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState('');
   const [modalOpen, setModalOpen] = useState(false);
+  const { openMessageModal } = useMessageModal();
+  const [dossiersUniv, setDossiersUniv] = useState([]);
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -516,6 +532,12 @@ function PageDossier({ token, email }) {
         setInfos(i);
       } catch {
         setInfos(null);
+      }
+      try {
+        const u = await apiListDossiersUniversiteByDossier(token, d.code_dossier);
+        setDossiersUniv(u);
+      } catch {
+        setDossiersUniv([]);
       }
     } catch (e) {
       setError(e.message);
@@ -561,7 +583,7 @@ function PageDossier({ token, email }) {
         </div>
         <div className="info-grid">
           <div className="info-field">
-            <span className="info-field__label">Statut global</span>
+            <span className="info-field__label">Statut de mon dossier</span>
             <StatusBadge value={dossier.status} />
           </div>
           <div className="info-field">
@@ -629,17 +651,76 @@ function PageDossier({ token, email }) {
         <div className="info-grid">
           <div className="info-field">
             <span className="info-field__label">Conseiller admission</span>
-            {conseiller_a
-              ? <span className="info-field__value">{conseiller_a.prenom} {conseiller_a.nom} <span style={{ color: 'var(--slate-400)', fontSize: '.8rem' }}>({conseiller_a.code})</span></span>
-              : <span className="info-field__value" style={{ color: 'var(--slate-400)' }}>Non assigné</span>}
+            {conseiller_a ? (
+              <span className="info-field__value" style={{display:'flex',alignItems:'center',gap:'.5rem',flexWrap:'wrap'}}>
+                {conseiller_a.prenom} {conseiller_a.nom} <span style={{ color: 'var(--slate-400)', fontSize: '.8rem' }}>({conseiller_a.code})</span>
+                {conseiller_a.email && (
+                  <button className="info-card__edit-btn" style={{fontSize:'.75rem',padding:'.15rem .4rem'}} onClick={() => openMessageModal(token, conseiller_a.email, `${conseiller_a.prenom} ${conseiller_a.nom}`)}>
+                    <Send size={12} /> Message
+                  </button>
+                )}
+              </span>
+            ) : <span className="info-field__value" style={{ color: 'var(--slate-400)' }}>Non assigné</span>}
           </div>
           <div className="info-field">
             <span className="info-field__label">Conseiller visa</span>
-            {conseiller_v
-              ? <span className="info-field__value">{conseiller_v.prenom} {conseiller_v.nom} <span style={{ color: 'var(--slate-400)', fontSize: '.8rem' }}>({conseiller_v.code})</span></span>
-              : <span className="info-field__value" style={{ color: 'var(--slate-400)' }}>Non assigné</span>}
+            {conseiller_v ? (
+              <span className="info-field__value" style={{display:'flex',alignItems:'center',gap:'.5rem',flexWrap:'wrap'}}>
+                {conseiller_v.prenom} {conseiller_v.nom} <span style={{ color: 'var(--slate-400)', fontSize: '.8rem' }}>({conseiller_v.code})</span>
+                {conseiller_v.email && (
+                  <button className="info-card__edit-btn" style={{fontSize:'.75rem',padding:'.15rem .4rem'}} onClick={() => openMessageModal(token, conseiller_v.email, `${conseiller_v.prenom} ${conseiller_v.nom}`)}>
+                    <Send size={12} /> Message
+                  </button>
+                )}
+              </span>
+            ) : <span className="info-field__value" style={{ color: 'var(--slate-400)' }}>Non assigné</span>}
           </div>
         </div>
+      </div>
+
+      {/* Dossiers université */}
+      <div className="info-card" style={{ marginTop: '1.25rem' }}>
+        <div className="info-card__header">
+          <h2 className="info-card__title">Dossiers déposés en université ({dossiersUniv.length})</h2>
+        </div>
+        {dossiersUniv.length === 0 ? (
+          <p style={{ color: 'var(--slate-400)', fontSize: '.875rem', padding: '1rem 1.5rem' }}>
+            Aucun dossier universitaire déposé pour le moment.
+          </p>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem', padding: '1rem 1.5rem' }}>
+            {dossiersUniv.map(u => {
+              const stColor = u.statut === 'accepte' ? { bg: '#dcfce7', text: '#166534', border: '#bbf7d0' } :
+                              u.statut === 'refuse' ? { bg: '#fee2e2', text: '#991b1b', border: '#fecaca' } :
+                              { bg: '#ffedd5', text: '#9a3412', border: '#fed7aa' };
+              const stLabel = u.statut === 'accepte' ? 'Accepté' : u.statut === 'refuse' ? 'Refusé' : 'En attente';
+              return (
+                <div key={u.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '.75rem', background: '#f8fafc', borderRadius: '.5rem', padding: '.75rem .9rem', fontSize: '.85rem', border: '1px solid #eef2f7' }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '.4rem', background: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4338ca', flexShrink: 0 }}>
+                    <School size={16} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, color: '#1e293b', marginBottom: '.15rem' }}>{u.universite}</div>
+                    <div style={{ fontSize: '.78rem', color: '#64748b', display: 'flex', gap: '.6rem', flexWrap: 'wrap' }}>
+                      <span>{u.filiere}</span>
+                      <span>•</span>
+                      <span>{u.ville}, {u.pays}</span>
+                      {u.region && <><span>•</span><span>{u.region}</span></>}
+                    </div>
+                    {u.message_universite && (
+                      <div style={{ marginTop: '.4rem', fontSize: '.78rem', color: '#475569', fontStyle: 'italic', background: '#fff', padding: '.4rem .6rem', borderRadius: '.4rem', border: '1px solid #e2e8f0' }}>
+                        « {u.message_universite} »
+                      </div>
+                    )}
+                  </div>
+                  <span style={{ fontSize: '.72rem', fontWeight: 600, background: stColor.bg, color: stColor.text, border: `1px solid ${stColor.border}`, padding: '.15rem .5rem', borderRadius: '999px', flexShrink: 0 }}>
+                    {stLabel}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Section pièces jointes */}
@@ -656,6 +737,7 @@ function PageDossier({ token, email }) {
           onSuccess={fetchAll}
         />
       )}
+
     </>
   );
 }
@@ -1024,11 +1106,38 @@ function SectionPiecesJointes({ token, codeDossier }) {
 
   return (
     <div className="info-card" style={{ marginTop: '1.25rem' }}>
-      <div className="info-card__header">
-        <h2 className="info-card__title">Pièces jointes</h2>
+      <div className="info-card__header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
+          <h2 className="info-card__title">Pièces jointes requises</h2>
+          <span style={{ fontSize: '.7rem', fontWeight: 600, background: '#f1f5f9', color: '#475569', padding: '.15rem .45rem', borderRadius: '999px' }}>5 documents</span>
+        </div>
         <button className="info-card__edit-btn" onClick={() => setAddOpen(true)}>
           <Upload size={14} /> Ajouter
         </button>
+      </div>
+
+      <div style={{ padding: '1.25rem 1.5rem' }}>
+        <p style={{ fontSize: '.85rem', color: '#64748b', marginBottom: '.75rem' }}>
+          Veuillez ajouter les documents suivants pour valider votre dossier :
+        </p>
+        <ul style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.35rem 1.5rem', fontSize: '.85rem', color: '#334155', listStyle: 'none', padding: 0, margin: '0 0 .75rem' }}>
+          {[
+            'Carte d\'identité ou Passeport',
+            'Bulletins des trois dernières années (minimum)',
+            'Diplômes obtenus (Bac, Licence, Master)',
+            'Certifications obtenues',
+            'CV à jour',
+          ].map(doc => (
+            <li key={doc} style={{ display: 'flex', alignItems: 'flex-start', gap: '.35rem' }}>
+              <span style={{ color: '#2563eb', fontWeight: 700, fontSize: '.9rem', lineHeight: 1.2, flexShrink: 0 }}>•</span>
+              <span style={{ lineHeight: 1.35 }}>{doc}</span>
+            </li>
+          ))}
+        </ul>
+        <div style={{ marginTop: '.75rem', padding: '.6rem .75rem', background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: '.5rem', fontSize: '.78rem', color: '#92400e', display: 'flex', alignItems: 'center', gap: '.4rem' }}>
+          <span style={{ fontWeight: 700 }}>⚠️</span>
+          Formats acceptés : PDF, JPG, PNG (Taille max : 5 Mo par fichier)
+        </div>
       </div>
 
       {actionErr && (
@@ -1079,21 +1188,25 @@ function SectionPiecesJointes({ token, codeDossier }) {
                 >
                   {dlLoading === p.id ? <Loader size={14} className="auth-spinner" /> : <Download size={14} />}
                 </button>
-                <button
-                  className="pj-action-btn pj-action-btn--replace"
-                  onClick={() => { setReplacing(p); setActionErr(''); }}
-                  title="Remplacer"
-                >
-                  <RefreshCw size={14} />
-                </button>
-                <button
-                  className="pj-action-btn pj-action-btn--delete"
-                  onClick={() => handleDelete(p.id)}
-                  disabled={deleting === p.id}
-                  title="Supprimer"
-                >
-                  {deleting === p.id ? <Loader size={14} className="auth-spinner" /> : <Trash2 size={14} />}
-                </button>
+                {p.status !== 'VALIDE' && (
+                  <>
+                    <button
+                      className="pj-action-btn pj-action-btn--replace"
+                      onClick={() => { setReplacing(p); setActionErr(''); }}
+                      title="Remplacer"
+                    >
+                      <RefreshCw size={14} />
+                    </button>
+                    <button
+                      className="pj-action-btn pj-action-btn--delete"
+                      onClick={() => handleDelete(p.id)}
+                      disabled={deleting === p.id}
+                      title="Supprimer"
+                    >
+                      {deleting === p.id ? <Loader size={14} className="auth-spinner" /> : <Trash2 size={14} />}
+                    </button>
+                  </>
+                )}
               </div>
             </li>
           ))}
@@ -1144,6 +1257,9 @@ export default function DashboardStudent() {
 
   const handleLogout = () => { clearSession(); navigate('/connexion'); };
 
+  const { notifications, loading: notifLoading, unread, markRead, markAllRead } = useNotifications(session?.token);
+  const msg = useMessages(session?.token);
+
   if (!session) return null;
 
   const { token, etudiant, codeDossier } = session;
@@ -1162,13 +1278,19 @@ export default function DashboardStudent() {
         <nav className="db-nav">
           {NAV_ITEMS.map(item => {
             const Icon = item.icon;
+            const unreadMsg = item.id === 'messages' ? msg.unreadCount : null;
             return (
               <button
                 key={item.id}
                 className={`db-nav__item${activePage === item.id ? ' db-nav__item--active' : ''}`}
                 onClick={() => setActivePage(item.id)}
               >
-                <Icon size={16} /> {item.label}
+                <span style={{position:'relative',display:'inline-flex'}}>
+                  <Icon size={16} />
+                  {item.id === 'notifications' && unread > 0 && <span className="notif-dot">{unread > 9 ? '9+' : unread}</span>}
+                  {item.id === 'messages' && unreadMsg > 0 && <span className="notif-dot">{unreadMsg > 9 ? '9+' : unreadMsg}</span>}
+                </span>
+                {item.label}
               </button>
             );
           })}
@@ -1219,7 +1341,7 @@ export default function DashboardStudent() {
                 <h1 className="db-page__title">Mes informations</h1>
                 <p className="db-page__sub">Consultez et modifiez vos informations personnelles.</p>
               </div>
-              <PageInfos token={token} />
+              <PageInfos token={token} onVoirDossier={() => setActivePage('dossier')} />
             </div>
           )}
 
@@ -1235,28 +1357,26 @@ export default function DashboardStudent() {
 
           {activePage === 'notifications' && (
             <div className="db-page">
-              <div className="db-page__header">
-                <h1 className="db-page__title">Notifications</h1>
-                <p className="db-page__sub">Restez informé de chaque avancement de votre dossier.</p>
-              </div>
-              <div className="db-page__empty">
-                <Bell size={40} className="db-page__empty-icon" />
-                <p>Aucune notification pour l'instant.</p>
-              </div>
+              <NotificationsPanel
+                notifications={notifications}
+                loading={notifLoading}
+                unread={unread}
+                markRead={markRead}
+                markAllRead={markAllRead}
+              />
             </div>
           )}
 
           {activePage === 'messages' && (
-            <div className="db-page">
-              <div className="db-page__header">
-                <h1 className="db-page__title">Messages</h1>
-                <p className="db-page__sub">Communiquez directement avec votre conseiller.</p>
-              </div>
-              <div className="db-page__empty">
-                <MessageSquare size={40} className="db-page__empty-icon" />
-                <p>Aucun message pour l'instant.</p>
-              </div>
-            </div>
+            <MessagesPanel
+              conversations={msg.conversations}
+              messages={msg.messages}
+              activeChat={msg.activeChat}
+              unreadCount={msg.unreadCount}
+              userEmail={etudiant.email}
+              onSelectChat={msg.loadConversation}
+              onSend={msg.send}
+            />
           )}
 
         </div>

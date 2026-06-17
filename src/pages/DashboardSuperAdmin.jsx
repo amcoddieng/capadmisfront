@@ -1,32 +1,593 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getPersonnelSession, clearPersonnelSession } from '../api/auth';
+import {
+  GraduationCap, LogOut, LayoutDashboard, FolderOpen, Users, UserCheck,
+  History, MessageSquare, Bell, Menu, X, CreditCard, Plus, Pencil,
+  Trash2, Lock, Unlock, Loader, AlertCircle, CheckCircle, Send,
+} from 'lucide-react';
+import {
+  getPersonnelSession, clearPersonnelSession,
+  apiListPersonnel, apiCreatePersonnel, apiUpdatePersonnel, apiDeletePersonnel, apiToggleBlockPersonnel,
+  apiListEtudiants, apiCreateEtudiant, apiUpdateEtudiant, apiDeleteEtudiant, apiToggleBlockEtudiant,
+  apiListDossiers, apiAssignConseiller, apiUpdateDossierStatus, apiListConseillers,
+} from '../api/auth';
+import { useNotifications } from '../hooks/useNotifications';
+import NotificationsPanel from '../components/NotificationsPanel';
+import { useMessages } from '../hooks/useMessages';
+import MessagesPanel from '../components/MessagesPanel';
+import { useMessageModal } from '../context/MessageModalContext';
 
+const NAV_ITEMS = [
+  { id: 'dashboard',     label: 'Dashboard',           icon: LayoutDashboard },
+  { id: 'dossiers',      label: 'Dossiers',            icon: FolderOpen },
+  { id: 'etudiants',     label: 'Gestion étudiants',   icon: Users },
+  { id: 'conseillers',   label: 'Gestion conseillers', icon: UserCheck },
+  { id: 'paiement',      label: 'Paiement',            icon: CreditCard },
+  { id: 'historique',    label: 'Historique',          icon: History },
+  { id: 'messages',      label: 'Messages',            icon: MessageSquare },
+  { id: 'notifications', label: 'Notifications',       icon: Bell },
+];
+
+const ROLES_PERSONNEL = [
+  { value: 'admin',                label: 'Admin' },
+  { value: 'conseiller_admission', label: 'Conseiller Admission' },
+  { value: 'conseiller_visa',      label: 'Conseiller Visa' },
+];
+const ROLE_LABELS_PERS = { admin: 'Admin', conseiller_admission: 'Cons. Admission', conseiller_visa: 'Cons. Visa' };
+
+const STATUS_OPTIONS      = ['EN_COURS_D_ETUDE','VALIDE','INVALIDE','EN_ATTENTE','CHANGEMENT_A_APPORTER'];
+const STATUS_ADM_OPTIONS  = ['ADMISSION_EN_COURS','ADMISSION_VALIDE','ADMISSION_INVALIDE'];
+const STATUS_VISA_OPTIONS = ['DEMANDE_VISA_EN_COURS','DEMANDE_VISA_VALIDE','DEMANDE_VISA_INVALIDE'];
+const STATUS_LABELS = {
+  EN_COURS_D_ETUDE:'En cours d’étude', VALIDE:'Validé', INVALIDE:'Invalide',
+  EN_ATTENTE:'En attente', CHANGEMENT_A_APPORTER:'Changement requis',
+  ADMISSION_EN_COURS:'Admission en cours', ADMISSION_VALIDE:'Admission validée', ADMISSION_INVALIDE:'Admission invalidée',
+  DEMANDE_VISA_EN_COURS:'Visa en cours', DEMANDE_VISA_VALIDE:'Visa validé', DEMANDE_VISA_INVALIDE:'Visa invalidé',
+};
+function StatusBadge({ value }) {
+  if (!value) return <span style={{ color:'#94a3b8' }}>—</span>;
+  const green=['VALIDE','ADMISSION_VALIDE','DEMANDE_VISA_VALIDE'];
+  const red=['INVALIDE','ADMISSION_INVALIDE','DEMANDE_VISA_INVALIDE'];
+  const orange=['EN_ATTENTE','CHANGEMENT_A_APPORTER'];
+  const c = green.includes(value)?'green':red.includes(value)?'red':orange.includes(value)?'orange':'blue';
+  return <span className={`status-badge status-badge--${c}`}>{STATUS_LABELS[value]||value}</span>;
+}
+function TableWrap({ loading, error, children }) {
+  if (loading) return <div style={{display:'flex',gap:'.5rem',alignItems:'center',color:'#94a3b8',padding:'2rem 0'}}><Loader size={16} className="auth-spinner"/>Chargement…</div>;
+  if (error) return <p style={{color:'#dc2626',fontSize:'.875rem'}}>{error}</p>;
+  return children;
+}
+
+/* ── Modal assign conseiller ── */
+function ModalAssignConseiller({ token, dossier, onClose, onSuccess }) {
+  const [type, setType] = useState('admission');
+  const [conseillers, setConseillers] = useState([]);
+  const [conseillerId, setConseillerId] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  useEffect(() => {
+    apiListConseillers(token).then(l => { setConseillers(l); setLoading(false); }).catch(e => { setError(e.message); setLoading(false); });
+  }, [token]);
+  const filtered = conseillers.filter(c => c.role?.includes(type));
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!conseillerId) { setError('Sélectionnez un conseiller.'); return; }
+    setSaving(true); setError('');
+    try { await apiAssignConseiller(token, dossier.id, type, Number(conseillerId)); await onSuccess(); onClose(); }
+    catch (e) { setError(e.message); } finally { setSaving(false); }
+  };
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{ maxWidth: 420 }} onClick={e => e.stopPropagation()}>
+        <div className="modal__header">
+          <h3 className="modal__title">Assigner un conseiller — {dossier.code_dossier}</h3>
+          <button className="modal__close" onClick={onClose}><X size={18}/></button>
+        </div>
+        <div className="modal__body">
+          {error && <div className="auth-error" style={{margin:0}}><AlertCircle size={15}/> {error}</div>}
+          {loading ? <div style={{color:'#94a3b8'}}><Loader size={14} className="auth-spinner"/> Chargement…</div> : (
+            <form onSubmit={handleSubmit} style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
+              <div className="form-group">
+                <label className="form-label">Type</label>
+                <select className="form-select" value={type} onChange={e => { setType(e.target.value); setConseillerId(''); }}>
+                  <option value="admission">Admission</option>
+                  <option value="visa">Visa</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Conseiller</label>
+                <select className="form-select" required value={conseillerId} onChange={e => setConseillerId(e.target.value)}>
+                  <option value="">Sélectionner</option>
+                  {filtered.map(c => <option key={c.id} value={c.id}>{c.prenom} {c.nom} ({c.code})</option>)}
+                </select>
+              </div>
+              <div className="modal__footer" style={{marginTop:0}}>
+                <button type="button" className="form-back" onClick={onClose}>Annuler</button>
+                <button type="submit" className="form-submit" disabled={saving}>
+                  {saving ? <Loader size={14} className="auth-spinner"/> : <CheckCircle size={14}/>}
+                  {saving ? 'Assignation…' : 'Assigner'}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Modal statut dossier ── */
+function ModalDossierStatus({ token, dossier, onClose, onSuccess }) {
+  const [status, setStatus]       = useState(dossier.status || '');
+  const [statusAdm, setStatusAdm] = useState(dossier.status_admission || '');
+  const [statusVisa, setStatusVisa] = useState(dossier.status_visa || '');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const handleSubmit = async (e) => {
+    e.preventDefault(); setSaving(true); setError('');
+    try {
+      const p = {};
+      if (status) p.status = status;
+      if (statusAdm) p.status_admission = statusAdm;
+      if (statusVisa) p.status_visa = statusVisa;
+      await apiUpdateDossierStatus(token, dossier.id, p);
+      await onSuccess(); onClose();
+    } catch (e) { setError(e.message); } finally { setSaving(false); }
+  };
+  const Sel = ({ label, val, setVal, opts }) => (
+    <div className="form-group">
+      <label className="form-label">{label}</label>
+      <select className="form-select" value={val} onChange={e => setVal(e.target.value)}>
+        <option value="">— Inchangé —</option>
+        {opts.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
+      </select>
+    </div>
+  );
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{ maxWidth: 420 }} onClick={e => e.stopPropagation()}>
+        <div className="modal__header">
+          <h3 className="modal__title">Statut — {dossier.code_dossier}</h3>
+          <button className="modal__close" onClick={onClose}><X size={18}/></button>
+        </div>
+        <div className="modal__body">
+          {error && <div className="auth-error" style={{margin:'0 0 1rem'}}><AlertCircle size={15}/> {error}</div>}
+          <form onSubmit={handleSubmit} style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
+            <Sel label="Statut dossier" val={status} setVal={setStatus} opts={STATUS_OPTIONS}/>
+            <Sel label="Statut admission" val={statusAdm} setVal={setStatusAdm} opts={STATUS_ADM_OPTIONS}/>
+            <Sel label="Statut visa" val={statusVisa} setVal={setStatusVisa} opts={STATUS_VISA_OPTIONS}/>
+            <div className="modal__footer" style={{marginTop:0}}>
+              <button type="button" className="form-back" onClick={onClose}>Annuler</button>
+              <button type="submit" className="form-submit" disabled={saving}>
+                {saving ? <Loader size={14} className="auth-spinner"/> : <CheckCircle size={14}/>}
+                {saving ? 'Mise à jour…' : 'Enregistrer'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Page Dossiers ── */
+function PageDossiers({ token }) {
+  const { openMessageModal } = useMessageModal();
+  const [dossiers, setDossiers] = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState('');
+  const [assignModal, setAssignModal] = useState(null);
+  const [statusModal, setStatusModal] = useState(null);
+  const fetch = useCallback(async () => {
+    setLoading(true); setError('');
+    try { setDossiers(await apiListDossiers(token)); } catch (e) { setError(e.message); } finally { setLoading(false); }
+  }, [token]);
+  useEffect(() => { fetch(); }, [fetch]);
+  return (
+    <div className="cons-page">
+      <h2 className="cons-page__title">Dossiers</h2>
+      <p className="cons-page__sub">{dossiers.length} dossier(s) au total.</p>
+      <TableWrap loading={loading} error={error}>
+        <div className="sa-table-wrap">
+          <table className="sa-table">
+            <thead><tr><th>Code</th><th>Étudiant</th><th>Statut</th><th>Admission</th><th>Visa</th><th>Cons. Adm.</th><th>Cons. Visa</th><th>Actions</th></tr></thead>
+            <tbody>
+              {dossiers.length === 0 && <tr><td colSpan={8} className="sa-empty">Aucun dossier</td></tr>}
+              {dossiers.map(d => (
+                <tr key={d.id}>
+                  <td><code className="sa-code">{d.code_dossier}</code></td>
+                  <td>{d.etudiant ? `${d.etudiant.prenom} ${d.etudiant.nom}` : '—'}</td>
+                  <td><StatusBadge value={d.status}/></td>
+                  <td><StatusBadge value={d.status_admission}/></td>
+                  <td><StatusBadge value={d.status_visa}/></td>
+                  <td>{d.conseiller_admission ? `${d.conseiller_admission.prenom} ${d.conseiller_admission.nom}` : <span style={{color:'#94a3b8'}}>—</span>}</td>
+                  <td>{d.conseiller_visa ? `${d.conseiller_visa.prenom} ${d.conseiller_visa.nom}` : <span style={{color:'#94a3b8'}}>—</span>}</td>
+                  <td><div className="sa-actions">
+                    <button className="sa-btn sa-btn--blue" onClick={() => setAssignModal(d)} title="Assigner conseiller"><UserCheck size={14}/></button>
+                    <button className="sa-btn sa-btn--orange" onClick={() => setStatusModal(d)} title="Changer statut"><Pencil size={14}/></button>
+                    {d.etudiant?.email && <button className="sa-btn sa-btn--green" onClick={() => openMessageModal(token, d.etudiant.email, `${d.etudiant.prenom} ${d.etudiant.nom}`)} title="Envoyer message"><Send size={14}/></button>}
+                  </div></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </TableWrap>
+      {assignModal && <ModalAssignConseiller token={token} dossier={assignModal} onClose={() => setAssignModal(null)} onSuccess={fetch}/>}
+      {statusModal && <ModalDossierStatus token={token} dossier={statusModal} onClose={() => setStatusModal(null)} onSuccess={fetch}/>}
+    </div>
+  );
+}
+
+/* ── Modal étudiant ── */
+function ModalEtudiant({ token, etudiant, onClose, onSuccess }) {
+  const isEdit = !!etudiant;
+  const [form, setForm] = useState({
+    nom: etudiant?.nom||'', prenom: etudiant?.prenom||'', email: etudiant?.email||'', mdp: '',
+    sexe: etudiant?.sexe||'M', ville: etudiant?.ville||'', payes: etudiant?.payes||'Sénégal',
+    date_de_naissance: etudiant?.date_de_naissance?.slice(0,10)||'',
+    lieu_de_naissance: etudiant?.lieu_de_naissance||'',
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const handleSubmit = async (e) => {
+    e.preventDefault(); setSaving(true); setError('');
+    try {
+      const p = { ...form }; if (isEdit && !p.mdp) delete p.mdp;
+      if (isEdit) await apiUpdateEtudiant(token, etudiant.id, p);
+      else await apiCreateEtudiant(token, p);
+      await onSuccess(); onClose();
+    } catch (e) { setError(e.message); } finally { setSaving(false); }
+  };
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{ maxWidth: 520 }} onClick={e => e.stopPropagation()}>
+        <div className="modal__header">
+          <h3 className="modal__title">{isEdit ? 'Modifier' : 'Ajouter'} un étudiant</h3>
+          <button className="modal__close" onClick={onClose}><X size={18}/></button>
+        </div>
+        <div className="modal__body">
+          {error && <div className="auth-error" style={{margin:'0 0 1rem'}}><AlertCircle size={15}/> {error}</div>}
+          <form onSubmit={handleSubmit} style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'.875rem'}}>
+            <div className="form-group"><label className="form-label">Prénom *</label><input className="form-input" required value={form.prenom} onChange={e=>set('prenom',e.target.value)}/></div>
+            <div className="form-group"><label className="form-label">Nom *</label><input className="form-input" required value={form.nom} onChange={e=>set('nom',e.target.value)}/></div>
+            <div className="form-group" style={{gridColumn:'span 2'}}><label className="form-label">Email *</label><input className="form-input" type="email" required value={form.email} onChange={e=>set('email',e.target.value)}/></div>
+            <div className="form-group" style={{gridColumn:'span 2'}}>
+              <label className="form-label">Mot de passe {isEdit ? '(vide = inchangé)' : '*'}</label>
+              <input className="form-input" type="password" required={!isEdit} value={form.mdp} onChange={e=>set('mdp',e.target.value)}/>
+            </div>
+            <div className="form-group"><label className="form-label">Sexe</label>
+              <select className="form-select" value={form.sexe} onChange={e=>set('sexe',e.target.value)}><option value="M">Homme</option><option value="F">Femme</option></select>
+            </div>
+            <div className="form-group"><label className="form-label">Ville</label><input className="form-input" value={form.ville} onChange={e=>set('ville',e.target.value)}/></div>
+            <div className="form-group"><label className="form-label">Pays</label><input className="form-input" value={form.payes} onChange={e=>set('payes',e.target.value)}/></div>
+            <div className="form-group"><label className="form-label">Date de naissance</label><input className="form-input" type="date" value={form.date_de_naissance} onChange={e=>set('date_de_naissance',e.target.value)}/></div>
+            <div className="form-group" style={{gridColumn:'span 2'}}><label className="form-label">Lieu de naissance</label><input className="form-input" value={form.lieu_de_naissance} onChange={e=>set('lieu_de_naissance',e.target.value)}/></div>
+            <div className="modal__footer" style={{gridColumn:'span 2',marginTop:0}}>
+              <button type="button" className="form-back" onClick={onClose}>Annuler</button>
+              <button type="submit" className="form-submit" disabled={saving}>
+                {saving ? <Loader size={14} className="auth-spinner"/> : <CheckCircle size={14}/>}
+                {saving ? 'Enregistrement…' : isEdit ? 'Enregistrer' : 'Créer'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Page Étudiants ── */
+function PageEtudiants({ token }) {
+  const { openMessageModal } = useMessageModal();
+  const [etudiants, setEtudiants] = useState([]);
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState('');
+  const [actionErr, setActionErr] = useState('');
+  const [modal, setModal]         = useState(undefined);
+  const [toggling, setToggling]   = useState(null);
+  const [deleting, setDeleting]   = useState(null);
+  const fetch = useCallback(async () => {
+    setLoading(true); setError('');
+    try { setEtudiants(await apiListEtudiants(token)); } catch (e) { setError(e.message); } finally { setLoading(false); }
+  }, [token]);
+  useEffect(() => { fetch(); }, [fetch]);
+  const handleBlock = async (id) => {
+    setToggling(id); setActionErr('');
+    try { await apiToggleBlockEtudiant(token, id); await fetch(); } catch (e) { setActionErr(e.message); } finally { setToggling(null); }
+  };
+  const handleDelete = async (id) => {
+    if (!window.confirm('Supprimer cet étudiant ? Son dossier sera aussi supprimé.')) return;
+    setDeleting(id); setActionErr('');
+    try { await apiDeleteEtudiant(token, id); await fetch(); } catch (e) { setActionErr(e.message); } finally { setDeleting(null); }
+  };
+  return (
+    <div className="cons-page">
+      <div className="sa-page-header">
+        <h2 className="cons-page__title" style={{margin:0}}>Gestion étudiants</h2>
+        <button className="form-submit" style={{padding:'.4rem .875rem'}} onClick={() => setModal(null)}><Plus size={14}/> Ajouter</button>
+      </div>
+      <p className="cons-page__sub">{etudiants.length} étudiant(s) enregistré(s).</p>
+      {actionErr && <div className="auth-error" style={{margin:'0 0 .75rem'}}><AlertCircle size={15}/> {actionErr}</div>}
+      <TableWrap loading={loading} error={error}>
+        <div className="sa-table-wrap">
+          <table className="sa-table">
+            <thead><tr><th>Prénom</th><th>Nom</th><th>Email</th><th>Ville</th><th>Pays</th><th>Statut</th><th>Actions</th></tr></thead>
+            <tbody>
+              {etudiants.length === 0 && <tr><td colSpan={7} className="sa-empty">Aucun étudiant</td></tr>}
+              {etudiants.map(e => (
+                <tr key={e.id}>
+                  <td>{e.prenom}</td><td>{e.nom}</td>
+                  <td style={{fontSize:'.8rem'}}>{e.email}</td>
+                  <td>{e.ville||'—'}</td><td>{e.payes||'—'}</td>
+                  <td><span className={`status-badge status-badge--${e.bloque?'red':'green'}`}>{e.bloque?'Bloqué':'Actif'}</span></td>
+                  <td><div className="sa-actions">
+                    <button className="sa-btn sa-btn--blue" onClick={() => setModal(e)} title="Modifier"><Pencil size={14}/></button>
+                    <button className={`sa-btn ${e.bloque?'sa-btn--green':'sa-btn--orange'}`} onClick={() => handleBlock(e.id)} disabled={toggling===e.id} title={e.bloque?'Débloquer':'Bloquer'}>
+                      {toggling===e.id ? <Loader size={14} className="auth-spinner"/> : e.bloque ? <Unlock size={14}/> : <Lock size={14}/>}
+                    </button>
+                    <button className="sa-btn sa-btn--red" onClick={() => handleDelete(e.id)} disabled={deleting===e.id} title="Supprimer">
+                      {deleting===e.id ? <Loader size={14} className="auth-spinner"/> : <Trash2 size={14}/>}
+                    </button>
+                    <button className="sa-btn sa-btn--green" onClick={() => openMessageModal(token, e.email, `${e.prenom} ${e.nom}`)} title="Envoyer message"><Send size={14}/></button>
+                  </div></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </TableWrap>
+      {modal !== undefined && <ModalEtudiant token={token} etudiant={modal} onClose={() => setModal(undefined)} onSuccess={fetch}/>}
+    </div>
+  );
+}
+
+/* ── Modal personnel ── */
+function ModalPersonnel({ token, membre, onClose, onSuccess }) {
+  const isEdit = !!membre;
+  const [form, setForm] = useState({ prenom: membre?.prenom||'', nom: membre?.nom||'', email: membre?.email||'', mdp: '', role: membre?.role||'conseiller_admission' });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const handleSubmit = async (e) => {
+    e.preventDefault(); setSaving(true); setError('');
+    try {
+      const p = { ...form }; if (isEdit && !p.mdp) delete p.mdp; if (isEdit) delete p.role;
+      if (isEdit) await apiUpdatePersonnel(token, membre.id, p);
+      else await apiCreatePersonnel(token, p);
+      await onSuccess(); onClose();
+    } catch (e) { setError(e.message); } finally { setSaving(false); }
+  };
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{ maxWidth: 440 }} onClick={e => e.stopPropagation()}>
+        <div className="modal__header">
+          <h3 className="modal__title">{isEdit ? 'Modifier' : 'Ajouter'} un membre</h3>
+          <button className="modal__close" onClick={onClose}><X size={18}/></button>
+        </div>
+        <div className="modal__body">
+          {error && <div className="auth-error" style={{margin:'0 0 1rem'}}><AlertCircle size={15}/> {error}</div>}
+          <form onSubmit={handleSubmit} style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'.875rem'}}>
+            <div className="form-group"><label className="form-label">Prénom *</label><input className="form-input" required value={form.prenom} onChange={e=>set('prenom',e.target.value)}/></div>
+            <div className="form-group"><label className="form-label">Nom *</label><input className="form-input" required value={form.nom} onChange={e=>set('nom',e.target.value)}/></div>
+            <div className="form-group" style={{gridColumn:'span 2'}}><label className="form-label">Email *</label><input className="form-input" type="email" required value={form.email} onChange={e=>set('email',e.target.value)}/></div>
+            <div className="form-group" style={{gridColumn:'span 2'}}>
+              <label className="form-label">Mot de passe {isEdit ? '(vide = inchangé)' : '*'}</label>
+              <input className="form-input" type="password" required={!isEdit} value={form.mdp} onChange={e=>set('mdp',e.target.value)}/>
+            </div>
+            {!isEdit && (
+              <div className="form-group" style={{gridColumn:'span 2'}}><label className="form-label">Rôle *</label>
+                <select className="form-select" value={form.role} onChange={e=>set('role',e.target.value)}>
+                  {ROLES_PERSONNEL.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+                </select>
+              </div>
+            )}
+            <div className="modal__footer" style={{gridColumn:'span 2',marginTop:0}}>
+              <button type="button" className="form-back" onClick={onClose}>Annuler</button>
+              <button type="submit" className="form-submit" disabled={saving}>
+                {saving ? <Loader size={14} className="auth-spinner"/> : <CheckCircle size={14}/>}
+                {saving ? 'Enregistrement…' : isEdit ? 'Enregistrer' : 'Créer'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Page Conseillers ── */
+function PageConseillers({ token }) {
+  const { openMessageModal } = useMessageModal();
+  const [personnel, setPersonnel] = useState([]);
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState('');
+  const [actionErr, setActionErr] = useState('');
+  const [modal, setModal]         = useState(undefined);
+  const [toggling, setToggling]   = useState(null);
+  const [deleting, setDeleting]   = useState(null);
+  const fetch = useCallback(async () => {
+    setLoading(true); setError('');
+    try { setPersonnel(await apiListPersonnel(token)); } catch (e) { setError(e.message); } finally { setLoading(false); }
+  }, [token]);
+  useEffect(() => { fetch(); }, [fetch]);
+  const handleBlock = async (id) => {
+    setToggling(id); setActionErr('');
+    try { await apiToggleBlockPersonnel(token, id); await fetch(); } catch (e) { setActionErr(e.message); } finally { setToggling(null); }
+  };
+  const handleDelete = async (id) => {
+    if (!window.confirm('Supprimer ce membre du personnel ?')) return;
+    setDeleting(id); setActionErr('');
+    try { await apiDeletePersonnel(token, id); await fetch(); } catch (e) { setActionErr(e.message); } finally { setDeleting(null); }
+  };
+  return (
+    <div className="cons-page">
+      <div className="sa-page-header">
+        <h2 className="cons-page__title" style={{margin:0}}>Gestion des conseillers</h2>
+        <button className="form-submit" style={{padding:'.4rem .875rem'}} onClick={() => setModal(null)}><Plus size={14}/> Ajouter</button>
+      </div>
+      <p className="cons-page__sub">{personnel.length} membre(s) du personnel.</p>
+      {actionErr && <div className="auth-error" style={{margin:'0 0 .75rem'}}><AlertCircle size={15}/> {actionErr}</div>}
+      <TableWrap loading={loading} error={error}>
+        <div className="sa-table-wrap">
+          <table className="sa-table">
+            <thead><tr><th>Prénom</th><th>Nom</th><th>Email</th><th>Code</th><th>Rôle</th><th>Statut</th><th>Actions</th></tr></thead>
+            <tbody>
+              {personnel.length === 0 && <tr><td colSpan={7} className="sa-empty">Aucun membre</td></tr>}
+              {personnel.map(m => (
+                <tr key={m.id}>
+                  <td>{m.prenom}</td><td>{m.nom}</td>
+                  <td style={{fontSize:'.8rem'}}>{m.email}</td>
+                  <td><code className="sa-code">{m.code}</code></td>
+                  <td><span className="status-badge status-badge--blue">{ROLE_LABELS_PERS[m.role]||m.role}</span></td>
+                  <td><span className={`status-badge status-badge--${m.bloque?'red':'green'}`}>{m.bloque?'Bloqué':'Actif'}</span></td>
+                  <td><div className="sa-actions">
+                    <button className="sa-btn sa-btn--blue" onClick={() => setModal(m)} title="Modifier"><Pencil size={14}/></button>
+                    <button className={`sa-btn ${m.bloque?'sa-btn--green':'sa-btn--orange'}`} onClick={() => handleBlock(m.id)} disabled={toggling===m.id} title={m.bloque?'Débloquer':'Bloquer'}>
+                      {toggling===m.id ? <Loader size={14} className="auth-spinner"/> : m.bloque ? <Unlock size={14}/> : <Lock size={14}/>}
+                    </button>
+                    <button className="sa-btn sa-btn--red" onClick={() => handleDelete(m.id)} disabled={deleting===m.id} title="Supprimer">
+                      {deleting===m.id ? <Loader size={14} className="auth-spinner"/> : <Trash2 size={14}/>}
+                    </button>
+                    <button className="sa-btn sa-btn--green" onClick={() => openMessageModal(token, m.email, `${m.prenom} ${m.nom}`)} title="Envoyer message"><Send size={14}/></button>
+                  </div></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </TableWrap>
+      {modal !== undefined && <ModalPersonnel token={token} membre={modal} onClose={() => setModal(undefined)} onSuccess={fetch}/>}
+    </div>
+  );
+}
+
+/* ── Pages placeholder ── */
+function PageDashboard() {
+  return (
+    <div className="cons-page">
+      <h2 className="cons-page__title">Dashboard</h2>
+      <p className="cons-page__sub">Vue d'ensemble de la plateforme.</p>
+      <div className="cons-stats">
+        {[{label:'Étudiants',value:'—'},{label:'Dossiers actifs',value:'—'},{label:'En attente',value:'—'},{label:'Validés',value:'—'},{label:'Conseillers',value:'—'},{label:'Admins',value:'—'}].map(s => (
+          <div key={s.label} className="cons-stat-card"><span className="cons-stat-card__value">{s.value}</span><span className="cons-stat-card__label">{s.label}</span></div>
+        ))}
+      </div>
+    </div>
+  );
+}
+function PageHistorique()    { return <div className="cons-page"><h2 className="cons-page__title">Historique</h2><p className="cons-page__sub">Journal des actions.</p><div className="cons-empty"><History size={40} strokeWidth={1.2}/><p>Aucun événement enregistré.</p></div></div>; }
+function PageMessages(props) {
+  return (
+    <div className="cons-page">
+      <MessagesPanel {...props} />
+    </div>
+  );
+}
+function PagePaiement()      { return <div className="cons-page"><h2 className="cons-page__title">Paiement</h2><p className="cons-page__sub">Suivi des paiements.</p><div className="cons-empty"><CreditCard size={40} strokeWidth={1.2}/><p>Aucun paiement enregistré.</p></div></div>; }
+function PageNotifications(props) {
+  return (
+    <div className="cons-page">
+      <NotificationsPanel {...props} />
+    </div>
+  );
+}
+
+/* ── Composant principal ── */
 export default function DashboardSuperAdmin() {
   const navigate = useNavigate();
-  const { token, personnel } = getPersonnelSession();
+  const [session, setSession]       = useState(null);
+  const [activePage, setActivePage] = useState('dashboard');
+  const [mobileNav, setMobileNav]   = useState(false);
 
   useEffect(() => {
-    if (!token || !personnel || personnel.role !== 'superadmin') {
-      navigate('/espace-pro');
-    }
+    const s = getPersonnelSession();
+    if (!s.token || !s.personnel) { navigate('/personnel'); return; }
+    setSession(s);
   }, [navigate]);
-
-  if (!token || !personnel) return null;
 
   const handleLogout = () => {
     clearPersonnelSession();
-    navigate('/espace-pro');
+    navigate('/personnel');
+  };
+
+  const { notifications, loading: notifLoading, unread, markRead, markAllRead } = useNotifications(session?.token);
+  const msg = useMessages(session?.token);
+
+  if (!session) return null;
+  const { personnel, token } = session;
+
+  const renderPage = () => {
+    switch (activePage) {
+      case 'dashboard':     return <PageDashboard />;
+      case 'dossiers':      return <PageDossiers token={token} />;
+      case 'etudiants':     return <PageEtudiants token={token} />;
+      case 'conseillers':   return <PageConseillers token={token} />;
+      case 'paiement':      return <PagePaiement />;
+      case 'historique':    return <PageHistorique />;
+      case 'messages':      return <PageMessages conversations={msg.conversations} messages={msg.messages} activeChat={msg.activeChat} unreadCount={msg.unreadCount} userEmail={personnel.email} onSelectChat={msg.loadConversation} onSend={msg.send} />;
+      case 'notifications': return <PageNotifications notifications={notifications} loading={notifLoading} unread={unread} markRead={markRead} markAllRead={markAllRead} />;
+      default:              return null;
+    }
   };
 
   return (
-    <div className="stub-page">
-      <div className="stub-page__card">
-        <p className="stub-page__role">superadmin</p>
-        <h1 className="stub-page__name">{personnel.prenom} {personnel.nom}</h1>
-        <span className="stub-page__code">{personnel.code}</span>
-        <button className="stub-page__logout" onClick={handleLogout}>Déconnexion</button>
-      </div>
+    <div className="cons-layout">
+      {/* ── Header ── */}
+      <header className="cons-header sa-header">
+        <div className="cons-header__brand">
+          <GraduationCap size={22} />
+          <span>Capadmis</span>
+          <span className="cons-header__role-badge sa-badge">Super Admin</span>
+        </div>
+
+        <nav className="cons-header__nav">
+          {NAV_ITEMS.map(({ id, label, icon: Icon }) => (
+            <button key={id} className={`cons-nav-btn${activePage === id ? ' cons-nav-btn--active' : ''}`} onClick={() => setActivePage(id)}>
+              <span style={{position:'relative',display:'inline-flex'}}>
+                <Icon size={15} />
+                {id === 'notifications' && unread > 0 && <span className="notif-dot">{unread > 9 ? '9+' : unread}</span>}
+                {id === 'messages' && msg.unreadCount > 0 && <span className="notif-dot">{msg.unreadCount > 9 ? '9+' : msg.unreadCount}</span>}
+              </span>
+              <span className="cons-nav-label">{label}</span>
+            </button>
+          ))}
+        </nav>
+
+        <div className="cons-header__user">
+          <span className="cons-header__user-name">
+            {personnel.prenom} {personnel.nom}
+            <span className="cons-header__user-code">({personnel.code})</span>
+          </span>
+          <button className="cons-logout-btn" onClick={handleLogout}>
+            <LogOut size={14} /> Déconnexion
+          </button>
+          <button className="cons-mobile-toggle" onClick={() => setMobileNav(v => !v)}>
+            {mobileNav ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+      </header>
+
+      {/* Nav mobile */}
+      {mobileNav && (
+        <div className="cons-mobile-nav">
+          {NAV_ITEMS.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              className={`cons-mobile-nav__item${activePage === id ? ' cons-mobile-nav__item--active' : ''}`}
+              onClick={() => { setActivePage(id); setMobileNav(false); }}
+            >
+              <Icon size={16} /> {label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <main className="cons-main">
+        {renderPage()}
+      </main>
     </div>
   );
 }

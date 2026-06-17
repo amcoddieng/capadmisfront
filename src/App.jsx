@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -11,16 +11,40 @@ import Temoignages from './pages/Temoignages';
 import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
 import Auth from './pages/Auth';
-import AuthPersonnel from './pages/AuthPersonnel';
+import { getSession, getPersonnelSession } from './api/auth';
 import DashboardStudent from './pages/DashboardStudent';
-import DashboardAdmin from './pages/DashboardAdmin';
+import AuthPersonnel from './pages/AuthPersonnel';
+import DashboardPersonnel from './pages/DashboardPersonnel';
+import DashboardConseiller from './pages/DashboardConseiller';
 import DashboardSuperAdmin from './pages/DashboardSuperAdmin';
-import DashboardConseillerAdmission from './pages/DashboardConseillerAdmission';
-import DashboardConseillerVisa from './pages/DashboardConseillerVisa';
+import { MessageModalProvider } from './context/MessageModalContext';
+
+/* ── Guards de route ── */
+function PrivateRoute({ children }) {
+  const { token } = getSession();
+  return token ? children : <Navigate to="/connexion" replace />;
+}
+
+function PrivatePersonnelRoute({ children, roles }) {
+  const { token, personnel } = getPersonnelSession();
+  if (!token || !personnel) return <Navigate to="/personnel" replace />;
+  if (roles) {
+    const r = (personnel.role || '').toLowerCase();
+    const ok = roles.some(allowed =>
+      allowed === 'admin'      ? r === 'admin' :
+      allowed === 'superadmin' ? r === 'superadmin' :
+      r.includes(allowed)
+    );
+    if (!ok) return <Navigate to="/personnel" replace />;
+  }
+  return children;
+}
 
 function Layout({ children }) {
   const location = useLocation();
-  const isAuthPage = location.pathname === '/connexion' || location.pathname === '/inscription';
+  const noLayoutPages = ['/connexion', '/inscription', '/personnel'];
+  const isAuthPage = noLayoutPages.includes(location.pathname)
+    || location.pathname.startsWith('/dashboard');
 
   return (
     <div className="page-wrapper">
@@ -36,25 +60,27 @@ function Layout({ children }) {
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout><Home /></Layout>} />
-        <Route path="/a-propos" element={<Layout><APropos /></Layout>} />
-        <Route path="/procedure" element={<Layout><Procedure /></Layout>} />
-        <Route path="/tarifs" element={<Layout><Tarifs /></Layout>} />
-        <Route path="/pourquoi" element={<Layout><Pourquoi /></Layout>} />
-        <Route path="/analyse" element={<Layout><Analyse /></Layout>} />
-        <Route path="/temoignages" element={<Layout><Temoignages /></Layout>} />
-        <Route path="/faq" element={<Layout><FAQ /></Layout>} />
-        <Route path="/contact" element={<Layout><Contact /></Layout>} />
-        <Route path="/connexion" element={<Auth />} />
-        <Route path="/inscription" element={<Auth />} />
-        <Route path="/dashboard" element={<DashboardStudent />} />
-        <Route path="/espace-pro" element={<AuthPersonnel />} />
-        <Route path="/dashboard-admin" element={<DashboardAdmin />} />
-        <Route path="/dashboard-superadmin" element={<DashboardSuperAdmin />} />
-        <Route path="/dashboard-conseiller-admission" element={<DashboardConseillerAdmission />} />
-        <Route path="/dashboard-conseiller-visa" element={<DashboardConseillerVisa />} />
-      </Routes>
+      <MessageModalProvider>
+        <Routes>
+          <Route path="/" element={<Layout><Home /></Layout>} />
+          <Route path="/a-propos" element={<Layout><APropos /></Layout>} />
+          <Route path="/procedure" element={<Layout><Procedure /></Layout>} />
+          <Route path="/tarifs" element={<Layout><Tarifs /></Layout>} />
+          <Route path="/pourquoi" element={<Layout><Pourquoi /></Layout>} />
+          <Route path="/analyse" element={<Layout><Analyse /></Layout>} />
+          <Route path="/temoignages" element={<Layout><Temoignages /></Layout>} />
+          <Route path="/faq" element={<Layout><FAQ /></Layout>} />
+          <Route path="/contact" element={<Layout><Contact /></Layout>} />
+          <Route path="/connexion" element={<Auth />} />
+          <Route path="/inscription" element={<Auth />} />
+          <Route path="/dashboard" element={<PrivateRoute><DashboardStudent /></PrivateRoute>} />
+          <Route path="/personnel" element={<AuthPersonnel />} />
+          <Route path="/dashboard/admin" element={<PrivatePersonnelRoute roles={['admin']}><DashboardPersonnel /></PrivatePersonnelRoute>} />
+          <Route path="/dashboard/superadmin" element={<PrivatePersonnelRoute roles={['superadmin']}><DashboardSuperAdmin /></PrivatePersonnelRoute>} />
+          <Route path="/dashboard/conseiller-admission" element={<PrivatePersonnelRoute roles={['admission']}><DashboardConseiller /></PrivatePersonnelRoute>} />
+          <Route path="/dashboard/conseiller-visa" element={<PrivatePersonnelRoute roles={['visa']}><DashboardConseiller /></PrivatePersonnelRoute>} />
+        </Routes>
+      </MessageModalProvider>
     </BrowserRouter>
   );
 }
