@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Star, Quote } from 'lucide-react';
+import { getStartPath } from '../api/auth';
 
 const testimonials = [
   { name: 'Aminata D.', city: 'Dakar', flag: '🇸🇳', school: 'Université Lyon 2', filiere: 'Sciences du langage', text: "Grâce à Capadmis., j'ai obtenu mon admission à Lyon 2. Le suivi était parfait et les conseils très précis. Je savais exactement où en était mon dossier à chaque moment.", stars: 5, visa: true },
@@ -80,7 +81,7 @@ export default function Temoignages() {
           <h2 className="page-cta__title">Votre success story commence ici</h2>
           <p className="page-cta__desc">Rejoignez des centaines d'étudiants qui ont réalisé leur rêve d'études à l'étranger.</p>
           <div className="page-cta__actions">
-            <Link to="/inscription" className="btn btn--cta-white">
+            <Link to={getStartPath()} className="btn btn--cta-white">
               Commencer ma procédure <ArrowRight size={18} />
             </Link>
           </div>

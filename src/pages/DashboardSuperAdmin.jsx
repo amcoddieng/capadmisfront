@@ -8,7 +8,7 @@ import {
 import logoHeader from '../assets/les images du site/logo-horizontal-2x.png';
 import DossierDetailConseiller from '../components/DossierDetailConseiller';
 import {
-  getPersonnelSession, clearPersonnelSession,
+  getPersonnelSession, clearPersonnelSession, apiLogout,
   apiListPersonnel, apiCreatePersonnel, apiUpdatePersonnel, apiDeletePersonnel, apiToggleBlockPersonnel,
   apiListEtudiants, apiCreateEtudiant, apiUpdateEtudiant, apiDeleteEtudiant, apiToggleBlockEtudiant,
   apiListDossiers, apiAssignConseiller, apiUpdateDossierStatus, apiListConseillers,
@@ -721,7 +721,8 @@ export default function DashboardSuperAdmin() {
     setSession(s);
   }, [navigate]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try { await apiLogout(); } catch (_) {}
     clearPersonnelSession();
     navigate('/personnel');
   };

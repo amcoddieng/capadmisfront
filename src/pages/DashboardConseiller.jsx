@@ -6,7 +6,7 @@ import {
   Loader, AlertCircle, Eye, Send,
 } from 'lucide-react';
 import logoHeader from '../assets/les images du site/logo-horizontal-2x.png';
-import { getPersonnelSession, clearPersonnelSession, apiGetMesDossiers } from '../api/auth';
+import { getPersonnelSession, clearPersonnelSession, apiLogout, apiGetMesDossiers } from '../api/auth';
 import { useNotifications } from '../hooks/useNotifications';
 import NotificationsPanel from '../components/NotificationsPanel';
 import { useMessages } from '../hooks/useMessages';
@@ -241,7 +241,8 @@ export default function DashboardConseiller() {
     }
   }, [navigate]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try { await apiLogout(); } catch (_) {}
     clearPersonnelSession();
     navigate('/personnel');
   };

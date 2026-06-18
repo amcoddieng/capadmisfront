@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle, Star, BarChart3, Shield, Award, Globe, Zap, TrendingUp } from 'lucide-react';
+import { getStartPath } from '../api/auth';
 import heroImage from '../assets/hero.png';
 
 const steps = [
@@ -56,7 +57,7 @@ export default function Home() {
         <div className="hero__overlay" />
         <div className="hero__content">
           <div className="hero__actions">
-            <Link to="/inscription" className="btn btn--hero-primary">
+            <Link to={getStartPath()} className="btn btn--hero-primary">
               Commencer ma procédure <ArrowRight size={18} />
             </Link>
             <Link to="/analyse" className="btn btn--hero-secondary">

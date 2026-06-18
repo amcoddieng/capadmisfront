@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Target, Cpu, BookOpen, Globe, Users, Shield, CheckCircle } from 'lucide-react';
+import { getStartPath } from '../api/auth';
 
 const services = [
   { icon: <BookOpen size={20} />, title: 'Conseil en orientation', desc: "Analyse de votre profil académique pour identifier les filières et universités adaptées." },
@@ -125,7 +126,7 @@ export default function APropos() {
           <h2 className="page-cta__title">Prêt à commencer ?</h2>
           <p className="page-cta__desc">Rejoignez des centaines d'étudiants qui ont réussi avec Capadmis.</p>
           <div className="page-cta__actions">
-            <Link to="/inscription" className="btn btn--cta-primary">
+            <Link to={getStartPath()} className="btn btn--cta-primary">
               Créer mon compte <ArrowRight size={18} />
             </Link>
           </div>

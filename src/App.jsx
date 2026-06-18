@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -11,13 +12,14 @@ import Temoignages from './pages/Temoignages';
 import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
 import Auth from './pages/Auth';
-import { getSession, getPersonnelSession } from './api/auth';
+import { getSession, getPersonnelSession, initSession } from './api/auth';
 import DashboardStudent from './pages/DashboardStudent';
 import AuthPersonnel from './pages/AuthPersonnel';
 import DashboardPersonnel from './pages/DashboardPersonnel';
 import DashboardConseiller from './pages/DashboardConseiller';
 import DashboardSuperAdmin from './pages/DashboardSuperAdmin';
 import { MessageModalProvider } from './context/MessageModalContext';
+import ScrollToTop from './components/ScrollToTop';
 
 /* ── Guards de route ── */
 function PrivateRoute({ children }) {
@@ -58,8 +60,24 @@ function Layout({ children }) {
 }
 
 function App() {
+  const [authReady, setAuthReady] = useState(false);
+
+  useEffect(() => {
+    initSession().finally(() => setAuthReady(true));
+  }, []);
+
+  if (!authReady) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0c1c3f' }}>
+        <div style={{ width: 40, height: 40, border: '3px solid rgba(197,161,80,.3)', borderTopColor: '#c5a150', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <MessageModalProvider>
         <Routes>
           <Route path="/" element={<Layout><Home /></Layout>} />

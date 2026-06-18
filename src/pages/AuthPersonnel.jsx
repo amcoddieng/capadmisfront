@@ -25,8 +25,8 @@ export default function AuthPersonnel() {
     setLoading(true);
     setError('');
     try {
-      const { token, personnel } = await apiPersonnelLogin(email, mdp);
-      savePersonnelSession(token, personnel);
+      const { accessToken, personnel } = await apiPersonnelLogin(email, mdp);
+      savePersonnelSession(accessToken, personnel);
       navigate(getRoleRoute(personnel.role));
     } catch (err) {
       setError(err.message);

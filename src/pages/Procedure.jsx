@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle, FileText, Users, BookOpen, Trophy, Plane, Stamp, Star } from 'lucide-react';
+import { getStartPath } from '../api/auth';
 
 const steps = [
   {
@@ -195,7 +196,7 @@ export default function Procedure() {
           <h2 className="page-cta__title">Prêt à démarrer votre procédure ?</h2>
           <p className="page-cta__desc">Rejoignez des centaines d'étudiants qui ont réussi leurs études à l'étranger grâce à Capadmis.</p>
           <div className="page-cta__actions">
-            <Link to="/inscription" className="btn btn--cta-white">
+            <Link to={getStartPath()} className="btn btn--cta-white">
               Commencer maintenant <ArrowRight size={18} />
             </Link>
           </div>

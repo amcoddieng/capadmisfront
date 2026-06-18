@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle, X, Zap, BarChart3, Shield, Users, Bell, TrendingUp, Award, Clock } from 'lucide-react';
+import { getStartPath } from '../api/auth';
 
 const differentiators = [
   {
@@ -144,7 +145,7 @@ export default function Pourquoi() {
           <h2 className="page-cta__title">Faites l'expérience Capadmis.</h2>
           <p className="page-cta__desc">Rejoignez une plateforme pensée pour vous simplifier la vie.</p>
           <div className="page-cta__actions">
-            <Link to="/inscription" className="btn btn--cta-white">
+            <Link to={getStartPath()} className="btn btn--cta-white">
               Commencer ma procédure <ArrowRight size={18} />
             </Link>
             <Link to="/analyse" className="btn btn--hero-secondary">

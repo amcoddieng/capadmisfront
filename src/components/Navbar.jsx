@@ -4,6 +4,7 @@ import {
   Menu, X, Home, Info, FileText, CreditCard, Star, MessageSquare,
   HelpCircle, Mail, BarChart3, ArrowRight,
 } from 'lucide-react';
+import { getStartPath } from '../api/auth';
 import logoNavbar from '../assets/les images du site/logo-navbar-dark - Copie.png';
 
 const navLinks = [
@@ -52,7 +53,7 @@ export default function Navbar() {
             <BarChart3 size={14} />
             <span>Analyse</span>
           </Link>
-          <Link to="/inscription" className="btn btn--primary-sm navbar__cta-compact">
+          <Link to={getStartPath()} className="btn btn--primary-sm navbar__cta-compact">
             <span>Commencer</span>
             <ArrowRight size={14} />
           </Link>

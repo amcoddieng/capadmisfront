@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle, X, HelpCircle } from 'lucide-react';
+import { getStartPath } from '../api/auth';
 
 const plans = [
   {
@@ -110,7 +111,7 @@ export default function Tarifs() {
                 </ul>
                 {plan.note && <p className="plan-card__note">{plan.note}</p>}
                 <Link
-                  to={plan.ctaPath}
+                  to={plan.ctaPath === '/inscription' ? getStartPath() : plan.ctaPath}
                   className={`plan-card__cta${plan.id === 'visa' ? ' plan-card__cta--featured' : ' plan-card__cta--default'}`}
                 >
                   {plan.cta} <ArrowRight size={16} />

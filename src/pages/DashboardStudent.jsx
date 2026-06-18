@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import logoHeader from '../assets/les images du site/logo-horizontal-2x.png';
 import {
-  getSession, clearSession, apiGetMe, apiUpdateMe,
+  getSession, clearSession, apiLogout, apiGetMe, apiUpdateMe,
   apiGetDossier, apiGetInfosDossier, apiPostInfosDossier, apiPutInfosDossier,
   apiListPiecesJointes, apiGetPieceJointeUrl, apiAddPieceJointe, apiReplacePieceJointe, apiDeletePieceJointe,
   apiGenererCode, apiModifierInfosCode, apiListDossiersUniversiteByDossier,
@@ -1256,7 +1256,11 @@ export default function DashboardStudent() {
     setSession(s);
   }, [navigate]);
 
-  const handleLogout = () => { clearSession(); navigate('/connexion'); };
+  const handleLogout = async () => {
+    try { await apiLogout(); } catch (_) {}
+    clearSession();
+    navigate('/connexion');
+  };
 
   const { notifications, loading: notifLoading, unread, markRead, markAllRead } = useNotifications(session?.token);
   const msg = useMessages(session?.token);

@@ -28,8 +28,8 @@ export default function Auth() {
     setLoading(true);
     try {
       const data = await apiLogin(form.email, form.mdp);
-      const dossier = await apiGetDossier(data.token);
-      saveSession(data.token, data.etudiant, dossier.code_dossier);
+      const dossier = await apiGetDossier(data.accessToken);
+      saveSession(data.accessToken, data.etudiant, dossier.code_dossier);
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);
@@ -55,7 +55,7 @@ export default function Auth() {
         date_de_naissance: form.date_de_naissance,
         lieu_de_naissance: form.lieu_de_naissance,
       });
-      saveSession(data.token, data.etudiant, data.dossier?.code_dossier);
+      saveSession(data.accessToken, data.etudiant, data.dossier?.code_dossier);
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);

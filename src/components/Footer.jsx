@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, Globe, Share2 } from 'lucide-react';
+import { getStartPath } from '../api/auth';
 import logoFooter from '../assets/les images du site/logo-horizontal-2x.png';
 
 const navLinks = [
@@ -68,23 +69,23 @@ export default function Footer() {
           <ul className="footer__contact-list">
             <li className="footer__contact-item">
               <MapPin size={15} className="footer__contact-icon" />
-              <span className="footer__contact-text">Dakar, Sénégal</span>
+              <span className="footer__contact-text">Cite Keur Gorgui - Dakar, Sénégal</span>
             </li>
             <li className="footer__contact-item">
               <Phone size={15} className="footer__contact-icon" />
-              <a href="tel:+221000000000" className="footer__contact-link">+221 00 000 00 00</a>
+              <a href="tel:+221000000000" className="footer__contact-link">+221 76 948 60 60</a>
             </li>
             <li className="footer__contact-item">
               <Mail size={15} className="footer__contact-icon" />
-              <a href="mailto:contact@capadmis.com" className="footer__contact-link">contact@capadmis.com</a>
+              <a href="mailto:contact@capadmis.com" className="footer__contact-link">service@eazy-visa.com</a>
             </li>
           </ul>
-          <Link to="/inscription" className="footer__cta-btn">Commencer ma procédure</Link>
+          <Link to={getStartPath()} className="footer__cta-btn">Commencer ma procédure</Link>
         </div>
       </div>
 
       <div className="footer__bottom">
-        <p>© {new Date().getFullYear()} Capadmis. Tous droits réservés.</p>
+        <p>© {new Date().getFullYear()} eazy-visa. Tous droits réservés.</p>
         <div className="footer__bottom-links">
           <a href="#" className="footer__bottom-link">Mentions légales</a>
           <a href="#" className="footer__bottom-link">Confidentialité</a>

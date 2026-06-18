@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
-import { getPersonnelSession, clearPersonnelSession } from '../api/auth';
+import { getPersonnelSession, clearPersonnelSession, apiLogout } from '../api/auth';
 import logoHeader from '../assets/les images du site/logo-horizontal-2x.png';
 
 const ROLE_LABELS = {
@@ -32,7 +32,8 @@ export default function DashboardPersonnel() {
     setSession(s);
   }, [navigate]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try { await apiLogout(); } catch (_) {}
     clearPersonnelSession();
     navigate('/personnel');
   };

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, BarChart3, CheckCircle, AlertTriangle, TrendingUp, Star, Info } from 'lucide-react';
+import { getStartPath } from '../api/auth';
 
 const filieres = [
   'Droit', 'Sciences économiques', 'Gestion / Management', 'Informatique / Numérique',
@@ -229,7 +230,7 @@ export default function Analyse() {
               </div>
 
               <div className="result-actions">
-                <Link to="/inscription" className="result-action-primary">
+                <Link to={getStartPath()} className="result-action-primary">
                   Lancer ma procédure <ArrowRight size={16} />
                 </Link>
                 <button
