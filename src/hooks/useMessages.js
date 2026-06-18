@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { apiGetConversations, apiGetMessages, apiSendMessage, apiGetUnreadMessages } from '../api/auth';
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'http://localhost:3000';
+const WS_URL = import.meta.env.VITE_WS_URL || 'https://capadmis.onrender.com';
 
 export function useMessages(token) {
   const [conversations, setConversations]   = useState([]);

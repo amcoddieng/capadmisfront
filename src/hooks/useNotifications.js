@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { apiGetNotifications, apiMarkNotifRead, apiMarkAllNotifsRead } from '../api/auth';
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'http://localhost:3000';
+const WS_URL = import.meta.env.VITE_WS_URL || 'https://capadmis.onrender.com';
 
 export function useNotifications(token) {
   const [notifications, setNotifications] = useState([]);

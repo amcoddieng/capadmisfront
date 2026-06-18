@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader, AlertCircle, Mail, ArrowRight, Shield } from 'lucide-react';
+import { Loader, AlertCircle, Mail, ArrowRight, Shield, Lock } from 'lucide-react';
 import { apiPersonnelLogin, savePersonnelSession } from '../api/auth';
 import logoAuth from '../assets/les images du site/logo-horizontal-white-bg - Copie.png';
 
@@ -104,7 +104,7 @@ export default function AuthPersonnel() {
         </div>
 
         <p className="auth-footer">
-          Accès non autorisé ? <a href="/contact" style={{ color: 'rgba(191,219,254,.8)' }}>Contactez un administrateur</a>
+          Accès non autorisé ? <a href="/contact" style={{ color: 'rgba(239,227,203,.8)' }}>Contactez un administrateur</a>
         </p>
       </div>
     </div>
