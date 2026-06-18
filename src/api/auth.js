@@ -550,3 +550,22 @@ export async function apiLogout() {
     credentials: 'include',
   });
 }
+
+/* ── Dashboard stats ── */
+export async function apiGetDashboardAdmin(token) {
+  const res = await authFetch(`${BASE}/dashboard/admin`, {
+    headers: { Authorization: `Bearer ${token}` }, credentials: 'include',
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Erreur dashboard admin');
+  return data;
+}
+
+export async function apiGetDashboardConseiller(token) {
+  const res = await authFetch(`${BASE}/dashboard/conseiller`, {
+    headers: { Authorization: `Bearer ${token}` }, credentials: 'include',
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Erreur dashboard conseiller');
+  return data;
+}

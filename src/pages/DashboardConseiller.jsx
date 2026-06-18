@@ -6,13 +6,19 @@ import {
   Loader, AlertCircle, Eye, Send,
 } from 'lucide-react';
 import logoHeader from '../assets/les images du site/logo-horizontal-2x.png';
-import { getPersonnelSession, clearPersonnelSession, apiLogout, apiGetMesDossiers } from '../api/auth';
+import { getPersonnelSession, clearPersonnelSession, apiLogout, apiGetMesDossiers, apiGetDashboardConseiller } from '../api/auth';
 import { useNotifications } from '../hooks/useNotifications';
 import NotificationsPanel from '../components/NotificationsPanel';
 import { useMessages } from '../hooks/useMessages';
 import MessagesPanel from '../components/MessagesPanel';
 import DossierDetailConseiller from '../components/DossierDetailConseiller';
 import { useMessageModal } from '../context/MessageModalContext';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell,
+} from 'recharts';
+
+const CHART_COLORS = ['#2563eb', '#7c3aed', '#f59e0b', '#10b981', '#ef4444', '#ec4899', '#06b6d4', '#8b5cf6'];
 
 const NAV_ITEMS = [
   { id: 'dashboard',     label: 'Dashboard',      icon: LayoutDashboard },
@@ -37,82 +43,163 @@ function getRoleLabel(role) {
 /* ── Pages placeholder ── */
 function PageDashboard({ token, personnel, onOpenChat }) {
   const { openMessageModal } = useMessageModal();
-  const [dossiers, setDossiers] = useState([]);
+  const [stats, setStats] = useState(null);
   const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState('');
   const [selected, setSelected] = useState(null);
 
   useEffect(() => {
     let mounted = true;
-    setLoading(true);
-    apiGetMesDossiers(token).then(list => {
-      if (mounted) setDossiers(list);
-    }).catch(() => {}).finally(() => { if (mounted) setLoading(false); });
+    setLoading(true); setError('');
+    apiGetDashboardConseiller(token).then(data => {
+      if (mounted) setStats(data);
+    }).catch(e => {
+      if (mounted) setError(e.message);
+    }).finally(() => { if (mounted) setLoading(false); });
     return () => { mounted = false; };
   }, [token]);
 
-  const total       = dossiers.length;
-  const enCours     = dossiers.filter(d => d.status === 'EN_COURS_D_ETUDE').length;
-  const valides     = dossiers.filter(d => d.status === 'VALIDE').length;
-  const aCompleter  = dossiers.filter(d => d.status === 'CHANGEMENT_A_APPORTER').length;
   const roleLabel   = getRoleLabel(personnel.role);
+
+  const statCard = (label, value, color = 'blue') => (
+    <div className="cons-stat-card" style={{ borderTop: `3px solid var(--${color}-600, #2563eb)` }}>
+      <span className="cons-stat-card__value">{value}</span>
+      <span className="cons-stat-card__label">{label}</span>
+    </div>
+  );
+
+  const listBlock = (title, items, keyField, countField) => (
+    <div style={{ background: '#fff', borderRadius: '.5rem', border: '1px solid #e2e8f0', padding: '1rem', marginBottom: '1rem' }}>
+      <h4 style={{ margin: '0 0 .75rem', fontSize: '.9rem', color: '#1e293b' }}>{title}</h4>
+      {items?.length === 0 ? (
+        <p style={{ color: '#94a3b8', fontSize: '.8rem' }}>Aucune donnée</p>
+      ) : (
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '.35rem' }}>
+          {items?.map(item => (
+            <li key={item[keyField]} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.85rem', color: '#475569' }}>
+              <span>{item[keyField]}</span>
+              <span style={{ fontWeight: 600, color: '#1e293b' }}>{item[countField]}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+
+  if (loading) return (
+    <div className="cons-page">
+      <h2 className="cons-page__title">Dashboard</h2>
+      <p className="cons-page__sub">{roleLabel} — {personnel.prenom} {personnel.nom}</p>
+      <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center', color: '#94a3b8', padding: '2rem 0' }}>
+        <Loader size={16} className="auth-spinner"/> Chargement…
+      </div>
+    </div>
+  );
+
+  if (error) return (
+    <div className="cons-page">
+      <h2 className="cons-page__title">Dashboard</h2>
+      <p className="cons-page__sub">{roleLabel} — {personnel.prenom} {personnel.nom}</p>
+      <p style={{ color: '#dc2626', fontSize: '.875rem' }}><AlertCircle size={14} /> {error}</p>
+    </div>
+  );
 
   return (
     <div className="cons-page">
       <h2 className="cons-page__title">Dashboard</h2>
       <p className="cons-page__sub">{roleLabel} — {personnel.prenom} {personnel.nom}</p>
       <div className="cons-stats">
-        {[
-          { label: 'Dossiers assignés',  value: total },
-          { label: 'En cours d\'étude',  value: enCours },
-          { label: 'Validés',            value: valides },
-          { label: 'À compléter',        value: aCompleter },
-        ].map(s => (
-          <div key={s.label} className="cons-stat-card">
-            <span className="cons-stat-card__value">{s.value}</span>
-            <span className="cons-stat-card__label">{s.label}</span>
-          </div>
-        ))}
+        {statCard('Dossiers assignés', stats?.totalDossiersAssignes ?? 0, 'blue')}
+        {statCard('Dossiers univ.', stats?.totalDossiersUniversite ?? 0, 'indigo')}
+        {statCard('Messages non lus', stats?.messagesNonLus ?? 0, 'green')}
+        {statCard('Notifications', stats?.notificationsNonLues ?? 0, 'orange')}
       </div>
 
-      {/* ── Liste des dossiers assignés ── */}
-      <h3 style={{margin:'1.5rem 0 .75rem',fontSize:'1rem',color:'#1e293b'}}>Mes dossiers assignés</h3>
-      {loading && (
-        <div style={{display:'flex',gap:'.5rem',alignItems:'center',color:'#94a3b8',padding:'1rem 0'}}>
-          <Loader size={16} className="auth-spinner"/> Chargement…
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem', marginTop: '1.5rem' }}>
+        {/* BarChart — Dossiers par statut général */}
+        <div style={{ background: '#fff', borderRadius: '.5rem', border: '1px solid #e2e8f0', padding: '1rem' }}>
+          <h4 style={{ margin: '0 0 .75rem', fontSize: '.9rem', color: '#1e293b' }}>Dossiers par statut général</h4>
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={stats?.dossiersParStatus || []}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis dataKey="status" tick={{ fontSize: 11 }} interval={0} angle={-15} textAnchor="end" height={50} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+              <Tooltip />
+              <Bar dataKey="count" name="Dossiers" radius={[4, 4, 0, 0]}>
+                {(stats?.dossiersParStatus || []).map((_, i) => (
+                  <Cell key={`cell-${i}`} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
         </div>
-      )}
-      {!loading && dossiers.length === 0 && (
-        <p style={{color:'#94a3b8',fontSize:'.875rem'}}>Aucun dossier assigné pour le moment.</p>
-      )}
-      {!loading && dossiers.length > 0 && (
-        <div className="sa-table-wrap">
-          <table className="sa-table">
-            <thead><tr><th>Code</th><th>Étudiant</th><th>Statut global</th><th>Admission</th><th>Visa</th><th>Actions</th></tr></thead>
-            <tbody>
-              {dossiers.map(d => (
-                <tr key={d.id}>
-                  <td><code className="sa-code">{d.code_dossier}</code></td>
-                  <td>{d.etudiant ? `${d.etudiant.prenom} ${d.etudiant.nom}` : '—'}</td>
-                  <td><StatusBadge value={d.status}/></td>
-                  <td><StatusBadge value={d.status_admission}/></td>
-                  <td><StatusBadge value={d.status_visa}/></td>
-                  <td>
-                    <div className="sa-actions">
-                      <button className="sa-btn sa-btn--blue" onClick={() => setSelected(d)} title="Voir détails"><Eye size={14}/></button>
-                      {d.etudiant?.email && (
-                        <button className="sa-btn sa-btn--green" onClick={() => openMessageModal(token, d.etudiant.email, `${d.etudiant.prenom} ${d.etudiant.nom}`)} title="Envoyer message"><Send size={14}/></button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+
+        {/* PieChart — Dossiers par statut admission */}
+        <div style={{ background: '#fff', borderRadius: '.5rem', border: '1px solid #e2e8f0', padding: '1rem' }}>
+          <h4 style={{ margin: '0 0 .75rem', fontSize: '.9rem', color: '#1e293b' }}>Dossiers par statut admission</h4>
+          <ResponsiveContainer width="100%" height={250}>
+            <PieChart>
+              <Pie
+                data={stats?.dossiersParStatusAdmission || []}
+                dataKey="count"
+                nameKey="status"
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+                label={({ status, count }) => `${status}: ${count}`}
+                labelLine={false}
+              >
+                {(stats?.dossiersParStatusAdmission || []).map((_, i) => (
+                  <Cell key={`cell-${i}`} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
-      )}
-      {selected && (
-        <DossierDetailConseiller token={token} personnel={personnel} dossier={selected} onClose={() => setSelected(null)} onRefresh={() => {}} onOpenChat={onOpenChat} />
-      )}
+
+        {/* BarChart — Dossiers par statut visa */}
+        <div style={{ background: '#fff', borderRadius: '.5rem', border: '1px solid #e2e8f0', padding: '1rem' }}>
+          <h4 style={{ margin: '0 0 .75rem', fontSize: '.9rem', color: '#1e293b' }}>Dossiers par statut visa</h4>
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={stats?.dossiersParStatusVisa || []}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis dataKey="status" tick={{ fontSize: 11 }} interval={0} angle={-15} textAnchor="end" height={50} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+              <Tooltip />
+              <Bar dataKey="count" name="Dossiers" radius={[4, 4, 0, 0]}>
+                {(stats?.dossiersParStatusVisa || []).map((_, i) => (
+                  <Cell key={`cell-${i}`} fill={CHART_COLORS[(i + 3) % CHART_COLORS.length]} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* PieChart — Dossiers université par statut */}
+        <div style={{ background: '#fff', borderRadius: '.5rem', border: '1px solid #e2e8f0', padding: '1rem' }}>
+          <h4 style={{ margin: '0 0 .75rem', fontSize: '.9rem', color: '#1e293b' }}>Dossiers université par statut</h4>
+          <ResponsiveContainer width="100%" height={250}>
+            <PieChart>
+              <Pie
+                data={stats?.dossiersUniversiteParStatut || []}
+                dataKey="count"
+                nameKey="statut"
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+                label={({ statut, count }) => `${statut}: ${count}`}
+                labelLine={false}
+              >
+                {(stats?.dossiersUniversiteParStatut || []).map((_, i) => (
+                  <Cell key={`cell-${i}`} fill={CHART_COLORS[(i + 5) % CHART_COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
     </div>
   );
 }

@@ -12,12 +12,19 @@ import {
   apiListPersonnel, apiCreatePersonnel, apiUpdatePersonnel, apiDeletePersonnel, apiToggleBlockPersonnel,
   apiListEtudiants, apiCreateEtudiant, apiUpdateEtudiant, apiDeleteEtudiant, apiToggleBlockEtudiant,
   apiListDossiers, apiAssignConseiller, apiUpdateDossierStatus, apiListConseillers,
+  apiGetDashboardAdmin,
 } from '../api/auth';
 import { useNotifications } from '../hooks/useNotifications';
 import NotificationsPanel from '../components/NotificationsPanel';
 import { useMessages } from '../hooks/useMessages';
 import MessagesPanel from '../components/MessagesPanel';
 import { useMessageModal } from '../context/MessageModalContext';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  PieChart, Pie, Cell,
+} from 'recharts';
+
+const CHART_COLORS = ['#2563eb', '#7c3aed', '#f59e0b', '#10b981', '#ef4444', '#ec4899', '#06b6d4', '#8b5cf6'];
 
 const NAV_ITEMS = [
   { id: 'dashboard',     label: 'Dashboard',           icon: LayoutDashboard },
@@ -677,20 +684,169 @@ function PageConseillers({ token }) {
   );
 }
 
-/* ── Pages placeholder ── */
-function PageDashboard() {
+/* ── Page Dashboard ── */
+function PageDashboard({ token }) {
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true); setError('');
+    apiGetDashboardAdmin(token).then(data => {
+      if (mounted) setStats(data);
+    }).catch(e => {
+      if (mounted) setError(e.message);
+    }).finally(() => {
+      if (mounted) setLoading(false);
+    });
+    return () => { mounted = false; };
+  }, [token]);
+
+  const statCard = (label, value, color = 'blue') => (
+    <div className="cons-stat-card" style={{ borderTop: `3px solid var(--${color}-600, #2563eb)` }}>
+      <span className="cons-stat-card__value">{value}</span>
+      <span className="cons-stat-card__label">{label}</span>
+    </div>
+  );
+
+  const listBlock = (title, items, keyField, countField) => (
+    <div style={{ background: '#fff', borderRadius: '.5rem', border: '1px solid #e2e8f0', padding: '1rem', marginBottom: '1rem' }}>
+      <h4 style={{ margin: '0 0 .75rem', fontSize: '.9rem', color: '#1e293b' }}>{title}</h4>
+      {items?.length === 0 ? (
+        <p style={{ color: '#94a3b8', fontSize: '.8rem' }}>Aucune donnée</p>
+      ) : (
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '.35rem' }}>
+          {items?.map(item => (
+            <li key={item[keyField]} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.85rem', color: '#475569' }}>
+              <span>{item[keyField]}</span>
+              <span style={{ fontWeight: 600, color: '#1e293b' }}>{item[countField]}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+
+  if (loading) return (
+    <div className="cons-page">
+      <h2 className="cons-page__title">Dashboard</h2>
+      <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center', color: '#94a3b8', padding: '2rem 0' }}>
+        <Loader size={16} className="auth-spinner" /> Chargement…
+      </div>
+    </div>
+  );
+
+  if (error) return (
+    <div className="cons-page">
+      <h2 className="cons-page__title">Dashboard</h2>
+      <p style={{ color: '#dc2626', fontSize: '.875rem' }}><AlertCircle size={14} /> {error}</p>
+    </div>
+  );
+
   return (
     <div className="cons-page">
       <h2 className="cons-page__title">Dashboard</h2>
-      <p className="cons-page__sub">Vue d'ensemble de la plateforme.</p>
+      <p className="cons-page__sub">Vue d'ensemble de la plateforme</p>
+
       <div className="cons-stats">
-        {[{label:'Étudiants',value:'—'},{label:'Dossiers actifs',value:'—'},{label:'En attente',value:'—'},{label:'Validés',value:'—'},{label:'Conseillers',value:'—'},{label:'Admins',value:'—'}].map(s => (
-          <div key={s.label} className="cons-stat-card"><span className="cons-stat-card__value">{s.value}</span><span className="cons-stat-card__label">{s.label}</span></div>
-        ))}
+        {statCard('Étudiants', stats?.totalEtudiants ?? 0, 'blue')}
+        {statCard('Dossiers', stats?.totalDossiers ?? 0, 'indigo')}
+        {statCard('Personnel', stats?.totalPersonnel ?? 0, 'amber')}
+        {statCard('Dossiers univ.', stats?.totalDossiersUniversite ?? 0, 'violet')}
+        {statCard('Messages non lus', stats?.totalMessagesNonLus ?? 0, 'green')}
+        {statCard('Notifications', stats?.totalNotificationsNonLues ?? 0, 'orange')}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem', marginTop: '1.5rem' }}>
+        {/* BarChart — Dossiers par statut général */}
+        <div style={{ background: '#fff', borderRadius: '.5rem', border: '1px solid #e2e8f0', padding: '1rem' }}>
+          <h4 style={{ margin: '0 0 .75rem', fontSize: '.9rem', color: '#1e293b' }}>Dossiers par statut général</h4>
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={stats?.dossiersParStatus || []}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis dataKey="status" tick={{ fontSize: 11 }} interval={0} angle={-15} textAnchor="end" height={50} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+              <Tooltip />
+              <Bar dataKey="count" name="Dossiers" radius={[4, 4, 0, 0]}>
+                {(stats?.dossiersParStatus || []).map((_, i) => (
+                  <Cell key={`cell-${i}`} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* PieChart — Personnel par rôle */}
+        <div style={{ background: '#fff', borderRadius: '.5rem', border: '1px solid #e2e8f0', padding: '1rem' }}>
+          <h4 style={{ margin: '0 0 .75rem', fontSize: '.9rem', color: '#1e293b' }}>Personnel par rôle</h4>
+          <ResponsiveContainer width="100%" height={250}>
+            <PieChart>
+              <Pie
+                data={stats?.personnelParRole || []}
+                dataKey="count"
+                nameKey="role"
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+                label={({ role, count }) => `${role}: ${count}`}
+                labelLine={false}
+              >
+                {(stats?.personnelParRole || []).map((_, i) => (
+                  <Cell key={`cell-${i}`} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* BarChart — Dossiers par statut admission */}
+        <div style={{ background: '#fff', borderRadius: '.5rem', border: '1px solid #e2e8f0', padding: '1rem' }}>
+          <h4 style={{ margin: '0 0 .75rem', fontSize: '.9rem', color: '#1e293b' }}>Dossiers par statut admission</h4>
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={stats?.dossiersParStatusAdmission || []}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis dataKey="status" tick={{ fontSize: 11 }} interval={0} angle={-15} textAnchor="end" height={50} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+              <Tooltip />
+              <Bar dataKey="count" name="Dossiers" radius={[4, 4, 0, 0]}>
+                {(stats?.dossiersParStatusAdmission || []).map((_, i) => (
+                  <Cell key={`cell-${i}`} fill={CHART_COLORS[(i + 2) % CHART_COLORS.length]} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* PieChart — Dossiers par statut visa */}
+        <div style={{ background: '#fff', borderRadius: '.5rem', border: '1px solid #e2e8f0', padding: '1rem' }}>
+          <h4 style={{ margin: '0 0 .75rem', fontSize: '.9rem', color: '#1e293b' }}>Dossiers par statut visa</h4>
+          <ResponsiveContainer width="100%" height={250}>
+            <PieChart>
+              <Pie
+                data={stats?.dossiersParStatusVisa || []}
+                dataKey="count"
+                nameKey="status"
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+                label={({ status, count }) => `${status}: ${count}`}
+                labelLine={false}
+              >
+                {(stats?.dossiersParStatusVisa || []).map((_, i) => (
+                  <Cell key={`cell-${i}`} fill={CHART_COLORS[(i + 4) % CHART_COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );
 }
+
 function PageHistorique()    { return <div className="cons-page"><h2 className="cons-page__title">Historique</h2><p className="cons-page__sub">Journal des actions.</p><div className="cons-empty"><History size={40} strokeWidth={1.2}/><p>Aucun événement enregistré.</p></div></div>; }
 function PageMessages(props) {
   return (
@@ -735,7 +891,7 @@ export default function DashboardSuperAdmin() {
 
   const renderPage = () => {
     switch (activePage) {
-      case 'dashboard':     return <PageDashboard />;
+      case 'dashboard':     return <PageDashboard token={token} />;
       case 'dossiers':      return <PageDossiers token={token} personnel={personnel} />;
       case 'etudiants':     return <PageEtudiants token={token} personnel={personnel} />;
       case 'conseillers':   return <PageConseillers token={token} />;
