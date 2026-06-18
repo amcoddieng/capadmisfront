@@ -3,7 +3,7 @@ import { Mail, Phone, MapPin, Clock, Send, CheckCircle } from 'lucide-react';
 
 const contactInfo = [
   { icon: <MapPin className="w-5 h-5 text-blue-600" />, label: 'Adresse', value: 'Dakar, Sénégal' },
-  { icon: <Phone className="w-5 h-5 text-blue-600" />, label: 'Téléphone / WhatsApp', value: '+221 00 000 00 00' },
+  { icon: <Phone className="w-5 h-5 text-blue-600" />, label: 'Téléphone / WhatsApp', value: '+221 76 948 60 60' },
   { icon: <Mail className="w-5 h-5 text-blue-600" />, label: 'Email', value: 'contact@capadmis.com' },
   { icon: <Clock className="w-5 h-5 text-blue-600" />, label: 'Disponibilité', value: 'Lun–Sam, 8h–20h' },
 ];
