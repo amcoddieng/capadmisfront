@@ -152,6 +152,10 @@ function PageInfos({ token, onVoirDossier }) {
             <span className="info-field__value">{profil.ville || '—'}</span>
           </div>
           <div className="info-field">
+            <span className="info-field__label">Téléphone</span>
+            <span className="info-field__value">{profil.telephone || '—'}</span>
+          </div>
+          <div className="info-field">
             <span className="info-field__label">Date de naissance</span>
             <span className="info-field__value">{formatDate(profil.date_de_naissance)}</span>
           </div>
@@ -202,6 +206,7 @@ function ModalInfos({ profil, onClose, onSuccess }) {
   const [form, setForm]       = useState({
     prenom:            profil.prenom || '',
     nom:               profil.nom || '',
+    telephone:         profil.telephone || '',
     sexe:              profil.sexe || '',
     payes:             profil.payes || '',
     ville:             profil.ville || '',
@@ -277,6 +282,15 @@ function ModalInfos({ profil, onClose, onSuccess }) {
                   <label className="form-label">Nom</label>
                   <input className="form-input" value={form.nom} onChange={e => set('nom', e.target.value)} />
                 </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Téléphone</label>
+                <input
+                  type="tel" className="form-input"
+                  value={form.telephone} onChange={e => set('telephone', e.target.value)}
+                  placeholder="Ex: +221 77 123 45 67"
+                />
               </div>
 
               <div className="form-group">

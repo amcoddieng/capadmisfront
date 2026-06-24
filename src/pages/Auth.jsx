@@ -15,7 +15,7 @@ export default function Auth() {
   const [error, setError]     = useState('');
 
   const [form, setForm] = useState({
-    prenom: '', nom: '', email: '', mdp: '',
+    prenom: '', nom: '', email: '', mdp: '', telephone: '',
     sexe: '', payes: '', ville: '',
     date_de_naissance: '', lieu_de_naissance: '',
   });
@@ -49,6 +49,7 @@ export default function Auth() {
         prenom:            form.prenom,
         email:             form.email,
         mdp:               form.mdp,
+        telephone:         form.telephone,
         sexe:              form.sexe,
         ville:             form.ville,
         payes:             form.payes,
@@ -173,6 +174,15 @@ export default function Auth() {
                     <div className="form-group">
                       <label className="form-label">Email *</label>
                       <input required type="email" className="form-input" value={form.email} onChange={e => set('email', e.target.value)} placeholder="votre@email.com" />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Téléphone *</label>
+                      <input
+                        required type="tel" className="form-input"
+                        value={form.telephone} onChange={e => set('telephone', e.target.value)}
+                        placeholder="Ex: +221 77 123 45 67"
+                      />
                     </div>
 
                     <div className="form-group">

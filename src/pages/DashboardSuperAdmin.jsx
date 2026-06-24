@@ -306,7 +306,7 @@ function PageDossiers({ token, personnel }) {
 function ModalEtudiant({ token, etudiant, onClose, onSuccess }) {
   const isEdit = !!etudiant;
   const [form, setForm] = useState({
-    nom: etudiant?.nom||'', prenom: etudiant?.prenom||'', email: etudiant?.email||'', mdp: '',
+    nom: etudiant?.nom||'', prenom: etudiant?.prenom||'', email: etudiant?.email||'', mdp: '', telephone: etudiant?.telephone||'',
     sexe: etudiant?.sexe||'M', ville: etudiant?.ville||'', payes: etudiant?.payes||'Sénégal',
     date_de_naissance: etudiant?.date_de_naissance?.slice(0,10)||'',
     lieu_de_naissance: etudiant?.lieu_de_naissance||'',
@@ -339,6 +339,10 @@ function ModalEtudiant({ token, etudiant, onClose, onSuccess }) {
             <div className="form-group" style={{gridColumn:'span 2'}}>
               <label className="form-label">Mot de passe {isEdit ? '(vide = inchangé)' : '*'}</label>
               <input className="form-input" type="password" required={!isEdit} value={form.mdp} onChange={e=>set('mdp',e.target.value)}/>
+            </div>
+            <div className="form-group" style={{gridColumn:'span 2'}}>
+              <label className="form-label">Téléphone</label>
+              <input className="form-input" type="tel" value={form.telephone} onChange={e=>set('telephone',e.target.value)} placeholder="Ex: +221 77 123 45 67"/>
             </div>
             <div className="form-group"><label className="form-label">Sexe</label>
               <select className="form-select" value={form.sexe} onChange={e=>set('sexe',e.target.value)}><option value="M">Homme</option><option value="F">Femme</option></select>
@@ -397,6 +401,7 @@ function PageEtudiants({ token, personnel }) {
       e.prenom?.toLowerCase().includes(q) ||
       e.nom?.toLowerCase().includes(q) ||
       e.email?.toLowerCase().includes(q) ||
+      e.telephone?.toLowerCase().includes(q) ||
       e.ville?.toLowerCase().includes(q) ||
       e.code_dossier?.toLowerCase().includes(q);
     const matchStatut = !filterStatut || (filterStatut === 'bloque' ? e.bloque : !e.bloque);
@@ -423,7 +428,7 @@ function PageEtudiants({ token, personnel }) {
       <div style={{ display: 'flex', gap: '.75rem', flexWrap: 'wrap', alignItems: 'center', marginBottom: '1.25rem', background: '#fff', padding: '.75rem 1rem', borderRadius: '.5rem', border: '1px solid #e2e8f0' }}>
         <input
           type="text"
-          placeholder="Rechercher (prénom, nom, email, ville, code dossier...)"
+          placeholder="Rechercher (prénom, nom, email, téléphone, ville, code dossier...)"
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{ flex: 1, minWidth: 200, padding: '.4rem .6rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.85rem' }}
@@ -439,13 +444,14 @@ function PageEtudiants({ token, personnel }) {
       <TableWrap loading={loading} error={error}>
         <div className="sa-table-wrap">
           <table className="sa-table">
-            <thead><tr><th>Prénom</th><th>Nom</th><th>Email</th><th>Ville</th><th>Pays</th><th>Statut</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Prénom</th><th>Nom</th><th>Email</th><th>Téléphone</th><th>Ville</th><th>Pays</th><th>Statut</th><th>Actions</th></tr></thead>
             <tbody>
-              {filtered.length === 0 && <tr><td colSpan={7} className="sa-empty">Aucun étudiant trouvé</td></tr>}
+              {filtered.length === 0 && <tr><td colSpan={8} className="sa-empty">Aucun étudiant trouvé</td></tr>}
               {filtered.map(e => (
                 <tr key={e.id}>
                   <td>{e.prenom}</td><td>{e.nom}</td>
                   <td style={{fontSize:'.8rem'}}>{e.email}</td>
+                  <td style={{fontSize:'.8rem'}}>{e.telephone || '—'}</td>
                   <td>{e.ville||'—'}</td><td>{e.payes||'—'}</td>
                   <td><span className={`status-badge status-badge--${e.bloque?'red':'green'}`}>{e.bloque?'Bloqué':'Actif'}</span></td>
                   <td><div className="sa-actions">
