@@ -45,15 +45,12 @@ export default function Home() {
     <main>
 
       {/* ── HERO ── */}
-      <section
-        className="hero"
-        style={{
-          backgroundImage: `url(${heroImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        }}
-      >
+      <section className="hero">
+        <img
+          src={heroImage}
+          alt="Étudiants africains préparant leur admission en France"
+          className="hero__image"
+        />
         <div className="hero__overlay" />
         <div className="hero__content">
           <div className="hero__actions">

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   LogOut, User, FolderOpen,
   Bell, MessageSquare, ChevronDown, Pencil, X,
-  Loader, AlertCircle, CheckCircle, FolderSearch, Lock, Send,
+  Loader, AlertCircle, CheckCircle, FolderSearch, Lock,
   Download, Trash2, Upload, RefreshCw, Eye, School,
 } from 'lucide-react';
 import logoHeader from '../assets/les images du site/logo-horizontal-2x.png';
@@ -11,7 +11,7 @@ import {
   getSession, clearSession, apiLogout, apiGetMe, apiUpdateMe,
   apiGetDossier, apiGetInfosDossier, apiPostInfosDossier, apiPutInfosDossier,
   apiListPiecesJointes, apiGetPieceJointeUrl, apiAddPieceJointe, apiReplacePieceJointe, apiDeletePieceJointe,
-  apiGenererCode, apiModifierInfosCode, apiListDossiersUniversiteByDossier,
+  apiListDossiersUniversiteByDossier,
 } from '../api/auth';
 import { useNotifications } from '../hooks/useNotifications';
 import NotificationsPanel from '../components/NotificationsPanel';
@@ -169,6 +169,7 @@ function PageInfos({ token, onVoirDossier }) {
       {/* ── Modal modification infos ── */}
       {modalOpen && (
         <ModalInfos
+          token={token}
           profil={profil}
           onClose={() => setModalOpen(false)}
           onSuccess={fetchProfil}
@@ -189,17 +190,14 @@ function PageInfos({ token, onVoirDossier }) {
 
       {/* ── Modal Mot de passe ── */}
       {mdpOpen && (
-        <ModalPassword token={token} email={profil.email} onClose={() => setMdpOpen(false)} />
+        <ModalPassword token={token} onClose={() => setMdpOpen(false)} />
       )}
     </>
   );
 }
 
-/* ── Modal modification infos (codes temporaires) ── */
-function ModalInfos({ profil, onClose, onSuccess }) {
-  const [step, setStep]       = useState(1);
-  const [code, setCode]       = useState('');
-  const [sending, setSending] = useState(false);
+/* ── Modal modification infos ── */
+function ModalInfos({ token, profil, onClose, onSuccess }) {
   const [saving, setSaving]   = useState(false);
   const [error, setError]     = useState('');
   const [success, setSuccess] = useState(false);
@@ -216,28 +214,12 @@ function ModalInfos({ profil, onClose, onSuccess }) {
 
   const set = (f, v) => setForm(p => ({ ...p, [f]: v }));
 
-  /* Étape 1 → enregistrer : envoie le code et passe à l'étape 2 */
-  const handleSave = async (e) => {
-    e.preventDefault();
-    setSending(true);
-    setError('');
-    try {
-      await apiGenererCode(profil.email, 'modification_infos');
-      setStep(2);
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setSending(false);
-    }
-  };
-
-  /* Étape 2 → confirmer avec le code */
-  const handleConfirm = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
     setError('');
     try {
-      await apiModifierInfosCode({ email: profil.email, code, ...form });
+      await apiUpdateMe(token, form);
       setSuccess(true);
       await onSuccess();
       setTimeout(onClose, 1500);
@@ -252,9 +234,7 @@ function ModalInfos({ profil, onClose, onSuccess }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={e => e.stopPropagation()}>
         <div className="modal__header">
-          <h3 className="modal__title">
-            {step === 1 ? 'Modifier mes informations' : 'Valider les modifications'}
-          </h3>
+          <h3 className="modal__title">Modifier mes informations</h3>
           <button className="modal__close" onClick={onClose}><X size={18} /></button>
         </div>
 
@@ -270,9 +250,8 @@ function ModalInfos({ profil, onClose, onSuccess }) {
             </div>
           )}
 
-          {/* ── Étape 1 : formulaire ── */}
-          {step === 1 && !success && (
-            <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {!success && (
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div className="form-row">
                 <div className="form-group">
                   <label className="form-label">Prénom</label>
@@ -329,42 +308,9 @@ function ModalInfos({ profil, onClose, onSuccess }) {
 
               <div className="modal__footer" style={{ marginTop: 0 }}>
                 <button type="button" className="form-back" onClick={onClose}>Annuler</button>
-                <button type="submit" className="form-submit" disabled={sending}>
-                  {sending ? <Loader size={15} className="auth-spinner" /> : <CheckCircle size={15} />}
-                  {sending ? 'Envoi du code...' : 'Enregistrer'}
-                </button>
-              </div>
-            </form>
-          )}
-
-          {/* ── Étape 2 : saisie du code ── */}
-          {step === 2 && !success && (
-            <form onSubmit={handleConfirm} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div className="pwd-step" style={{ paddingTop: '.5rem', paddingBottom: '.5rem' }}>
-                <div className="pwd-step__icon"><Send size={20} /></div>
-                <p className="pwd-step__text">
-                  Un code de validation a été envoyé à :
-                </p>
-                <p className="pwd-step__email">{profil.email}</p>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Code de validation *</label>
-                <input
-                  required className="form-input"
-                  value={code} onChange={e => setCode(e.target.value)}
-                  placeholder="Ex: 482931" maxLength={6} inputMode="numeric"
-                  autoFocus
-                />
-              </div>
-
-              <div className="modal__footer" style={{ marginTop: 0 }}>
-                <button type="button" className="form-back" onClick={() => { setStep(1); setCode(''); setError(''); }}>
-                  Retour
-                </button>
                 <button type="submit" className="form-submit" disabled={saving}>
                   {saving ? <Loader size={15} className="auth-spinner" /> : <CheckCircle size={15} />}
-                  {saving ? 'Validation...' : 'Confirmer'}
+                  {saving ? 'Enregistrement…' : 'Enregistrer'}
                 </button>
               </div>
             </form>
@@ -375,39 +321,20 @@ function ModalInfos({ profil, onClose, onSuccess }) {
   );
 }
 
-/* ── Modal changement de mot de passe (2 étapes) ── */
-function ModalPassword({ token, email, onClose }) {
-  const [step, setStep]           = useState(1);
+/* ── Modal changement de mot de passe ── */
+function ModalPassword({ token, onClose }) {
   const [mdpActuel, setMdpActuel] = useState('');
   const [mdpNew, setMdpNew]       = useState('');
-  const [code, setCode]           = useState('');
-  const [sending, setSending]     = useState(false);
   const [saving, setSaving]       = useState(false);
   const [error, setError]         = useState('');
-  const [success, setSuccess]     = useState(false);
+  const [success, setSuccess]   = useState(false);
 
-  /* Étape 1 → Enregistrer : envoie le code de validation */
-  const handleSave = async (e) => {
-    e.preventDefault();
-    setSending(true);
-    setError('');
-    try {
-      await apiGenererCode(email, 'modification_mot_de_passe');
-      setStep(2);
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setSending(false);
-    }
-  };
-
-  /* Étape 2 → Confirmer avec le code → applique le changement */
-  const handleConfirm = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
     setError('');
     try {
-      await apiUpdateMe(token, { mdp_actuel: mdpActuel, mdp: mdpNew, code });
+      await apiUpdateMe(token, { mdp_actuel: mdpActuel, mdp: mdpNew });
       setSuccess(true);
       setTimeout(onClose, 1500);
     } catch (e) {
@@ -421,9 +348,7 @@ function ModalPassword({ token, email, onClose }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" style={{ maxWidth: '420px' }} onClick={e => e.stopPropagation()}>
         <div className="modal__header">
-          <h3 className="modal__title">
-            {step === 1 ? 'Changer le mot de passe' : 'Valider le changement'}
-          </h3>
+          <h3 className="modal__title">Changer le mot de passe</h3>
           <button className="modal__close" onClick={onClose}><X size={18} /></button>
         </div>
 
@@ -439,9 +364,8 @@ function ModalPassword({ token, email, onClose }) {
             </div>
           )}
 
-          {/* ── Étape 1 : saisie des mots de passe ── */}
-          {step === 1 && !success && (
-            <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {!success && (
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div className="form-group">
                 <label className="form-label">Mot de passe actuel *</label>
                 <input
@@ -461,38 +385,9 @@ function ModalPassword({ token, email, onClose }) {
               </div>
               <div className="modal__footer" style={{ marginTop: 0 }}>
                 <button type="button" className="form-back" onClick={onClose}>Annuler</button>
-                <button type="submit" className="form-submit" disabled={sending}>
-                  {sending ? <Loader size={15} className="auth-spinner" /> : <CheckCircle size={15} />}
-                  {sending ? 'Envoi du code...' : 'Enregistrer'}
-                </button>
-              </div>
-            </form>
-          )}
-
-          {/* ── Étape 2 : saisie du code de validation ── */}
-          {step === 2 && !success && (
-            <form onSubmit={handleConfirm} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div className="pwd-step" style={{ paddingTop: '.5rem', paddingBottom: '.5rem' }}>
-                <div className="pwd-step__icon"><Send size={20} /></div>
-                <p className="pwd-step__text">Un code de validation a été envoyé à :</p>
-                <p className="pwd-step__email">{email}</p>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Code de validation *</label>
-                <input
-                  required className="form-input"
-                  value={code} onChange={e => setCode(e.target.value)}
-                  placeholder="Ex: 482931" maxLength={6} inputMode="numeric"
-                  autoFocus
-                />
-              </div>
-              <div className="modal__footer" style={{ marginTop: 0 }}>
-                <button type="button" className="form-back" onClick={() => { setStep(1); setCode(''); setError(''); }}>
-                  Retour
-                </button>
                 <button type="submit" className="form-submit" disabled={saving}>
                   {saving ? <Loader size={15} className="auth-spinner" /> : <CheckCircle size={15} />}
-                  {saving ? 'Validation...' : 'Confirmer'}
+                  {saving ? 'Enregistrement…' : 'Enregistrer'}
                 </button>
               </div>
             </form>
