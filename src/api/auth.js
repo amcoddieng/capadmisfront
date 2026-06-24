@@ -1,5 +1,5 @@
-// const BASE = import.meta.env.PROD ? 'https://capadmis.onrender.com/api' : '/api';
-const BASE = 'http://localhost:3000/api';
+const BASE = import.meta.env.PROD ? 'https://capadmis.onrender.com/api' : '/api';
+// const BASE = 'http://localhost:3000/api';
 
 /* ── In-memory token store (never in localStorage) ── */
 let _studentToken = null;
