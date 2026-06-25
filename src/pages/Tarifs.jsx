@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { ArrowRight, CheckCircle, X, HelpCircle } from 'lucide-react';
 import { getStartPath } from '../api/auth';
 
@@ -72,6 +73,12 @@ const faqs = [
 export default function Tarifs() {
   return (
     <main>
+      <Helmet>
+        <title>Nos tarifs — Capadmis</title>
+        <meta name="description" content="Découvrez nos tarifs transparents pour l'accompagnement études à l'étranger. À partir de 39 900 FCFA. 3x moins cher qu'une agence classique." />
+        <link rel="canonical" href="https://capadmis.com/tarifs" />
+      </Helmet>
+
       {/* Hero */}
       <section className="page-hero page-hero--center">
         <div className="container">

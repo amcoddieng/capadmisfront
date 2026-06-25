@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { ArrowRight, Target, Cpu, BookOpen, Globe, Users, Shield, CheckCircle } from 'lucide-react';
 import { getStartPath } from '../api/auth';
 
@@ -35,6 +36,12 @@ const missionStats = [
 export default function APropos() {
   return (
     <main>
+      <Helmet>
+        <title>À propos — Capadmis</title>
+        <meta name="description" content="Découvrez Capadmis, la plateforme digitale qui accompagne les étudiants africains dans leurs études à l'étranger. Notre mission, nos valeurs et notre équipe." />
+        <link rel="canonical" href="https://capadmis.com/a-propos" />
+      </Helmet>
+
       {/* Hero */}
       <section className="page-hero">
         <div className="container">

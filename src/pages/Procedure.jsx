@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { ArrowRight, CheckCircle, FileText, Users, BookOpen, Trophy, Plane, Stamp, Star } from 'lucide-react';
 import { getStartPath } from '../api/auth';
 
@@ -128,6 +129,12 @@ const steps = [
 export default function Procedure() {
   return (
     <main>
+      <Helmet>
+        <title>Procédure Campus France — Capadmis</title>
+        <meta name="description" content="Découvrez les 8 étapes clés pour réussir votre admission et obtenir votre visa étudiant. Capadmis vous accompagne de l'orientation au départ." />
+        <link rel="canonical" href="https://capadmis.com/procedure" />
+      </Helmet>
+
       {/* Hero */}
       <section className="page-hero--gradient">
         <div className="container">

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle } from 'lucide-react';
 
 const contactInfo = [
@@ -21,6 +22,12 @@ export default function Contact() {
 
   return (
     <main>
+      <Helmet>
+        <title>Contact — Capadmis</title>
+        <meta name="description" content="Contactez Capadmis pour toute question sur votre procédure d'études à l'étranger. WhatsApp, email ou téléphone. Réponse rapide garantie." />
+        <link rel="canonical" href="https://capadmis.com/contact" />
+      </Helmet>
+
       {/* Hero */}
       <section className="page-hero--gradient page-hero--center">
         <div className="container">

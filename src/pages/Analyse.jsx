@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { ArrowRight, BarChart3, CheckCircle, AlertTriangle, TrendingUp, Star, Info } from 'lucide-react';
 import { getStartPath } from '../api/auth';
 
@@ -72,6 +73,12 @@ export default function Analyse() {
 
   return (
     <main>
+      <Helmet>
+        <title>Analyse gratuite — Capadmis</title>
+        <meta name="description" content="Analysez gratuitement vos chances d'admission en France. Évaluez votre profil académique et recevez des recommandations personnalisées d'universités." />
+        <link rel="canonical" href="https://capadmis.com/analyse" />
+      </Helmet>
+
       {/* Hero */}
       <section className="page-hero--gradient page-hero--center">
         <div className="container">

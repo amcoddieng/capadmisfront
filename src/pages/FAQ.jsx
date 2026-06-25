@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
 
 const faqCategories = [
@@ -69,6 +70,12 @@ export default function FAQ() {
 
   return (
     <main>
+      <Helmet>
+        <title>FAQ — Capadmis</title>
+        <meta name="description" content="Trouvez les réponses à vos questions sur la procédure Campus France, le visa étudiant, les tarifs et la plateforme Capadmis." />
+        <link rel="canonical" href="https://capadmis.com/faq" />
+      </Helmet>
+
       {/* Hero */}
       <section className="page-hero--gradient page-hero--center">
         <div className="container">

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Eye, EyeOff, ArrowRight, CheckCircle, AlertCircle, Loader } from 'lucide-react';
 import { apiLogin, apiRegister, apiGetDossier, saveSession } from '../api/auth';
 import logoAuth from '../assets/les images du site/logo-horizontal-white-bg - Copie.png';
@@ -69,6 +70,11 @@ export default function Auth() {
 
   return (
     <div className="auth-page">
+      <Helmet>
+        <title>Connexion / Inscription — Capadmis</title>
+        <meta name="description" content="Connectez-vous ou créez votre compte Capadmis pour démarrer votre procédure d'études à l'étranger." />
+        <meta name="robots" content="noindex, follow" />
+      </Helmet>
       <div className="auth-wrapper">
         {/* Logo */}
         <div className="auth-logo">

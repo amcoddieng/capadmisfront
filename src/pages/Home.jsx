@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { ArrowRight, CheckCircle, Star, BarChart3, Shield, Award, Globe, Zap, TrendingUp } from 'lucide-react';
 import { getStartPath } from '../api/auth';
 import heroImage from '../assets/hero.png';
@@ -43,6 +44,11 @@ const dashboardItems = [
 export default function Home() {
   return (
     <main>
+      <Helmet>
+        <title>Capadmis — Accompagnement études à l'étranger</title>
+        <meta name="description" content="Capadmis : plateforme digitale d'accompagnement pour vos études en France, Canada, Belgique et plus. De l'orientation au visa." />
+        <link rel="canonical" href="https://capadmis.com/" />
+      </Helmet>
 
       {/* ── HERO ── */}
       <section className="hero">

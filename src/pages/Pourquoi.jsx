@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { ArrowRight, CheckCircle, X, Zap, BarChart3, Shield, Users, Bell, TrendingUp, Award, Clock } from 'lucide-react';
 import { getStartPath } from '../api/auth';
 
@@ -63,6 +64,12 @@ const testimonialHighlight = {
 export default function Pourquoi() {
   return (
     <main>
+      <Helmet>
+        <title>Pourquoi Capadmis — Accompagnement études à l'étranger</title>
+        <meta name="description" content="Capadmis vs agences classiques : processus 100% digital, suivi transparent, tarif accessible. Découvrez pourquoi plus de 500 étudiants nous font confiance." />
+        <link rel="canonical" href="https://capadmis.com/pourquoi" />
+      </Helmet>
+
       {/* Hero */}
       <section className="page-hero--gradient">
         <div className="container">

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { ArrowRight, Star, Quote } from 'lucide-react';
 import { getStartPath } from '../api/auth';
 
@@ -24,6 +25,12 @@ const stats = [
 export default function Temoignages() {
   return (
     <main>
+      <Helmet>
+        <title>Témoignages — Capadmis</title>
+        <meta name="description" content="Découvrez les témoignages de nos étudiants admis en France. Plus de 500 étudiants accompagnés avec un taux de satisfaction de 95%." />
+        <link rel="canonical" href="https://capadmis.com/temoignages" />
+      </Helmet>
+
       {/* Hero */}
       <section className="page-hero--gradient page-hero--center">
         <div className="container">
