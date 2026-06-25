@@ -73,7 +73,8 @@ Inscription d'un étudiant. Crée automatiquement un dossier.
   "ville": "Dakar",
   "payes": "Sénégal",
   "date_de_naissance": "2000-05-15",
-  "lieu_de_naissance": "Dakar"
+  "lieu_de_naissance": "Dakar",
+  "telephone": "221771234567"
 }
 ```
 
@@ -92,7 +93,7 @@ Inscription d'un étudiant. Crée automatiquement un dossier.
 **Erreurs :**
 | Code | Cause |
 |---|---|
-| `400` | Email déjà utilisé |
+| `400` | Téléphone manquant, email ou téléphone déjà utilisé |
 | `500` | Erreur serveur |
 
 ---
@@ -369,7 +370,7 @@ Lister tous les étudiants.
 ```json
 {
   "etudiants": [
-    { "id": 1, "nom": "Diallo", "prenom": "Moussa", "email": "moussa@example.com", "bloque": false, ... }
+    { "id": 1, "nom": "Diallo", "prenom": "Moussa", "email": "moussa@example.com", "telephone": "221771234567", "bloque": false, ... }
   ]
 }
 ```
@@ -377,10 +378,11 @@ Lister tous les étudiants.
 ---
 
 ### `PUT /api/etudiants/me`
-L'étudiant connecté modifie son propre profil.
+L'étudiant connecté modifie son propre profil (informations personnelles, téléphone, mot de passe).
 
 **Auth :** Token étudiant
 
+> ✅ Aucun code temporaire requis — modification directe.
 > ⚠️ Ne peut pas modifier son email via cette route. Compte bloqué → `403`.
 > Pour changer le mot de passe, `mdp_actuel` est **obligatoire**.
 
@@ -394,6 +396,7 @@ L'étudiant connecté modifie son propre profil.
   "payes": "Sénégal",
   "date_de_naissance": "2000-01-01",
   "lieu_de_naissance": "Thiès",
+  "telephone": "221771234567",
   "mdp_actuel": "ancienmdp",
   "mdp": "nouveaumotdepasse"
 }
@@ -431,9 +434,12 @@ Créer un étudiant (par admin/superadmin). Crée automatiquement un dossier.
   "ville": "Ziguinchor",
   "payes": "Sénégal",
   "date_de_naissance": "1999-08-20",
-  "lieu_de_naissance": "Ziguinchor"
+  "lieu_de_naissance": "Ziguinchor",
+  "telephone": "221771234567"
 }
 ```
+
+> `telephone` est optionnel lors de la création par un admin.
 
 **Réponse `201` :**
 ```json
@@ -453,7 +459,7 @@ Modifier un étudiant.
 
 **Params :** `id`
 
-**Body :** *(tous optionnels — mêmes champs que la création)*
+**Body :** *(tous optionnels — mêmes champs que la création, dont `telephone`)*
 
 **Réponse `200` :**
 ```json
@@ -626,6 +632,8 @@ Assigner un conseiller à un dossier.
 `type` : `"admission"` ou `"visa"`
 
 > ⚠️ Le conseiller doit avoir le rôle correspondant au type (`conseiller_admission` ou `conseiller_visa`).
+
+> 💡 Lors de la **première assignation** d'un conseiller `admission`, le `status` du dossier passe automatiquement à `EN_COURS_D_ETUDE`.
 
 **Réponse `200` :**
 ```json
@@ -903,6 +911,9 @@ Créer les informations académiques d'un dossier.
   "pays_souhaite": "France",
   "filieres": ["Informatique", "Génie logiciel"],
   "nombre_fois_bac": 1,
+  "serie_bac": "S2",
+  "formation_en_cours": "Licence Informatique",
+  "paiement": false,
   "status": "EN_ATTENTE"
 }
 ```
@@ -921,6 +932,9 @@ Créer les informations académiques d'un dossier.
     "pays_souhaite": "France",
     "filieres": ["Informatique", "Génie logiciel"],
     "nombre_fois_bac": 1,
+    "serie_bac": "S2",
+    "formation_en_cours": "Licence Informatique",
+    "paiement": false,
     "status": "EN_ATTENTE",
     "createdAt": "...",
     "updatedAt": "..."
@@ -931,7 +945,7 @@ Créer les informations académiques d'un dossier.
 **Erreurs :**
 | Code | Cause |
 |---|---|
-| `400` | Champs requis manquants |
+| `400` | Champs requis manquants (niveau_etude, pays_souhaite, filieres, nombre_fois_bac, serie_bac, formation_en_cours) |
 | `403` | Accès refusé (dossier ne vous appartient pas, ou conseiller non assigné) |
 | `409` | Infos déjà créées pour ce dossier |
 
@@ -960,29 +974,22 @@ Modifier les informations d'un dossier.
 
 **Params :** `code_dossier`
 
-**Body :** *(tous optionnels sauf `code_validation` pour les étudiants)*
+**Body :** *(tous optionnels)*
 ```json
 {
   "niveau_etude": "Master 1",
   "pays_souhaite": "Canada",
   "filieres": ["Intelligence Artificielle"],
   "nombre_fois_bac": 2,
-  "status": "VALIDE",
-  "code_validation": "482931"
+  "serie_bac": "S1",
+  "formation_en_cours": "Licence Mathématiques",
+  "paiement": true,
+  "status": "VALIDE"
 }
 ```
 
 > ⚠️ Si l'appelant est un **étudiant** :
-> - `code_validation` est **obligatoire** — générez-le d'abord via `POST /api/codes-temporaires/generer` avec `type: "modification_infos"`
 > - Le `status` est automatiquement forcé à `EN_ATTENTE` quel que soit ce qui est envoyé
-> - Le code est **consommé** après utilisation (non réutilisable)
-
-**Flux étudiant :**
-```
-1. POST /api/codes-temporaires/generer  →  { email, type: "modification_infos" }
-2. Récupérer le code reçu par email
-3. PUT /api/infos-dossier/:code_dossier →  { ...modifications, code_validation: "482931" }
-```
 
 **Valeurs `status` (personnel uniquement) :** `EN_ATTENTE`, `VALIDE`, `INVALIDE`
 
@@ -997,7 +1004,41 @@ Modifier les informations d'un dossier.
 **Erreurs :**
 | Code | Cause |
 |---|---|
-| `400` | `code_validation` absent (étudiant), code invalide ou expiré |
+| `400` | Aucun champ fourni ou `status` invalide |
+
+---
+
+### `PATCH /api/infos-dossier/:code_dossier/paiement`
+Basculer le statut de paiement d'un dossier (true/false).
+
+**Auth :** Token personnel — tout rôle (`admin`, `superadmin`, `conseiller_admission`, `conseiller_visa`)
+
+**Params :** `code_dossier`
+
+**Body :**
+```json
+{
+  "paiement": true
+}
+```
+
+> 💡 Cette route est **réservée au personnel**. Les étudiants ne peuvent pas modifier le paiement.
+
+**Réponse `200` :**
+```json
+{
+  "message": "Paiement mis à jour",
+  "infos": { ... }
+}
+```
+
+**Erreurs :**
+| Code | Cause |
+|---|---|
+| `400` | `paiement` manquant ou non booléen |
+| `401` | Token absent |
+| `403` | Token étudiant (réservé au personnel) |
+| `404` | Dossier introuvable |
 
 ---
 
@@ -1234,20 +1275,18 @@ Modifie le mot de passe après validation du code temporaire.
 ### `POST /api/codes-temporaires/modifier-infos`
 Modifie les informations personnelles après validation du code temporaire.
 
+> 💡 **Pour les étudiants**, utiliser directement `PUT /api/etudiants/me` — aucun code requis.
+> Cette route est principalement utilisée par le **personnel** (admin, superadmin, conseillers) pour modifier leur nom/prénom.
+
 **Auth :** Aucune (le code valide l'identité)
 
 **Body :**
 ```json
 {
-  "email": "moussa@example.com",
+  "email": "conseiller@capadmis.com",
   "code": "482931",
   "nom": "Nouveau nom",
-  "prenom": "Nouveau prénom",
-  "ville": "Thiès",
-  "payes": "Sénégal",
-  "sexe": "M",
-  "date_de_naissance": "2000-05-15",
-  "lieu_de_naissance": "Thiès"
+  "prenom": "Nouveau prénom"
 }
 ```
 
@@ -1280,7 +1319,8 @@ Modifie les informations personnelles après validation du code temporaire.
 ### `StatusDossier`
 | Valeur | Signification |
 |---|---|
-| `EN_COURS_D_ETUDE` | Dossier en cours de traitement *(défaut)* |
+| `non_demarre` | Aucun conseiller assigné *(défaut à la création)* |
+| `EN_COURS_D_ETUDE` | Automatiquement défini lors de la **première assignation** d'un conseiller admission |
 | `VALIDE` | Dossier validé |
 | `CHANGEMENT_A_APPORTER` | Des modifications sont requises |
 
@@ -1395,6 +1435,7 @@ Modifie les informations personnelles après validation du code temporaire.
 | Envoyer / recevoir des messages | ✅ | ✅ | ✅ | ✅ |
 | Créer / modifier / supprimer un dossier université | ❌ | ✅ *(si conseiller admission assigné)* | ✅ | ✅ |
 | Voir les dossiers université | ❌ | ✅ *(si assigné)* | ✅ | ✅ |
+| Envoyer un message WhatsApp | ❌ | ✅ | ✅ | ✅ |
 
 ---
 
@@ -1678,6 +1719,44 @@ socket.on('message', (msg) => {
 
 ---
 
+## 📱 WhatsApp
+
+Envoi de messages WhatsApp via **WaAPI** (`waapi.app`). Nécessite une instance WaAPI active et connectée.
+
+### `POST /api/whatsapp/send`
+Envoyer un message WhatsApp à un numéro de téléphone.
+
+**Auth :** Token personnel — tout rôle
+
+**Body :**
+```json
+{
+  "telephone": "221771234567",
+  "message": "Bonjour, votre dossier est en cours de traitement."
+}
+```
+
+> Le numéro doit inclure l'indicatif pays sans le `+` (ex: `221771234567` pour le Sénégal).
+
+**Réponse `200` :**
+```json
+{ "message": "Message WhatsApp envoyé avec succès" }
+```
+
+**Erreurs :**
+| Code | Cause |
+|------|-------|
+| `400` | `telephone` ou `message` manquant |
+| `500` | Échec d'envoi (instance WaAPI non connectée, numéro invalide…) |
+
+> **Variables d'environnement requises :**
+> ```env
+> WAAPI_INSTANCE_ID=votre_instance_id
+> WAAPI_TOKEN=votre_api_token
+> ```
+
+---
+
 ## ⚠️ Codes d'erreur communs
 
 | Code HTTP | Signification |
@@ -1686,5 +1765,5 @@ socket.on('message', (msg) => {
 | `401` | Token absent |
 | `403` | Token invalide/expiré, compte bloqué, ou accès non autorisé |
 | `404` | Ressource introuvable |
-| `409` | Conflit (email déjà utilisé, dossier déjà existant…) |
+| `409` | Conflit (email ou téléphone déjà utilisé, dossier déjà existant…) |
 | `500` | Erreur interne du serveur |

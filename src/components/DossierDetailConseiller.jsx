@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Loader, AlertCircle, Send, Pencil, Eye, User, FolderOpen, CheckCircle, Upload, MessageSquare, Mail, MapPin, Globe, BookOpen, FileText, Calendar, Shield, Award, School, Trash2, Plus, Download } from 'lucide-react';
-import { apiGetInfosDossier, apiListPiecesJointes, apiGetPieceJointeUrl, apiUpdateDossierStatus, apiAddPieceJointe, apiUpdatePieceJointeStatus, apiPutInfosDossier, apiListDossiersUniversite, apiListDossiersUniversiteByDossier, apiCreateDossierUniversite, apiUpdateDossierUniversite, apiDeleteDossierUniversite } from '../api/auth';
+import { apiGetInfosDossier, apiListPiecesJointes, apiGetPieceJointeUrl, apiUpdateDossierStatus, apiAddPieceJointe, apiUpdatePieceJointeStatus, apiPutInfosDossier, apiPatchPaiement, apiListDossiersUniversite, apiListDossiersUniversiteByDossier, apiCreateDossierUniversite, apiUpdateDossierUniversite, apiDeleteDossierUniversite } from '../api/auth';
 import { useMessageModal } from '../context/MessageModalContext';
 
 const STATUS_OPTIONS      = ['EN_COURS_D_ETUDE','VALIDE','INVALIDE','EN_ATTENTE','CHANGEMENT_A_APPORTER'];
@@ -267,10 +267,12 @@ const PAYS_CIBLE_LISTE = ['France', 'Canada', 'Belgique', 'Suisse', 'Espagne', '
 /* ── Modal infos académiques ── */
 function ModalInfosAcademiques({ token, codeDossier, infos, onClose, onSuccess }) {
   const [form, setForm] = useState({
-    niveau_etude:    infos?.niveau_etude || '',
-    pays_souhaite:   infos?.pays_souhaite || '',
-    filieres:        infos?.filieres?.join(', ') || '',
-    nombre_fois_bac: infos?.nombre_fois_bac ?? 1,
+    niveau_etude:     infos?.niveau_etude || '',
+    pays_souhaite:    infos?.pays_souhaite || '',
+    filieres:         infos?.filieres?.join(', ') || '',
+    nombre_fois_bac:  infos?.nombre_fois_bac ?? 1,
+    serie_bac:        infos?.serie_bac || '',
+    formation_en_cours: infos?.formation_en_cours || '',
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -280,13 +282,15 @@ function ModalInfosAcademiques({ token, codeDossier, infos, onClose, onSuccess }
     e.preventDefault();
     setSaving(true); setError('');
     try {
-      await apiPutInfosDossier(token, codeDossier, {
-        niveau_etude:    form.niveau_etude,
-        pays_souhaite:   form.pays_souhaite,
-        filieres:        form.filieres.split(',').map(s => s.trim()).filter(Boolean),
-        nombre_fois_bac: Number(form.nombre_fois_bac),
+      const updated = await apiPutInfosDossier(token, codeDossier, {
+        niveau_etude:     form.niveau_etude,
+        pays_souhaite:    form.pays_souhaite,
+        filieres:         form.filieres.split(',').map(s => s.trim()).filter(Boolean),
+        nombre_fois_bac:  Number(form.nombre_fois_bac),
+        serie_bac:        form.serie_bac,
+        formation_en_cours: form.formation_en_cours,
       });
-      await onSuccess();
+      onSuccess(updated);
       onClose();
     } catch (e) { setError(e.message); } finally { setSaving(false); }
   };
@@ -319,9 +323,19 @@ function ModalInfosAcademiques({ token, codeDossier, infos, onClose, onSuccess }
               <label className="form-label">Filières souhaitées <span style={{ color: '#94a3b8', fontWeight: 400 }}>(séparées par des virgules)</span></label>
               <input className="form-input" value={form.filieres} onChange={e => set('filieres', e.target.value)} placeholder="Ex: Informatique, Génie logiciel" required />
             </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">Série bac</label>
+                <input className="form-input" value={form.serie_bac} onChange={e => set('serie_bac', e.target.value)} placeholder="Ex: S2, L, SMS" required />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Nombre de fois au bac</label>
+                <input type="number" min={1} className="form-input" value={form.nombre_fois_bac} onChange={e => set('nombre_fois_bac', e.target.value)} required />
+              </div>
+            </div>
             <div className="form-group">
-              <label className="form-label">Nombre de fois au bac</label>
-              <input type="number" min={1} className="form-input" value={form.nombre_fois_bac} onChange={e => set('nombre_fois_bac', e.target.value)} required />
+              <label className="form-label">Formation en cours</label>
+              <input className="form-input" value={form.formation_en_cours} onChange={e => set('formation_en_cours', e.target.value)} placeholder="Ex: Licence Informatique" required />
             </div>
             <div className="modal__footer" style={{marginTop:0}}>
               <button type="button" className="form-back" onClick={onClose}>Annuler</button>
@@ -348,6 +362,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
   const [uploading, setUploading] = useState(false);
   const [updatingPj, setUpdatingPj] = useState(null);
   const [updatingInfos, setUpdatingInfos] = useState(false);
+  const [updatingPaiement, setUpdatingPaiement] = useState(false);
   const [uploadType, setUploadType] = useState('');
   const [dossiersUniv, setDossiersUniv] = useState([]);
   const [univModal, setUnivModal] = useState(null);
@@ -356,6 +371,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
   const [preview, setPreview] = useState(null);
   const [previewLoading, setPreviewLoading] = useState(null);
   const [infosModal, setInfosModal] = useState(false);
+  const fileInputRef = useRef(null);
 
   const fetchDetails = useCallback(async () => {
     setLoading(true); setError('');
@@ -397,7 +413,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
   const handleAddPieceJointe = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    if (!uploadType) { alert('Veuillez sélectionner un type de document.'); e.target.value = ''; return; }
+    if (!uploadType) { alert('Veuillez sélectionner un type de document.'); if (fileInputRef.current) fileInputRef.current.value = ''; return; }
     setUploading(true);
     try {
       const formData = new FormData();
@@ -406,20 +422,27 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
       formData.append('type', uploadType);
       await apiAddPieceJointe(token, formData);
       setUploadType('');
-      await fetchDetails();
-    } catch (err) { alert(err.message); } finally { setUploading(false); e.target.value = ''; }
+      const p = await apiListPiecesJointes(token, dossier.code_dossier);
+      setPieces(p);
+    } catch (err) { alert(err.message); } finally { setUploading(false); if (fileInputRef.current) fileInputRef.current.value = ''; }
   };
 
   const handleUpdatePjStatus = async (id, status) => {
+    const oldStatus = pieces.find(p => p.id === id)?.status;
+    setPieces(prev => prev.map(p => p.id === id ? { ...p, status } : p));
     setUpdatingPj(id);
     try {
       await apiUpdatePieceJointeStatus(token, id, status);
-      await fetchDetails();
-    } catch (err) { alert(err.message); } finally { setUpdatingPj(null); }
+    } catch (err) {
+      setPieces(prev => prev.map(p => p.id === id ? { ...p, status: oldStatus } : p));
+      alert(err.message);
+    } finally { setUpdatingPj(null); }
   };
 
   const handleUpdateInfosStatus = async (newStatus) => {
     if (!infos) return;
+    const oldStatus = infos.status;
+    setInfos(prev => ({ ...prev, status: newStatus }));
     setUpdatingInfos(true);
     try {
       await apiPutInfosDossier(token, dossier.code_dossier, {
@@ -427,10 +450,27 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
         pays_souhaite: infos.pays_souhaite,
         filieres: infos.filieres,
         nombre_fois_bac: infos.nombre_fois_bac,
+        serie_bac: infos.serie_bac,
+        formation_en_cours: infos.formation_en_cours,
         status: newStatus,
       });
-      await fetchDetails();
-    } catch (err) { alert(err.message); } finally { setUpdatingInfos(false); }
+    } catch (err) {
+      setInfos(prev => ({ ...prev, status: oldStatus }));
+      alert(err.message);
+    } finally { setUpdatingInfos(false); }
+  };
+
+  const handleTogglePaiement = async () => {
+    if (!infos) return;
+    const oldValue = infos.paiement;
+    setInfos(prev => ({ ...prev, paiement: !oldValue }));
+    setUpdatingPaiement(true);
+    try {
+      await apiPatchPaiement(token, dossier.code_dossier, !oldValue);
+    } catch (err) {
+      setInfos(prev => ({ ...prev, paiement: oldValue }));
+      alert(err.message);
+    } finally { setUpdatingPaiement(false); }
   };
 
   const cardStyle = { background:'#fff', borderRadius:'.75rem', boxShadow:'0 1px 3px rgba(0,0,0,.06)', border:'1px solid #eef2f7', overflow:'hidden' };
@@ -517,9 +557,17 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
 
           {/* ── Infos académiques ── */}
           <SectionCard icon={BookOpen} title="Informations académiques" action={infos && (
-            <div style={{display:'flex',alignItems:'center',gap:'.5rem'}}>
+            <div style={{display:'flex',alignItems:'center',gap:'.5rem',flexWrap:'wrap'}}>
               <button style={{...btnGhost,fontSize:'.75rem',padding:'.2rem .5rem'}} onClick={() => setInfosModal(true)} title="Modifier">
                 <Pencil size={12}/> Modifier
+              </button>
+              <button
+                style={{...btnGhost,fontSize:'.75rem',padding:'.2rem .5rem',background:infos.paiement?'#dcfce7':'#fee2e2',color:infos.paiement?'#166534':'#991b1b',borderColor:infos.paiement?'#bbf7d0':'#fecaca'}}
+                onClick={() => handleTogglePaiement()}
+                disabled={updatingPaiement}
+              >
+                {updatingPaiement ? <Loader size={12} className="auth-spinner"/> : <CheckCircle size={12}/>}
+                {infos.paiement ? 'Payé' : 'Non payé'}
               </button>
               <span style={{fontSize:'.75rem',color:'#64748b'}}>Statut :</span>
               <select
@@ -537,10 +585,13 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
             {infos ? (
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'.35rem 1.5rem'}}>
                 <div style={infoRow}><span style={labelStyle}><BookOpen size={13}/> Niveau actuel :</span> {infos.niveau_etude || '—'}</div>
-                <div style={infoRow}><span style={labelStyle}><Globe size={13}/> Pays Souhaiter :</span> {infos.pays_souhaite || '—'}</div>
-                <div style={{...infoRow,gridColumn:'span 2'}}><span style={labelStyle}><FolderOpen size={13}/> Filières Souhaitées :</span> {infos.filieres?.join(', ') || '—'}</div>
+                <div style={infoRow}><span style={labelStyle}><Globe size={13}/> Pays souhaité :</span> {infos.pays_souhaite || '—'}</div>
+                <div style={{...infoRow,gridColumn:'span 2'}}><span style={labelStyle}><FolderOpen size={13}/> Filières souhaitées :</span> {infos.filieres?.join(', ') || '—'}</div>
+                <div style={infoRow}><span style={labelStyle}><Calendar size={13}/> Série bac :</span> {infos.serie_bac || '—'}</div>
                 <div style={infoRow}><span style={labelStyle}><Calendar size={13}/> Nombre de fois au bac :</span> {infos.nombre_fois_bac ?? '—'}</div>
+                <div style={{...infoRow,gridColumn:'span 2'}}><span style={labelStyle}><BookOpen size={13}/> Formation en cours :</span> {infos.formation_en_cours || '—'}</div>
                 <div style={infoRow}><span style={labelStyle}><Shield size={13}/> Statut :</span><StatusBadge value={infos.status}/></div>
+                <div style={infoRow}><span style={labelStyle}><CheckCircle size={13}/> Paiement :</span><StatusBadge value={infos.paiement?'VALIDE':'INVALIDE'}/></div>
               </div>
             ) : (
               <p style={{color:'#94a3b8',fontSize:'.875rem',margin:0}}>Aucune information académique renseignée.</p>
@@ -562,7 +613,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
               </select>
               <label style={{...btnPrimary,cursor:'pointer',opacity:uploadType?1:.6}}>
                 <Upload size={12}/> Ajouter
-                <input type="file" style={{display:'none'}} onChange={handleAddPieceJointe} disabled={uploading || !uploadType}/>
+                <input ref={fileInputRef} type="file" style={{display:'none'}} onChange={handleAddPieceJointe} disabled={uploading || !uploadType}/>
               </label>
             </div>
           }>
@@ -649,7 +700,9 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
                             <button style={{...btnGhost,padding:'.25rem .4rem',fontSize:'.7rem',color:'#dc2626'}} onClick={async () => {
                               if (!window.confirm('Supprimer ce dossier université ?')) return;
                               setDeletingUniv(u.id);
-                              try { await apiDeleteDossierUniversite(token, u.id); fetchDetails(); } catch (e) { alert(e.message); } finally { setDeletingUniv(null); }
+                              const oldList = dossiersUniv;
+                              setDossiersUniv(prev => prev.filter(x => x.id !== u.id));
+                              try { await apiDeleteDossierUniversite(token, u.id); } catch (e) { alert(e.message); setDossiersUniv(oldList); } finally { setDeletingUniv(null); }
                             }} disabled={deletingUniv === u.id} title="Supprimer">
                               {deletingUniv === u.id ? <Loader size={12} className="auth-spinner"/> : <Trash2 size={12}/>}
                             </button>
@@ -685,13 +738,17 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
         )}
         {univModal !== null && (
           <ModalDossierUniversite token={token} codeDossier={dossier.code_dossier} initial={univModal.id ? univModal : undefined}
-            onClose={() => setUnivModal(null)} onSuccess={fetchDetails} />
+            onClose={() => setUnivModal(null)} onSuccess={() => {
+              apiListDossiersUniversiteByDossier(token, dossier.code_dossier)
+                .then(u => setDossiersUniv(u))
+                .catch(() => setDossiersUniv([]));
+            }} />
         )}
         {preview && (
           <ModalPreviewPJ piece={preview.piece} url={preview.url} onClose={() => setPreview(null)} />
         )}
         {infosModal && infos && (
-          <ModalInfosAcademiques token={token} codeDossier={dossier.code_dossier} infos={infos} onClose={() => setInfosModal(false)} onSuccess={fetchDetails} />
+          <ModalInfosAcademiques token={token} codeDossier={dossier.code_dossier} infos={infos} onClose={() => setInfosModal(false)} onSuccess={newInfos => setInfos(newInfos)} />
         )}
       </div>
     );
@@ -714,13 +771,17 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
         )}
         {univModal !== null && (
           <ModalDossierUniversite token={token} codeDossier={dossier.code_dossier} initial={univModal.id ? univModal : undefined}
-            onClose={() => setUnivModal(null)} onSuccess={fetchDetails} />
+            onClose={() => setUnivModal(null)} onSuccess={() => {
+              apiListDossiersUniversiteByDossier(token, dossier.code_dossier)
+                .then(u => setDossiersUniv(u))
+                .catch(() => setDossiersUniv([]));
+            }} />
         )}
         {preview && (
           <ModalPreviewPJ piece={preview.piece} url={preview.url} onClose={() => setPreview(null)} />
         )}
         {infosModal && infos && (
-          <ModalInfosAcademiques token={token} codeDossier={dossier.code_dossier} infos={infos} onClose={() => setInfosModal(false)} onSuccess={fetchDetails} />
+          <ModalInfosAcademiques token={token} codeDossier={dossier.code_dossier} infos={infos} onClose={() => setInfosModal(false)} onSuccess={newInfos => setInfos(newInfos)} />
         )}
       </div>
     </div>

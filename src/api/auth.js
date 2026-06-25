@@ -175,6 +175,17 @@ export async function apiPutInfosDossier(token, codeDossier, payload) {
   return data.infos;
 }
 
+export async function apiPatchPaiement(token, codeDossier, paiement) {
+  const res = await authFetch(`${BASE}/infos-dossier/${codeDossier}/paiement`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, credentials: 'include',
+    body: JSON.stringify({ paiement }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Erreur lors de la mise à jour du paiement');
+  return data.infos;
+}
+
 export async function apiGenererCode(email, type) {
   const res = await authFetch(`${BASE}/codes-temporaires/generer`, {
     method: 'POST',

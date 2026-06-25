@@ -538,8 +538,20 @@ function PageDossier({ token, email }) {
               <span className="info-field__value">{infos.filieres?.length ? infos.filieres.join(', ') : '—'}</span>
             </div>
             <div className="info-field">
+              <span className="info-field__label">Série bac</span>
+              <span className="info-field__value">{infos.serie_bac || '—'}</span>
+            </div>
+            <div className="info-field">
               <span className="info-field__label">Fois au bac</span>
               <span className="info-field__value">{infos.nombre_fois_bac ?? '—'}</span>
+            </div>
+            <div className="info-field">
+              <span className="info-field__label">Formation en cours</span>
+              <span className="info-field__value">{infos.formation_en_cours || '—'}</span>
+            </div>
+            <div className="info-field">
+              <span className="info-field__label">Paiement</span>
+              <span className="info-field__value">{infos.paiement ? 'Payé' : 'Non payé'}</span>
             </div>
             <div className="info-field">
               <span className="info-field__label">Statut</span>
@@ -640,11 +652,10 @@ function PageDossier({ token, email }) {
       {modalOpen && (
         <ModalInfosDossier
           token={token}
-          email={email}
           codeDossier={dossier.code_dossier}
           infos={infos}
           onClose={() => setModalOpen(false)}
-          onSuccess={fetchAll}
+          onSuccess={newInfos => setInfos(newInfos)}
         />
       )}
 
@@ -653,60 +664,43 @@ function PageDossier({ token, email }) {
 }
 
 /* ── Modal infos dossier (création / modification) ── */
-function ModalInfosDossier({ token, email, codeDossier, infos, onClose, onSuccess }) {
+function ModalInfosDossier({ token, codeDossier, infos, onClose, onSuccess }) {
   const isCreating = !infos;
-  const [step, setStep]       = useState(1);
-  const [code, setCode]       = useState('');
-  const [sending, setSending] = useState(false);
   const [saving, setSaving]   = useState(false);
   const [error, setError]     = useState('');
   const [success, setSuccess] = useState(false);
   const [form, setForm]       = useState({
-    niveau_etude:    infos?.niveau_etude || '',
-    pays_souhaite:   infos?.pays_souhaite || '',
-    filieres:        infos?.filieres?.join(', ') || '',
-    nombre_fois_bac: infos?.nombre_fois_bac ?? 1,
+    niveau_etude:     infos?.niveau_etude || '',
+    pays_souhaite:    infos?.pays_souhaite || '',
+    filieres:         infos?.filieres?.join(', ') || '',
+    nombre_fois_bac:  infos?.nombre_fois_bac ?? 1,
+    serie_bac:        infos?.serie_bac || '',
+    formation_en_cours: infos?.formation_en_cours || '',
   });
 
   const set = (f, v) => setForm(p => ({ ...p, [f]: v }));
   const buildPayload = () => ({
-    niveau_etude:    form.niveau_etude,
-    pays_souhaite:   form.pays_souhaite,
-    filieres:        form.filieres.split(',').map(s => s.trim()).filter(Boolean),
-    nombre_fois_bac: Number(form.nombre_fois_bac),
+    niveau_etude:     form.niveau_etude,
+    pays_souhaite:    form.pays_souhaite,
+    filieres:         form.filieres.split(',').map(s => s.trim()).filter(Boolean),
+    nombre_fois_bac:  Number(form.nombre_fois_bac),
+    serie_bac:        form.serie_bac,
+    formation_en_cours: form.formation_en_cours,
   });
 
-  /* Étape 1 → Enregistrer */
-  const handleSave = async (e) => {
-    e.preventDefault();
-    setSending(true);
-    setError('');
-    try {
-      if (isCreating) {
-        await apiPostInfosDossier(token, { code_dossier: codeDossier, ...buildPayload() });
-        setSuccess(true);
-        await onSuccess();
-        setTimeout(onClose, 1500);
-      } else {
-        await apiGenererCode(email, 'modification_infos');
-        setStep(2);
-      }
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setSending(false);
-    }
-  };
-
-  /* Étape 2 → Confirmer avec le code */
-  const handleConfirm = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
     setError('');
     try {
-      await apiPutInfosDossier(token, codeDossier, { ...buildPayload(), code_validation: code });
+      let newInfos;
+      if (isCreating) {
+        newInfos = await apiPostInfosDossier(token, { code_dossier: codeDossier, ...buildPayload() });
+      } else {
+        newInfos = await apiPutInfosDossier(token, codeDossier, buildPayload());
+      }
       setSuccess(true);
-      await onSuccess();
+      onSuccess(newInfos);
       setTimeout(onClose, 1500);
     } catch (e) {
       setError(e.message);
@@ -720,7 +714,7 @@ function ModalInfosDossier({ token, email, codeDossier, infos, onClose, onSucces
       <div className="modal" onClick={e => e.stopPropagation()}>
         <div className="modal__header">
           <h3 className="modal__title">
-            {isCreating ? 'Compléter mon dossier' : step === 1 ? 'Modifier les infos académiques' : 'Valider les modifications'}
+            {isCreating ? 'Compléter mon dossier' : 'Modifier les infos académiques'}
           </h3>
           <button className="modal__close" onClick={onClose}><X size={18} /></button>
         </div>
@@ -737,9 +731,8 @@ function ModalInfosDossier({ token, email, codeDossier, infos, onClose, onSucces
             </div>
           )}
 
-          {/* ── Étape 1 : formulaire ── */}
-          {step === 1 && !success && (
-            <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {!success && (
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div className="form-row">
                 <div className="form-group">
                   <label className="form-label">Niveau d’étude *</label>
@@ -764,47 +757,36 @@ function ModalInfosDossier({ token, email, codeDossier, infos, onClose, onSucces
                   placeholder="Ex: Informatique, Génie logiciel"
                 />
               </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Série bac *</label>
+                  <input
+                    required className="form-input"
+                    value={form.serie_bac} onChange={e => set('serie_bac', e.target.value)}
+                    placeholder="Ex: S2, L, SMS"
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Nombre de fois au bac *</label>
+                  <input
+                    required type="number" className="form-input" min={1}
+                    value={form.nombre_fois_bac} onChange={e => set('nombre_fois_bac', e.target.value)}
+                  />
+                </div>
+              </div>
               <div className="form-group">
-                <label className="form-label">Nombre de fois au bac *</label>
+                <label className="form-label">Formation en cours (facultatif) *</label>
                 <input
-                  required type="number" className="form-input" min={1}
-                  value={form.nombre_fois_bac} onChange={e => set('nombre_fois_bac', e.target.value)}
+                  required className="form-input"
+                  value={form.formation_en_cours} onChange={e => set('formation_en_cours', e.target.value)}
+                  placeholder="Ex: Licence Informatique"
                 />
               </div>
               <div className="modal__footer" style={{ marginTop: 0 }}>
                 <button type="button" className="form-back" onClick={onClose}>Annuler</button>
-                <button type="submit" className="form-submit" disabled={sending}>
-                  {sending ? <Loader size={15} className="auth-spinner" /> : <CheckCircle size={15} />}
-                  {sending ? (isCreating ? 'Enregistrement...' : 'Envoi du code...') : 'Enregistrer'}
-                </button>
-              </div>
-            </form>
-          )}
-
-          {/* ── Étape 2 : code de validation (modification uniquement) ── */}
-          {step === 2 && !success && (
-            <form onSubmit={handleConfirm} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div className="pwd-step" style={{ paddingTop: '.5rem', paddingBottom: '.5rem' }}>
-                <div className="pwd-step__icon"><Send size={20} /></div>
-                <p className="pwd-step__text">Un code de validation a été envoyé à :</p>
-                <p className="pwd-step__email">{email}</p>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Code de validation *</label>
-                <input
-                  required className="form-input"
-                  value={code} onChange={e => setCode(e.target.value)}
-                  placeholder="Ex: 482931" maxLength={6} inputMode="numeric"
-                  autoFocus
-                />
-              </div>
-              <div className="modal__footer" style={{ marginTop: 0 }}>
-                <button type="button" className="form-back" onClick={() => { setStep(1); setCode(''); setError(''); }}>
-                  Retour
-                </button>
                 <button type="submit" className="form-submit" disabled={saving}>
                   {saving ? <Loader size={15} className="auth-spinner" /> : <CheckCircle size={15} />}
-                  {saving ? 'Validation...' : 'Confirmer'}
+                  {saving ? 'Enregistrement…' : 'Enregistrer'}
                 </button>
               </div>
             </form>
@@ -974,6 +956,15 @@ function SectionPiecesJointes({ token, codeDossier }) {
     }
   }, [token, codeDossier]);
 
+  const refreshPieces = useCallback(async () => {
+    try {
+      const list = await apiListPiecesJointes(token, codeDossier);
+      setPieces(list);
+    } catch (e) {
+      setActionErr(e.message);
+    }
+  }, [token, codeDossier]);
+
   useEffect(() => { fetchPieces(); }, [fetchPieces]);
 
   const handleDownload = async (id) => {
@@ -990,13 +981,16 @@ function SectionPiecesJointes({ token, codeDossier }) {
   };
 
   const handleDelete = async (id) => {
+    const oldPieces = pieces;
     setDeleting(id);
     setActionErr('');
     try {
       await apiDeletePieceJointe(token, id);
-      await fetchPieces();
+      setPieces(prev => prev.filter(p => p.id !== id));
     } catch (e) {
       setActionErr(e.message);
+      setPieces(oldPieces);
+    } finally {
       setDeleting(null);
     }
   };
@@ -1036,7 +1030,7 @@ function SectionPiecesJointes({ token, codeDossier }) {
             'Bulletins des trois dernières années (minimum)',
             'Diplômes obtenus (Bac, Licence, Master)',
             'Certifications obtenues',
-            'CV à jour',
+            'CV à jour (facultatif)',
           ].map(doc => (
             <li key={doc} style={{ display: 'flex', alignItems: 'flex-start', gap: '.35rem' }}>
               <span style={{ color: '#c5a150', fontWeight: 700, fontSize: '.9rem', lineHeight: 1.2, flexShrink: 0 }}>•</span>
@@ -1129,7 +1123,7 @@ function SectionPiecesJointes({ token, codeDossier }) {
           codeDossier={codeDossier}
           piece={null}
           onClose={() => setAddOpen(false)}
-          onSuccess={fetchPieces}
+          onSuccess={refreshPieces}
         />
       )}
       {replacing && (
@@ -1138,7 +1132,7 @@ function SectionPiecesJointes({ token, codeDossier }) {
           codeDossier={codeDossier}
           piece={replacing}
           onClose={() => setReplacing(null)}
-          onSuccess={fetchPieces}
+          onSuccess={refreshPieces}
         />
       )}
       {preview && (
@@ -1262,7 +1256,7 @@ export default function DashboardStudent() {
                 <h1 className="db-page__title">Mon dossier</h1>
                 <p className="db-page__sub">Suivez l'avancement de votre procédure Campus France.</p>
               </div>
-              <PageDossier token={token} email={etudiant.email} />
+              <PageDossier token={token} />
             </div>
           )}
 
