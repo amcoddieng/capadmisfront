@@ -45,8 +45,8 @@ export default function Home() {
   return (
     <main>
       <Helmet>
-        <title>Capadmis — Accompagnement études à l'étranger</title>
-        <meta name="description" content="Capadmis : plateforme digitale d'accompagnement pour vos études en France, Canada, Belgique et plus. De l'orientation au visa." />
+        <title>Capadmis | Études en France, Campus France et études à l'étranger</title>
+        <meta name="description" content="Capadmis accompagne les étudiants dans leurs études en France et à l'étranger : orientation, admission universitaire, procédure Campus France, visa étudiant et suivi personnalisé." />
         <link rel="canonical" href="https://capadmis.com/" />
       </Helmet>
 
@@ -59,6 +59,8 @@ export default function Home() {
         />
         <div className="hero__overlay" />
         <div className="hero__content">
+          <h1>Études en France et à l'étranger avec Capadmis</h1>
+          <p>Votre accompagnement pour l'orientation, l'admission universitaire, la procédure Campus France et le visa étudiant.</p>
           <div className="hero__actions">
             <Link to={getStartPath()} className="btn btn--hero-primary">
               Commencer ma procédure <ArrowRight size={18} />
