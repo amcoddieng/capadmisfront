@@ -22,12 +22,23 @@ import { MessageModalProvider } from './context/MessageModalContext';
 import ScrollToTop from './components/ScrollToTop';
 
 /* ── Guards de route ── */
-function PrivateRoute({ children }) {
+function AuthLoading() {
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0c1c3f' }}>
+      <div style={{ width: 40, height: 40, border: '3px solid rgba(197,161,80,.3)', borderTopColor: '#c5a150', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
+
+function PrivateRoute({ children, authReady }) {
+  if (!authReady) return <AuthLoading />;
   const { token } = getSession();
   return token ? children : <Navigate to="/connexion" replace />;
 }
 
-function PrivatePersonnelRoute({ children, roles }) {
+function PrivatePersonnelRoute({ children, roles, authReady }) {
+  if (!authReady) return <AuthLoading />;
   const { token, personnel } = getPersonnelSession();
   if (!token || !personnel) return <Navigate to="/personnel" replace />;
   if (roles) {
@@ -66,15 +77,6 @@ function App() {
     initSession().finally(() => setAuthReady(true));
   }, []);
 
-  if (!authReady) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0c1c3f' }}>
-        <div style={{ width: 40, height: 40, border: '3px solid rgba(197,161,80,.3)', borderTopColor: '#c5a150', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      </div>
-    );
-  }
-
   return (
     <BrowserRouter>
       <ScrollToTop />
@@ -91,12 +93,12 @@ function App() {
           <Route path="/contact" element={<Layout><Contact /></Layout>} />
           <Route path="/connexion" element={<Auth />} />
           <Route path="/inscription" element={<Auth />} />
-          <Route path="/dashboard" element={<PrivateRoute><DashboardStudent /></PrivateRoute>} />
+          <Route path="/dashboard" element={<PrivateRoute authReady={authReady}><DashboardStudent /></PrivateRoute>} />
           <Route path="/personnel" element={<AuthPersonnel />} />
-          <Route path="/dashboard/admin" element={<PrivatePersonnelRoute roles={['admin']}><DashboardPersonnel /></PrivatePersonnelRoute>} />
-          <Route path="/dashboard/superadmin" element={<PrivatePersonnelRoute roles={['superadmin']}><DashboardSuperAdmin /></PrivatePersonnelRoute>} />
-          <Route path="/dashboard/conseiller-admission" element={<PrivatePersonnelRoute roles={['admission']}><DashboardConseiller /></PrivatePersonnelRoute>} />
-          <Route path="/dashboard/conseiller-visa" element={<PrivatePersonnelRoute roles={['visa']}><DashboardConseiller /></PrivatePersonnelRoute>} />
+          <Route path="/dashboard/admin" element={<PrivatePersonnelRoute authReady={authReady} roles={['admin']}><DashboardPersonnel /></PrivatePersonnelRoute>} />
+          <Route path="/dashboard/superadmin" element={<PrivatePersonnelRoute authReady={authReady} roles={['superadmin']}><DashboardSuperAdmin /></PrivatePersonnelRoute>} />
+          <Route path="/dashboard/conseiller-admission" element={<PrivatePersonnelRoute authReady={authReady} roles={['admission']}><DashboardConseiller /></PrivatePersonnelRoute>} />
+          <Route path="/dashboard/conseiller-visa" element={<PrivatePersonnelRoute authReady={authReady} roles={['visa']}><DashboardConseiller /></PrivatePersonnelRoute>} />
         </Routes>
       </MessageModalProvider>
     </BrowserRouter>
