@@ -43,8 +43,8 @@ function StatusBadge({ value, size = 'sm' }) {
 /* ── Modal changer statut ── */
 function ModalChangerStatut({ token, dossier, isAdmin, isAdmission, isVisa, onClose, onSuccess }) {
   const [status, setStatus] = useState(dossier.status);
-  const [statusAdmission, setStatusAdmission] = useState(dossier.status_admission);
-  const [statusVisa, setStatusVisa] = useState(dossier.status_visa);
+  const [statusAdmission, setStatusAdmission] = useState(dossier.status_admission || STATUS_ADM_OPTIONS[0]);
+  const [statusVisa, setStatusVisa] = useState(dossier.status_visa || STATUS_VISA_OPTIONS[0]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -56,8 +56,14 @@ function ModalChangerStatut({ token, dossier, isAdmin, isAdmission, isVisa, onCl
     try {
       const payload = {};
       if (!isConseiller) payload.status = status;
-      if (isAdmin || isAdmission) payload.status_admission = statusAdmission;
-      if (isAdmin || isVisa) payload.status_visa = statusVisa;
+      if (isAdmin || isAdmission) {
+        if (!statusAdmission) throw new Error('Sélectionnez un statut admission.');
+        payload.status_admission = statusAdmission;
+      }
+      if (isAdmin || isVisa) {
+        if (!statusVisa) throw new Error('Sélectionnez un statut visa.');
+        payload.status_visa = statusVisa;
+      }
       const updated = await apiUpdateDossierStatus(token, dossier.id, payload);
       onSuccess(updated);
     } catch (e) { setError(e.message); } finally { setSaving(false); }
