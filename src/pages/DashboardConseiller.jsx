@@ -352,7 +352,7 @@ export default function DashboardConseiller() {
   const renderPage = () => {
     if (viewDossier) {
       return <DossierDetailConseiller token={token} personnel={personnel} dossier={viewDossier} asPage={true}
-        onRefresh={() => {}} onOpenChat={handleOpenChat} />;
+        onRefresh={updated => updated && setViewDossier(prev => ({ ...prev, ...updated }))} onOpenChat={handleOpenChat} />;
     }
     switch (activePage) {
       case 'dashboard':     return <PageDashboard token={token} personnel={personnel} onOpenChat={handleOpenChat} />;

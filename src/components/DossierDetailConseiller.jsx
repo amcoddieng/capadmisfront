@@ -58,8 +58,8 @@ function ModalChangerStatut({ token, dossier, isAdmin, isAdmission, isVisa, onCl
       if (!isConseiller) payload.status = status;
       if (isAdmin || isAdmission) payload.status_admission = statusAdmission;
       if (isAdmin || isVisa) payload.status_visa = statusVisa;
-      await apiUpdateDossierStatus(token, dossier.id, payload);
-      onSuccess();
+      const updated = await apiUpdateDossierStatus(token, dossier.id, payload);
+      onSuccess(updated);
     } catch (e) { setError(e.message); } finally { setSaving(false); }
   };
 
@@ -87,6 +87,11 @@ function ModalChangerStatut({ token, dossier, isAdmin, isAdmission, isVisa, onCl
                 <select className="form-select" value={statusAdmission} onChange={e => setStatusAdmission(e.target.value)}>
                   {STATUS_ADM_OPTIONS.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
                 </select>
+                {statusAdmission === 'ADMISSION_EN_COURS' && (
+                  <p style={{ margin: '.4rem 0 0', color: '#166534', fontSize: '.78rem' }}>
+                    Le statut global sera automatiquement défini sur « Validé ».
+                  </p>
+                )}
               </div>
             )}
             {(isAdmin || isVisa) && (
@@ -734,7 +739,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
         {content}
         {statusModal && (
           <ModalChangerStatut token={token} dossier={dossier} isAdmin={isAdmin} isAdmission={isAdmission} isVisa={isVisa}
-            onClose={() => setStatusModal(false)} onSuccess={() => { setStatusModal(false); if (onRefresh) onRefresh(); }}/>
+            onClose={() => setStatusModal(false)} onSuccess={updated => { setStatusModal(false); if (onRefresh) onRefresh(updated); }}/>
         )}
         {univModal !== null && (
           <ModalDossierUniversite token={token} codeDossier={dossier.code_dossier} initial={univModal.id ? univModal : undefined}
