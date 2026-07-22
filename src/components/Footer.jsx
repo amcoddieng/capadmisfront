@@ -85,7 +85,7 @@ export default function Footer() {
       </div>
 
       <div className="footer__bottom">
-        <p>© {new Date().getFullYear()} eazy-visa. Tous droits réservés.</p>
+        <p>© {new Date().getFullYear()} capadmis. Tous droits réservés.</p>
         <div className="footer__bottom-links">
           <a href="#" className="footer__bottom-link">Mentions légales</a>
           <a href="#" className="footer__bottom-link">Confidentialité</a>
