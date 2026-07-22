@@ -97,6 +97,7 @@ function App() {
           <Route path="/personnel" element={<AuthPersonnel />} />
           <Route path="/dashboard/admin" element={<PrivatePersonnelRoute authReady={authReady} roles={['admin']}><DashboardPersonnel /></PrivatePersonnelRoute>} />
           <Route path="/dashboard/superadmin" element={<PrivatePersonnelRoute authReady={authReady} roles={['superadmin']}><DashboardSuperAdmin /></PrivatePersonnelRoute>} />
+          <Route path="/dashboard/superadmin/:section" element={<PrivatePersonnelRoute authReady={authReady} roles={['superadmin']}><DashboardSuperAdmin /></PrivatePersonnelRoute>} />
           <Route path="/dashboard/conseiller-admission" element={<PrivatePersonnelRoute authReady={authReady} roles={['admission']}><DashboardConseiller /></PrivatePersonnelRoute>} />
           <Route path="/dashboard/conseiller-visa" element={<PrivatePersonnelRoute authReady={authReady} roles={['visa']}><DashboardConseiller /></PrivatePersonnelRoute>} />
         </Routes>

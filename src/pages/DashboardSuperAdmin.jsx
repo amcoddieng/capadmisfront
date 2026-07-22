@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LogOut, LayoutDashboard, FolderOpen, Users, UserCheck,
   History, MessageSquare, Bell, Menu, X, CreditCard, Plus, Pencil,
@@ -872,10 +872,12 @@ function PageNotifications(props) {
 
 /* ── Composant principal ── */
 export default function DashboardSuperAdmin() {
+  const location = useLocation();
   const navigate = useNavigate();
   const [session, setSession]       = useState(null);
-  const [activePage, setActivePage] = useState('dashboard');
   const [mobileNav, setMobileNav]   = useState(false);
+  const section = location.pathname.split('/').filter(Boolean).at(-1);
+  const activePage = NAV_ITEMS.some(item => item.id === section) ? section : 'dashboard';
 
   useEffect(() => {
     const s = getPersonnelSession();
@@ -920,7 +922,7 @@ export default function DashboardSuperAdmin() {
 
         <nav className="cons-header__nav">
           {NAV_ITEMS.map(({ id, label, icon: Icon }) => (
-            <button key={id} className={`cons-nav-btn${activePage === id ? ' cons-nav-btn--active' : ''}`} onClick={() => setActivePage(id)}>
+            <button key={id} className={`cons-nav-btn${activePage === id ? ' cons-nav-btn--active' : ''}`} onClick={() => navigate(`/dashboard/superadmin/${id}`)}>
               <span style={{position:'relative',display:'inline-flex'}}>
                 <Icon size={15} />
                 {id === 'notifications' && unread > 0 && <span className="notif-dot">{unread > 9 ? '9+' : unread}</span>}
@@ -952,7 +954,7 @@ export default function DashboardSuperAdmin() {
             <button
               key={id}
               className={`cons-mobile-nav__item${activePage === id ? ' cons-mobile-nav__item--active' : ''}`}
-              onClick={() => { setActivePage(id); setMobileNav(false); }}
+              onClick={() => { navigate(`/dashboard/superadmin/${id}`); setMobileNav(false); }}
             >
               <Icon size={16} /> {label}
             </button>

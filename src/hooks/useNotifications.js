@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { apiGetNotifications, apiMarkNotifRead, apiMarkAllNotifsRead } from '../api/auth';
+import { playNotificationSound, registerAudioUnlock } from '../utils/sound';
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'https://capadmis.onrender.com';
+const WS_URL = import.meta.env.VITE_WS_URL ?? import.meta.env.VITE_API_URL ?? 'https://capadmis.onrender.com';
 
 export function useNotifications(token) {
   const [notifications, setNotifications] = useState([]);
@@ -16,7 +17,10 @@ export function useNotifications(token) {
     setLoading(true);
     try {
       const list = await apiGetNotifications(token);
-      setNotifications(list);
+      setNotifications(prev => {
+        const currentIds = new Set(prev.map(notification => notification.id));
+        return [...list.filter(notification => !currentIds.has(notification.id)), ...prev];
+      });
     } catch (_) {
       /* silencieux */
     } finally {
@@ -25,15 +29,28 @@ export function useNotifications(token) {
   }, [token]);
 
   useEffect(() => {
+    registerAudioUnlock();
     fetchNotifs();
   }, [fetchNotifs]);
 
   useEffect(() => {
     if (!token) return;
-    const socket = io(WS_URL, { auth: { token }, reconnection: true });
+    const socket = io(WS_URL, {
+      path: '/socket.io',
+      transports: ['websocket', 'polling'],
+      auth: { token },
+      reconnection: true,
+    });
     socketRef.current = socket;
+    socket.on('connect_error', (error) => {
+      console.error('[WS notifications] connexion impossible:', error.message);
+    });
     socket.on('notification', (notif) => {
-      setNotifications(prev => [{ ...notif, lu: false }, ...prev]);
+      setNotifications(prev => {
+        if (prev.some(notification => notification.id === notif.id)) return prev;
+        playNotificationSound();
+        return [{ ...notif, lu: false }, ...prev];
+      });
     });
     return () => { socket.disconnect(); socketRef.current = null; };
   }, [token]);
