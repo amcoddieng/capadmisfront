@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LogOut, LayoutDashboard, FolderOpen, Users, UserCheck,
   History, MessageSquare, Bell, Menu, X, CreditCard, Plus, Pencil,
-  Trash2, Lock, Unlock, Loader, AlertCircle, CheckCircle, Send, Eye,
+  Trash2, Lock, Unlock, Loader, AlertCircle, CheckCircle, Send, Eye, Award, Globe,
 } from 'lucide-react';
 import logoHeader from '../assets/les images du site/logo-horizontal-2x.png';
 import DossierDetailConseiller from '../components/DossierDetailConseiller';
@@ -126,46 +126,46 @@ function ModalAssignConseiller({ token, dossier, defaultType = 'admission', onCl
   );
 }
 
-/* ── Modal statut dossier ── */
-function ModalDossierStatus({ token, dossier, onClose, onSuccess }) {
-  const [status, setStatus]       = useState(dossier.status || '');
-  const [statusAdm, setStatusAdm] = useState(dossier.status_admission || '');
-  const [statusVisa, setStatusVisa] = useState(dossier.status_visa || '');
+/* ── Modal statut dossier (single field) ── */
+const STATUS_FIELD_CONFIG = {
+  status:           { label: 'Statut global',   options: STATUS_OPTIONS },
+  status_admission: { label: 'Statut admission', options: STATUS_ADM_OPTIONS },
+  status_visa:      { label: 'Statut visa',      options: STATUS_VISA_OPTIONS },
+};
+
+function ModalSingleStatus({ token, dossier, field, onClose, onSuccess }) {
+  const cfg = STATUS_FIELD_CONFIG[field];
+  const [value, setValue] = useState(dossier[field] || cfg.options[0]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const handleSubmit = async (e) => {
     e.preventDefault(); setSaving(true); setError('');
     try {
-      const p = {};
-      if (status) p.status = status;
-      if (statusAdm) p.status_admission = statusAdm;
-      if (statusVisa) p.status_visa = statusVisa;
-      await apiUpdateDossierStatus(token, dossier.id, p);
+      await apiUpdateDossierStatus(token, dossier.id, { [field]: value });
       await onSuccess(); onClose();
     } catch (e) { setError(e.message); } finally { setSaving(false); }
   };
-  const Sel = ({ label, val, setVal, opts }) => (
-    <div className="form-group">
-      <label className="form-label">{label}</label>
-      <select className="form-select" value={val} onChange={e => setVal(e.target.value)}>
-        <option value="">— Inchangé —</option>
-        {opts.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
-      </select>
-    </div>
-  );
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" style={{ maxWidth: 420 }} onClick={e => e.stopPropagation()}>
+      <div className="modal" style={{ maxWidth: 380 }} onClick={e => e.stopPropagation()}>
         <div className="modal__header">
-          <h3 className="modal__title">Statut — {dossier.code_dossier}</h3>
+          <h3 className="modal__title">{cfg.label} — {dossier.code_dossier}</h3>
           <button className="modal__close" onClick={onClose}><X size={18}/></button>
         </div>
         <div className="modal__body">
           {error && <div className="auth-error" style={{margin:'0 0 1rem'}}><AlertCircle size={15}/> {error}</div>}
           <form onSubmit={handleSubmit} style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
-            <Sel label="Statut dossier" val={status} setVal={setStatus} opts={STATUS_OPTIONS}/>
-            <Sel label="Statut admission" val={statusAdm} setVal={setStatusAdm} opts={STATUS_ADM_OPTIONS}/>
-            <Sel label="Statut visa" val={statusVisa} setVal={setStatusVisa} opts={STATUS_VISA_OPTIONS}/>
+            <div className="form-group">
+              <label className="form-label">{cfg.label}</label>
+              <select className="form-select" value={value} onChange={e => setValue(e.target.value)}>
+                {cfg.options.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
+              </select>
+              {field === 'status_admission' && value === 'ADMISSION_EN_COURS' && (
+                <p style={{ margin: '.4rem 0 0', color: '#166534', fontSize: '.78rem' }}>
+                  Le statut global sera automatiquement défini sur « Validé ».
+                </p>
+              )}
+            </div>
             <div className="modal__footer" style={{marginTop:0}}>
               <button type="button" className="form-back" onClick={onClose}>Annuler</button>
               <button type="submit" className="form-submit" disabled={saving}>
@@ -188,6 +188,7 @@ function PageDossiers({ token, personnel }) {
   const [error, setError]       = useState('');
   const [assignModal, setAssignModal] = useState(null);
   const [statusModal, setStatusModal] = useState(null);
+  const [statusField, setStatusField] = useState('status');
   const [detailDossier, setDetailDossier] = useState(null);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
@@ -278,7 +279,9 @@ function PageDossiers({ token, personnel }) {
                   </td>
                   <td><div className="sa-actions">
                     <button className="sa-btn sa-btn--blue" onClick={() => setDetailDossier(d)} title="Voir le dossier"><Eye size={14}/></button>
-                    <button className="sa-btn sa-btn--orange" onClick={() => setStatusModal(d)} title="Changer statut"><Pencil size={14}/></button>
+                    <button className="sa-btn sa-btn--orange" onClick={() => { setStatusField('status'); setStatusModal(d); }} title="Changer statut global"><Pencil size={14}/></button>
+                    <button className="sa-btn sa-btn--orange" onClick={() => { setStatusField('status_admission'); setStatusModal(d); }} title="Changer statut admission"><Award size={14}/></button>
+                    <button className="sa-btn sa-btn--orange" onClick={() => { setStatusField('status_visa'); setStatusModal(d); }} title="Changer statut visa"><Globe size={14}/></button>
                     {d.etudiant?.email && <button className="sa-btn sa-btn--green" onClick={() => openMessageModal(token, d.etudiant.email, `${d.etudiant.prenom} ${d.etudiant.nom}`)} title="Envoyer message"><Send size={14}/></button>}
                   </div></td>
                 </tr>
@@ -288,7 +291,7 @@ function PageDossiers({ token, personnel }) {
         </div>
       </TableWrap>
       {assignModal && <ModalAssignConseiller token={token} dossier={assignModal.dossier} defaultType={assignModal.type} onClose={() => setAssignModal(null)} onSuccess={fetch}/>}
-      {statusModal && <ModalDossierStatus token={token} dossier={statusModal} onClose={() => setStatusModal(null)} onSuccess={fetch}/>}
+      {statusModal && <ModalSingleStatus token={token} dossier={statusModal} field={statusField} onClose={() => setStatusModal(null)} onSuccess={fetch}/>}
       {detailDossier && (
         <DossierDetailConseiller
           token={token}

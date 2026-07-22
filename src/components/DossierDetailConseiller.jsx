@@ -41,26 +41,29 @@ function StatusBadge({ value, size = 'sm' }) {
 }
 
 /* ── Modal changer statut ── */
-function ModalChangerStatut({ token, dossier, isAdmin, isAdmission, isVisa, onClose, onSuccess }) {
-  const [status, setStatus] = useState(dossier.status);
+function ModalChangerStatut({ token, dossier, isAdmin, isAdmission, isVisa, mode, onClose, onSuccess }) {
+  const [status, setStatus] = useState(dossier.status || STATUS_OPTIONS[0]);
   const [statusAdmission, setStatusAdmission] = useState(dossier.status_admission || STATUS_ADM_OPTIONS[0]);
   const [statusVisa, setStatusVisa] = useState(dossier.status_visa || STATUS_VISA_OPTIONS[0]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
   const isConseiller = isAdmin || isAdmission || isVisa;
+  const showStatus     = mode === 'status'     || (!mode && !isConseiller);
+  const showAdmission  = mode === 'admission'  || (!mode && (isAdmin || isAdmission));
+  const showVisa       = mode === 'visa'       || (!mode && (isAdmin || isVisa));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true); setError('');
     try {
       const payload = {};
-      if (!isConseiller) payload.status = status;
-      if (isAdmin || isAdmission) {
+      if (showStatus) payload.status = status;
+      if (showAdmission) {
         if (!statusAdmission) throw new Error('Sélectionnez un statut admission.');
         payload.status_admission = statusAdmission;
       }
-      if (isAdmin || isVisa) {
+      if (showVisa) {
         if (!statusVisa) throw new Error('Sélectionnez un statut visa.');
         payload.status_visa = statusVisa;
       }
@@ -69,17 +72,24 @@ function ModalChangerStatut({ token, dossier, isAdmin, isAdmission, isVisa, onCl
     } catch (e) { setError(e.message); } finally { setSaving(false); }
   };
 
+  const titleByMode = {
+    status:     'Statut global',
+    admission:  'Statut admission',
+    visa:       'Statut visa',
+  };
+  const modalTitle = mode ? `${titleByMode[mode]} — ${dossier.code_dossier}` : `Changer le statut — ${dossier.code_dossier}`;
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" style={{ maxWidth: 420 }} onClick={ev => ev.stopPropagation()}>
         <div className="modal__header">
-          <h3 className="modal__title">Changer le statut — {dossier.code_dossier}</h3>
+          <h3 className="modal__title">{modalTitle}</h3>
           <button className="modal__close" onClick={onClose}><X size={18}/></button>
         </div>
         <div className="modal__body">
           {error && <div className="auth-error" style={{margin:'0 0 1rem'}}><AlertCircle size={15}/> {error}</div>}
           <form onSubmit={handleSubmit} style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
-            {!isConseiller && (
+            {showStatus && (
               <div className="form-group">
                 <label className="form-label">Statut global</label>
                 <select className="form-select" value={status} onChange={e => setStatus(e.target.value)}>
@@ -87,7 +97,7 @@ function ModalChangerStatut({ token, dossier, isAdmin, isAdmission, isVisa, onCl
                 </select>
               </div>
             )}
-            {(isAdmin || isAdmission) && (
+            {showAdmission && (
               <div className="form-group">
                 <label className="form-label">Statut admission</label>
                 <select className="form-select" value={statusAdmission} onChange={e => setStatusAdmission(e.target.value)}>
@@ -100,7 +110,7 @@ function ModalChangerStatut({ token, dossier, isAdmin, isAdmission, isVisa, onCl
                 )}
               </div>
             )}
-            {(isAdmin || isVisa) && (
+            {showVisa && (
               <div className="form-group">
                 <label className="form-label">Statut visa</label>
                 <select className="form-select" value={statusVisa} onChange={e => setStatusVisa(e.target.value)}>
@@ -370,6 +380,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [statusModal, setStatusModal] = useState(false);
+  const [statusMode, setStatusMode] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [updatingPj, setUpdatingPj] = useState(null);
   const [updatingInfos, setUpdatingInfos] = useState(false);
@@ -420,6 +431,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
   const isAdmin     = personnel.role?.includes('admin');
   const isAdmission = personnel.role?.includes('admission');
   const isVisa      = personnel.role?.includes('visa');
+  const isConseiller = isAdmin || isAdmission || isVisa;
 
   const handleAddPieceJointe = async (e) => {
     const file = e.target.files[0];
@@ -534,19 +546,22 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
 
           {/* ── Statuts dossier ── */}
           <SectionCard icon={Shield} title="Statuts du dossier" action={
-            <button style={btnPrimary} onClick={() => setStatusModal(true)}><Pencil size={12}/> Modifier</button>
+            !isConseiller && <button style={btnPrimary} onClick={() => { setStatusMode(null); setStatusModal(true); }}><Pencil size={12}/> Tout modifier</button>
           }>
             <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:'.75rem'}}>
               {[
-                {label:'Statut global', val:dossier.status, icon:FileText},
-                {label:'Admission', val:dossier.status_admission, icon:Award},
-                {label:'Visa', val:dossier.status_visa, icon:Globe},
+                {label:'Statut global', val:dossier.status, icon:FileText, mode:'status'},
+                {label:'Admission', val:dossier.status_admission, icon:Award, mode:'admission'},
+                {label:'Visa', val:dossier.status_visa, icon:Globe, mode:'visa'},
               ].map(s => (
                 <div key={s.label} style={{background:'#f8fafc',borderRadius:'.5rem',padding:'.75rem',textAlign:'center'}}>
                   <div style={{fontSize:'.75rem',color:'#64748b',marginBottom:'.4rem',display:'flex',alignItems:'center',justifyContent:'center',gap:'.25rem'}}>
                     <s.icon size={12} color="#64748b"/> {s.label}
                   </div>
                   <StatusBadge value={s.val} size="lg"/>
+                  <button style={{...btnGhost,marginTop:'.5rem',fontSize:'.7rem',padding:'.2rem .5rem'}} onClick={() => { setStatusMode(s.mode); setStatusModal(true); }}>
+                    <Pencil size={10}/> Modifier
+                  </button>
                 </div>
               ))}
             </div>
@@ -744,7 +759,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
         </div>
         {content}
         {statusModal && (
-          <ModalChangerStatut token={token} dossier={dossier} isAdmin={isAdmin} isAdmission={isAdmission} isVisa={isVisa}
+          <ModalChangerStatut token={token} dossier={dossier} isAdmin={isAdmin} isAdmission={isAdmission} isVisa={isVisa} mode={statusMode}
             onClose={() => setStatusModal(false)} onSuccess={updated => { setStatusModal(false); if (onRefresh) onRefresh(updated); }}/>
         )}
         {univModal !== null && (
@@ -777,7 +792,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
         </div>
         <div className="modal__body" style={{padding:'1.25rem',background:'#f8fafc'}}>{content}</div>
         {statusModal && (
-          <ModalChangerStatut token={token} dossier={dossier} isAdmin={isAdmin} isAdmission={isAdmission} isVisa={isVisa}
+          <ModalChangerStatut token={token} dossier={dossier} isAdmin={isAdmin} isAdmission={isAdmission} isVisa={isVisa} mode={statusMode}
             onClose={() => setStatusModal(false)} onSuccess={() => { setStatusModal(false); onRefresh(); }}/>
         )}
         {univModal !== null && (
