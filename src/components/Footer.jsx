@@ -77,7 +77,7 @@ export default function Footer() {
             </li>
             <li className="footer__contact-item">
               <Mail size={15} className="footer__contact-icon" />
-              <a href="mailto:contact@capadmis.com" className="footer__contact-link">service@eazy-visa.com</a>
+              <a href="mailto:contact@capadmis.com" className="footer__contact-link">contact@capadmis.com</a>
             </li>
           </ul>
           <Link to={getStartPath()} className="footer__cta-btn">Commencer ma procédure</Link>
