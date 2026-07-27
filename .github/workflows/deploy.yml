@@ -23,6 +23,6 @@ jobs:
             git pull origin main
 
             cd /opt/capadmis/capadmis
-            docker compose up -d --build --no-cache front
+            docker compose up -d --build front
 
             docker image prune -f

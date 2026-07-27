@@ -79,7 +79,8 @@ export default function Footer() {
               <a href="mailto:contact@capadmis.com" className="footer__contact-link">contact@capadmis.com</a>
             </li>
             <li>
-              le mode ne dort pas, nous non plus 
+              {/* mettre un sticker haha */}
+              le mode ne dort pas, nous non plus :)
               <br />
               <span style={{fontSize:'0.8rem', color:'#666'}}>Disponible 24h/24 - 7j/7</span>
             </li>
