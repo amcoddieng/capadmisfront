@@ -80,7 +80,7 @@ export default function Footer() {
             </li>
             <li>
               {/* mettre un sticker haha */}
-              le mode ne dort pas, nous non plus :)
+              le mode ne dort pas, nous non plus 🤩
               <br />
               <span style={{fontSize:'0.8rem', color:'#666'}}>Disponible 24h/24 - 7j/7</span>
             </li>
