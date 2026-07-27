@@ -114,7 +114,7 @@ const homePlans = [
 const stats = [
   { value: '500+', label: 'Étudiants accompagnés' },
   { value: '95%',  label: 'Taux de satisfaction' },
-  { value: '6',    label: 'Pays couverts' },
+  { value: '1',    label: 'Pays couverts: France' },
   { value: '39 900', label: 'FCFA pour démarrer' },
 ];
 
