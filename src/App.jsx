@@ -19,6 +19,7 @@ import DashboardConseiller from './pages/DashboardConseiller';
 import DashboardSuperAdmin from './pages/DashboardSuperAdmin';
 import { MessageModalProvider } from './context/MessageModalContext';
 import ScrollToTop from './components/ScrollToTop';
+import NotFound from './pages/NotFound';
 
 /* ── Guards de route ── */
 function AuthLoading() {
@@ -98,6 +99,7 @@ function App() {
           <Route path="/dashboard/superadmin/:section" element={<PrivatePersonnelRoute authReady={authReady} roles={['superadmin']}><DashboardSuperAdmin /></PrivatePersonnelRoute>} />
           <Route path="/dashboard/conseiller-admission" element={<PrivatePersonnelRoute authReady={authReady} roles={['admission']}><DashboardConseiller /></PrivatePersonnelRoute>} />
           <Route path="/dashboard/conseiller-visa" element={<PrivatePersonnelRoute authReady={authReady} roles={['visa']}><DashboardConseiller /></PrivatePersonnelRoute>} />
+          <Route path="*" element={<Layout><NotFound /></Layout>} />
         </Routes>
       </MessageModalProvider>
     </BrowserRouter>

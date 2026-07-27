@@ -1,8 +1,27 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, ArrowRight, BarChart3, Check, CheckCircle, GraduationCap, Landmark, MapPin, Plane, Shield, TrendingUp, Zap } from 'lucide-react';
 import { getStartPath } from '../api/auth';
+
+function useScrollReveal() {
+  useEffect(() => {
+    const els = document.querySelectorAll('[data-reveal]');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -50px 0px' }
+    );
+    els.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+}
 
 const heroSlides = [
   {
@@ -128,6 +147,8 @@ export default function Home() {
     return () => window.clearInterval(timer);
   }, []);
 
+  useScrollReveal();
+
   const showPreviousSlide = () => {
     setActiveSlide((current) => (current - 1 + heroSlides.length) % heroSlides.length);
   };
@@ -210,11 +231,11 @@ export default function Home() {
       </section>
 
       {/* ── STATS ── */}
-      <section className="stats-section">
+      <section className="stats-section" data-reveal>
         <div className="container">
           <div className="stats-section__grid">
-            {stats.map((s) => (
-              <div key={s.label} className="stats-section__item">
+            {stats.map((s, i) => (
+              <div key={s.label} className="stats-section__item" data-reveal data-reveal-delay={i * 100}>
                 <div className="stats-section__value">{s.value}</div>
                 <div className="stats-section__label">{s.label}</div>
               </div>
@@ -223,9 +244,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="france-section">
+      <section className="france-section" data-reveal>
         <div className="container france-section__grid">
-          <div className="france-section__visual">
+          <div className="france-section__visual" data-reveal data-reveal-delay="100">
             <img
               className="france-section__main-image"
               src="https://unsplash.com/photos/nsHO6mtOsc4/download?force=true&w=1400"
@@ -240,7 +261,7 @@ export default function Home() {
             />
             <span className="france-section__badge"><MapPin size={16} /> Étudier en France</span>
           </div>
-          <div className="france-section__content">
+          <div className="france-section__content" data-reveal data-reveal-delay="200">
             <span className="section-label">Votre destination, notre expertise</span>
             <h2 className="section-title">La France, bien plus qu’une destination d’études</h2>
             <p className="france-section__intro">
@@ -262,7 +283,7 @@ export default function Home() {
       </section>
 
       {/* ── FEATURES ── */}
-      <section className="features-section">
+      <section className="features-section" data-reveal>
         <div className="container">
           <div className="features-section__header">
             <span className="section-label">L’expertise Capadmis</span>
@@ -270,8 +291,8 @@ export default function Home() {
             <p className="section-subtitle">Une méthode rigoureuse, des outils simples et un conseiller qui connaît réellement votre dossier.</p>
           </div>
           <div className="features-section__grid">
-            {features.map((f) => (
-              <div key={f.title} className="feature-card">
+            {features.map((f, i) => (
+              <div key={f.title} className="feature-card" data-reveal data-reveal-delay={i * 120}>
                 <div className="feature-card__icon">{f.icon}</div>
                 <h3 className="feature-card__title">{f.title}</h3>
                 <p className="feature-card__desc">{f.desc}</p>
@@ -282,7 +303,7 @@ export default function Home() {
       </section>
 
       {/* ── STEPS ── */}
-      <section className="steps-section">
+      <section className="steps-section" data-reveal>
         <div className="container--narrow">
           <div className="steps-section__header">
             <span className="section-label">Un chemin clair vers la France</span>
@@ -293,7 +314,7 @@ export default function Home() {
             <div className="steps-section__line" />
             <div className="steps-section__grid">
               {steps.map((step, i) => (
-                <div key={step.title} className="step-card">
+                <div key={step.title} className="step-card" data-reveal data-reveal-delay={i * 80}>
                   <div className="step-card__num">{i + 1}</div>
                   <h3 className="step-card__title">{step.title}</h3>
                   <p className="step-card__desc">{step.desc}</p>
@@ -304,7 +325,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="home-pricing">
+      <section className="home-pricing" data-reveal>
         <div className="container">
           <div className="home-pricing__header">
             <div>
@@ -315,7 +336,7 @@ export default function Home() {
           </div>
           <div className="home-pricing__grid">
             {homePlans.map((plan, index) => (
-              <article className={`home-price-card${index === 0 ? ' home-price-card--featured' : ''}`} key={plan.title}>
+              <article className={`home-price-card${index === 0 ? ' home-price-card--featured' : ''}`} key={plan.title} data-reveal data-reveal-delay={index * 150}>
                 <div className="home-price-card__top">
                   <span>{plan.step}</span>
                   {index === 0 && <strong>Pour commencer</strong>}
@@ -342,11 +363,11 @@ export default function Home() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="cta-section">
+      <section className="cta-section" data-reveal>
         <div className="cta-section__image" />
         <div className="cta-section__overlay" />
         <div className="container--tight">
-          <div className="cta-section__content">
+          <div className="cta-section__content" data-reveal data-reveal-delay="100">
             <span className="cta-section__eyebrow">Votre avenir n’attend pas</span>
             <h2 className="cta-section__title">Faites de la France votre prochain campus</h2>
             <p className="cta-section__desc">
