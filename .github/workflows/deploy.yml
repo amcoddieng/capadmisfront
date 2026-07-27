@@ -20,9 +20,9 @@ jobs:
 
           script: |
             cd /opt/capadmis/capadmisfront
-
             git pull origin main
 
-            docker compose up -d --build
+            cd /opt/capadmis/capadmis
+            docker compose up -d --build --no-cache front
 
             docker image prune -f

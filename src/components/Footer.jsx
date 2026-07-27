@@ -68,15 +68,20 @@ export default function Footer() {
           <ul className="footer__contact-list">
             <li className="footer__contact-item">
               <MapPin size={15} className="footer__contact-icon" />
-              <span className="footer__contact-text">Cite Keur Gorgui - Dakar, Sénégal</span>
+              <span className="footer__contact-text">Ouest Foire Cote marche serigne fallou - Dakar, Sénégal</span>
             </li>
             <li className="footer__contact-item">
               <Phone size={15} className="footer__contact-icon" />
-              <a href="tel:+221000000000" className="footer__contact-link">+221 76 948 60 60</a>
+              <a href="tel:+221000000000" className="footer__contact-link">+221 76 317 17 86</a>
             </li>
             <li className="footer__contact-item">
               <Mail size={15} className="footer__contact-icon" />
               <a href="mailto:contact@capadmis.com" className="footer__contact-link">contact@capadmis.com</a>
+            </li>
+            <li>
+              le mode ne dort pas, nous non plus 
+              <br />
+              <span style={{fontSize:'0.8rem', color:'#666'}}>Disponible 24h/24 - 7j/7</span>
             </li>
           </ul>
           <Link to={getStartPath()} className="footer__cta-btn">Commencer ma procédure</Link>
