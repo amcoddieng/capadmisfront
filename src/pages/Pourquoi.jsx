@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowRight, CheckCircle, X, Zap, BarChart3, Shield, Users, Bell, TrendingUp, Award, Clock } from 'lucide-react';
 import { getStartPath } from '../api/auth';
+import useAdvancedScroll from '../hooks/useAdvancedScroll';
 
 const differentiators = [
   {
@@ -55,6 +56,7 @@ const differentiators = [
 ];
 
 export default function Pourquoi() {
+  useAdvancedScroll();
   return (
     <main className="public-page public-page--why">
       <Helmet>
@@ -77,8 +79,8 @@ export default function Pourquoi() {
       </section>
 
       {/* Key message */}
-      <section className="page-section--blue-light">
-        <div className="container--tight">
+      <section className="page-section--blue-light" data-reveal>
+        <div className="container--tight" data-reveal data-reveal-delay="100">
           <p className="key-message">
             "Contrairement aux agences où un conseiller peut gérer trop de dossiers à la fois,{' '}
             <strong>Capadmis. structure le traitement de chaque dossier</strong> avec un suivi digital et des étapes clairement visibles par l'étudiant."
@@ -87,15 +89,15 @@ export default function Pourquoi() {
       </section>
 
       {/* Differentiators */}
-      <section className="page-section">
+      <section className="page-section" data-reveal>
         <div className="container">
           <div className="section-header">
             <span className="section-label">Nos différences</span>
             <h2 className="section-title">Ce qui nous distingue</h2>
           </div>
           <div className="grid-2">
-            {differentiators.map(d => (
-              <div key={d.title} className="diff-card">
+            {differentiators.map((d, i) => (
+              <div key={d.title} className="diff-card" data-reveal data-reveal-delay={i * 100} data-tilt>
                 <div className="diff-card__header">
                   <div className="diff-card__icon">{d.icon}</div>
                   <h3 className="diff-card__title">{d.title}</h3>
@@ -123,8 +125,8 @@ export default function Pourquoi() {
       </section>
 
       {/* CTA */}
-      <section className="page-section--blue">
-        <div className="container--tight">
+      <section className="page-section--blue" data-reveal>
+        <div className="container--tight" data-reveal data-reveal-delay="100">
           <h2 className="page-cta__title">Faites l'expérience Capadmis.</h2>
           <p className="page-cta__desc">Rejoignez une plateforme pensée pour vous simplifier la vie.</p>
           <div className="page-cta__actions">

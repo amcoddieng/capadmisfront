@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle } from 'lucide-react';
+import useAdvancedScroll from '../hooks/useAdvancedScroll';
 
 const contactInfo = [
   { icon: <MapPin className="w-5 h-5 text-blue-600" />, label: 'Adresse', value: 'Dakar, Sénégal' },
@@ -10,6 +11,7 @@ const contactInfo = [
 ];
 
 export default function Contact() {
+  useAdvancedScroll();
   const [sent, setSent] = useState(false);
   const [form, setForm] = useState({ nom: '', email: '', telephone: '', sujet: '', message: '' });
 
@@ -40,11 +42,11 @@ export default function Contact() {
       </section>
 
       {/* Content */}
-      <section className="page-section--gray">
+      <section className="page-section--gray" data-reveal>
         <div className="container">
           <div className="contact-layout">
             {/* Info */}
-            <div>
+            <div data-reveal data-reveal-delay="100">
               <span className="section-label">Un conseiller à votre écoute</span>
               <h2 className="contact-info__title">Votre projet commence par une conversation</h2>
               <p className="contact-info__desc">
@@ -52,7 +54,7 @@ export default function Contact() {
               </p>
               <div className="contact-info-cards">
                 {contactInfo.map(info => (
-                  <div key={info.label} className="contact-info-card">
+                  <div key={info.label} className="contact-info-card" data-tilt>
                     <div className="contact-info-card__icon">{info.icon}</div>
                     <div>
                       <div className="contact-info-card__label">{info.label}</div>
@@ -70,7 +72,7 @@ export default function Contact() {
             </div>
 
             {/* Form */}
-            <div className="contact-form-card">
+            <div className="contact-form-card" data-reveal data-reveal-delay="200">
               {sent ? (
                 <div className="contact-success">
                   <div className="contact-success__icon"><CheckCircle size={32} /></div>

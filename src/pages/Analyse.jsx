@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowRight, BarChart3, CheckCircle, AlertTriangle, TrendingUp, Star, Info } from 'lucide-react';
 import { getStartPath } from '../api/auth';
+import useAdvancedScroll from '../hooks/useAdvancedScroll';
 
 const filieres = [
   'Droit', 'Sciences économiques', 'Gestion / Management', 'Informatique / Numérique',
@@ -38,6 +39,7 @@ function getScoreInfo(moyenne, filiere, niveau) {
 }
 
 export default function Analyse() {
+  useAdvancedScroll();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     prenom: '', nom: '', email: '',
@@ -91,10 +93,10 @@ export default function Analyse() {
       </section>
 
       {/* Stepper + forms */}
-      <section className="page-section--gray">
+      <section className="page-section--gray" data-reveal>
         <div className="container--tight" style={{ maxWidth: '40rem', margin: '0 auto', padding: '0 1rem' }}>
           {/* Progress */}
-          <div className="stepper">
+          <div className="stepper" data-reveal data-reveal-delay="100">
             {[1, 2, 3].map((s) => (
               <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
                 <div className={`stepper__step stepper__step--${step > s ? 'done' : step === s ? 'active' : 'pending'}`}>

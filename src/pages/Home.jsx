@@ -1,27 +1,9 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, ArrowRight, BarChart3, Check, CheckCircle, GraduationCap, Landmark, MapPin, Plane, Shield, TrendingUp, Zap } from 'lucide-react';
 import { getStartPath } from '../api/auth';
-
-function useScrollReveal() {
-  useEffect(() => {
-    const els = document.querySelectorAll('[data-reveal]');
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: '0px 0px -50px 0px' }
-    );
-    els.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-}
+import useAdvancedScroll from '../hooks/useAdvancedScroll';
 
 const heroSlides = [
   {
@@ -147,7 +129,7 @@ export default function Home() {
     return () => window.clearInterval(timer);
   }, []);
 
-  useScrollReveal();
+  useAdvancedScroll();
 
   const showPreviousSlide = () => {
     setActiveSlide((current) => (current - 1 + heroSlides.length) % heroSlides.length);
@@ -235,7 +217,7 @@ export default function Home() {
         <div className="container">
           <div className="stats-section__grid">
             {stats.map((s, i) => (
-              <div key={s.label} className="stats-section__item" data-reveal data-reveal-delay={i * 100}>
+              <div key={s.label} className="stats-section__item" data-reveal data-reveal-delay={i * 100} data-tilt>
                 <div className="stats-section__value">{s.value}</div>
                 <div className="stats-section__label">{s.label}</div>
               </div>
@@ -246,7 +228,7 @@ export default function Home() {
 
       <section className="france-section" data-reveal>
         <div className="container france-section__grid">
-          <div className="france-section__visual" data-reveal data-reveal-delay="100">
+          <div className="france-section__visual" data-reveal data-reveal-delay="100" data-parallax="0.15">
             <img
               className="france-section__main-image"
               src="https://unsplash.com/photos/nsHO6mtOsc4/download?force=true&w=1400"
@@ -292,7 +274,7 @@ export default function Home() {
           </div>
           <div className="features-section__grid">
             {features.map((f, i) => (
-              <div key={f.title} className="feature-card" data-reveal data-reveal-delay={i * 120}>
+              <div key={f.title} className="feature-card" data-reveal data-reveal-delay={i * 120} data-tilt>
                 <div className="feature-card__icon">{f.icon}</div>
                 <h3 className="feature-card__title">{f.title}</h3>
                 <p className="feature-card__desc">{f.desc}</p>
@@ -336,7 +318,7 @@ export default function Home() {
           </div>
           <div className="home-pricing__grid">
             {homePlans.map((plan, index) => (
-              <article className={`home-price-card${index === 0 ? ' home-price-card--featured' : ''}`} key={plan.title} data-reveal data-reveal-delay={index * 150}>
+              <article className={`home-price-card${index === 0 ? ' home-price-card--featured' : ''}`} key={plan.title} data-reveal data-reveal-delay={index * 150} data-tilt>
                 <div className="home-price-card__top">
                   <span>{plan.step}</span>
                   {index === 0 && <strong>Pour commencer</strong>}

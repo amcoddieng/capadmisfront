@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowRight, CheckCircle, X, HelpCircle } from 'lucide-react';
 import { getStartPath } from '../api/auth';
+import useAdvancedScroll from '../hooks/useAdvancedScroll';
 
 const plans = [
   {
@@ -71,6 +72,7 @@ const faqs = [
 ];
 
 export default function Tarifs() {
+  useAdvancedScroll();
   return (
     <main className="public-page public-page--pricing">
       <Helmet>
@@ -96,11 +98,11 @@ export default function Tarifs() {
       </section>
 
       {/* Plans */}
-      <section className="page-section">
+      <section className="page-section" data-reveal>
         <div className="container--narrow">
           <div className="plans-grid">
-            {plans.map(plan => (
-              <div key={plan.id} className={`plan-card${plan.id === 'visa' ? ' plan-card--featured' : ''}`}>
+            {plans.map((plan, i) => (
+              <div key={plan.id} className={`plan-card${plan.id === 'visa' ? ' plan-card--featured' : ''}`} data-reveal data-reveal-delay={i * 150} data-tilt>
                 <div>
                   {plan.badge && <span className="plan-card__badge">{plan.badge}</span>}
                   <div className="plan-card__label">{plan.label}</div>
@@ -143,7 +145,7 @@ export default function Tarifs() {
       </section>
 
       {/* Comparison */}
-      <section className="page-section--gray">
+      <section className="page-section--gray" data-reveal>
         <div className="container--tight">
           <div className="section-header">
             <span className="section-label">Comparaison</span>
@@ -171,7 +173,7 @@ export default function Tarifs() {
       </section>
 
       {/* FAQ */}
-      <section className="page-section">
+      <section className="page-section" data-reveal>
         <div className="container--tight">
           <div className="section-header">
             <span className="section-label">FAQ</span>
@@ -189,8 +191,8 @@ export default function Tarifs() {
       </section>
 
       {/* CTA */}
-      <section className="page-section--dark">
-        <div className="container--tight" style={{ textAlign: 'center' }}>
+      <section className="page-section--dark" data-reveal>
+        <div className="container--tight" data-reveal data-reveal-delay="100" style={{ textAlign: 'center' }}>
           <h2 className="page-cta__title">Votre avenir commence à 39 900 FCFA</h2>
           <p className="page-cta__desc">Un prix accessible, un suivi complet et une équipe engagée à vos côtés.</p>
           <div className="page-cta__actions">

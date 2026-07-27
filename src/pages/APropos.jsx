@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowRight, Target, Cpu, BookOpen, Globe, Users, Shield, CheckCircle } from 'lucide-react';
 import { getStartPath } from '../api/auth';
+import useAdvancedScroll from '../hooks/useAdvancedScroll';
 
 const services = [
   { icon: <BookOpen size={20} />, title: 'Conseil en orientation', desc: "Analyse de votre profil académique pour identifier les filières et universités adaptées." },
@@ -34,6 +35,7 @@ const missionStats = [
 ];
 
 export default function APropos() {
+  useAdvancedScroll();
   return (
     <main className="public-page public-page--about">
       <Helmet>
@@ -56,10 +58,10 @@ export default function APropos() {
       </section>
 
       {/* Mission */}
-      <section className="page-section">
+      <section className="page-section" data-reveal>
         <div className="container">
           <div className="mission-grid">
-            <div className="mission-text">
+            <div className="mission-text" data-reveal data-reveal-delay="100">
               <span className="section-label">Notre mission</span>
               <h2 className="mission-title">Rendre les études en France accessibles, claires et sereines</h2>
               <p className="mission-desc">
@@ -75,7 +77,7 @@ export default function APropos() {
                 ))}
               </ul>
             </div>
-            <div className="mission-stats-box">
+            <div className="mission-stats-box" data-reveal data-reveal-delay="200" data-parallax="0.1">
               <div className="mission-stats-grid">
                 {missionStats.map(s => (
                   <div key={s.label} className="mission-stat">
@@ -90,15 +92,15 @@ export default function APropos() {
       </section>
 
       {/* Services */}
-      <section className="page-section--gray">
+      <section className="page-section--gray" data-reveal>
         <div className="container">
           <div className="section-header">
             <span className="section-label">Nos services</span>
             <h2 className="section-title">Une plateforme tout-en-un</h2>
           </div>
           <div className="grid-3">
-            {services.map(s => (
-              <div key={s.title} className="service-card">
+            {services.map((s, i) => (
+              <div key={s.title} className="service-card" data-reveal data-reveal-delay={i * 100} data-tilt>
                 <div className="service-card__icon">{s.icon}</div>
                 <h3 className="service-card__title">{s.title}</h3>
                 <p className="service-card__desc">{s.desc}</p>
@@ -109,15 +111,15 @@ export default function APropos() {
       </section>
 
       {/* Values */}
-      <section className="page-section">
+      <section className="page-section" data-reveal>
         <div className="container">
           <div className="section-header">
             <span className="section-label">Nos valeurs</span>
             <h2 className="section-title">Ce qui nous guide</h2>
           </div>
           <div className="grid-4">
-            {values.map(v => (
-              <div key={v.title} className="value-card">
+            {values.map((v, i) => (
+              <div key={v.title} className="value-card" data-reveal data-reveal-delay={i * 100} data-tilt>
                 <div className="value-card__emoji">{v.emoji}</div>
                 <div className="value-card__title">{v.title}</div>
                 <p className="value-card__desc">{v.desc}</p>
@@ -128,8 +130,8 @@ export default function APropos() {
       </section>
 
       {/* CTA */}
-      <section className="page-section--dark">
-        <div className="container--tight" style={{ textAlign: 'center' }}>
+      <section className="page-section--dark" data-reveal>
+        <div className="container--tight" data-reveal data-reveal-delay="100" style={{ textAlign: 'center' }}>
           <h2 className="page-cta__title">Votre projet mérite une stratégie solide</h2>
           <p className="page-cta__desc">Commencez aujourd’hui avec un accompagnement pensé pour votre profil et vos ambitions.</p>
           <div className="page-cta__actions">

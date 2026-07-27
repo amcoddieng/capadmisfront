@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowRight, CheckCircle, FileText, Users, BookOpen, Trophy, Plane, Stamp, Star } from 'lucide-react';
 import { getStartPath } from '../api/auth';
+import useAdvancedScroll from '../hooks/useAdvancedScroll';
 
 const steps = [
   {
@@ -127,6 +128,7 @@ const steps = [
 ];
 
 export default function Procedure() {
+  useAdvancedScroll();
   return (
     <main className="public-page public-page--procedure">
       <Helmet>
@@ -157,7 +159,7 @@ export default function Procedure() {
       </section>
 
       {/* Timeline */}
-      <section className="page-section">
+      <section className="page-section" data-reveal>
         <div className="container--narrow">
           <div className="section-header">
             <span className="section-label">Les étapes</span>
@@ -168,7 +170,7 @@ export default function Procedure() {
           </div>
           <div className="timeline">
             {steps.map((step, idx) => (
-              <div key={step.number} className="timeline__item">
+              <div key={step.number} className="timeline__item" data-reveal data-reveal-delay={idx * 80}>
                 <div className="timeline__connector">
                   <div className={`timeline__icon ${step.color}`}>{step.icon}</div>
                   {idx < steps.length - 1 && <div className="timeline__line" />}
@@ -198,8 +200,8 @@ export default function Procedure() {
       </section>
 
       {/* CTA */}
-      <section className="page-section--blue">
-        <div className="container--tight">
+      <section className="page-section--blue" data-reveal>
+        <div className="container--tight" data-reveal data-reveal-delay="100">
           <h2 className="page-cta__title">Prêt à démarrer votre procédure ?</h2>
           <p className="page-cta__desc">Rejoignez des centaines d'étudiants qui ont réussi leurs études à l'étranger grâce à Capadmis.</p>
           <div className="page-cta__actions">

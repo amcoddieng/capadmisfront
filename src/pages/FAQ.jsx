@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
+import useAdvancedScroll from '../hooks/useAdvancedScroll';
 
 const faqCategories = [
   {
@@ -66,6 +67,7 @@ function FAQItem({ item }) {
 }
 
 export default function FAQ() {
+  useAdvancedScroll();
   const [activeCategory, setActiveCategory] = useState('Général');
 
   return (
@@ -88,9 +90,9 @@ export default function FAQ() {
       </section>
 
       {/* FAQ */}
-      <section className="page-section--gray">
+      <section className="page-section--gray" data-reveal>
         <div className="container--tight">
-          <div className="faq-tabs">
+          <div className="faq-tabs" data-reveal data-reveal-delay="100">
             {faqCategories.map(cat => (
               <button
                 key={cat.category}
@@ -113,7 +115,7 @@ export default function FAQ() {
               </div>
             ))}
 
-          <div className="faq-contact-box">
+          <div className="faq-contact-box" data-reveal data-reveal-delay="200">
             <h3 className="faq-contact-box__title">Vous n'avez pas trouvé votre réponse ?</h3>
             <p className="faq-contact-box__desc">Contactez-nous directement, notre équipe vous répond rapidement.</p>
             <Link to="/contact" className="btn btn--primary-sm">
