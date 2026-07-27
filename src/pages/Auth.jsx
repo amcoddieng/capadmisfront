@@ -1,9 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Eye, EyeOff, ArrowRight, CheckCircle, AlertCircle, Loader } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, CheckCircle, AlertCircle, Loader, GraduationCap, MapPin, Shield } from 'lucide-react';
 import { apiLogin, apiRegister, apiGetDossier, saveSession } from '../api/auth';
 import logoAuth from '../assets/les images du site/logo-horizontal-white-bg - Copie.png';
+
+const authSlides = [
+  {
+    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1600&q=85',
+    title: 'Votre projet d\u2019\u00e9tudes en France commence ici',
+    subtitle: 'Paris \u00b7 Lyon \u00b7 Bordeaux \u00b7 Lille',
+    credit: 'Photo libre \u2014 Unsplash',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=1600&q=85',
+    title: 'Rejoignez les universit\u00e9s fran\u00e7aises qui forment l\u2019avenir',
+    subtitle: 'La Sorbonne \u00b7 Sciences Po \u00b7 Polytechnique',
+    credit: 'Paris \u2014 Unsplash',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1431274172761-fca41d930114?auto=format&fit=crop&w=1600&q=85',
+    title: 'De Dakar \u00e0 votre campus fran\u00e7ais',
+    subtitle: 'Un accompagnement complet \u00e0 chaque \u00e9tape',
+    credit: 'Campus \u2014 Unsplash',
+  },
+];
 
 const paysOrigine = ['Sénégal', 'Côte d\'Ivoire', 'Mali', 'Guinée', 'Cameroun', 'Maroc', 'Burkina Faso', 'Togo', 'Bénin', 'Niger', 'Autre'];
 
@@ -14,6 +35,14 @@ export default function Auth() {
   const [step, setStep]       = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveSlide((current) => (current + 1) % authSlides.length);
+    }, 6000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   const [form, setForm] = useState({
     prenom: '', nom: '', email: '', mdp: '', telephone: '',
@@ -75,16 +104,59 @@ export default function Auth() {
         <meta name="description" content="Connectez-vous ou créez votre compte Capadmis pour démarrer votre procédure d'études à l'étranger." />
         <meta name="robots" content="noindex, follow" />
       </Helmet>
-      <div className="auth-wrapper">
-        {/* Logo */}
-        <div className="auth-logo">
-          <Link to="/" className="auth-logo__link" style={{ padding: '0 .5rem' }}>
-            <img src={logoAuth} alt="Capadmis" style={{ height: 44, width: 'auto', display: 'block', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,.3))' }} />
-          </Link>
-        </div>
 
-        {/* Card */}
-        <div className="auth-card">
+      {/* ── Carrousel arrière-plan ── */}
+      <div className="auth-carousel">
+        {authSlides.map((slide, index) => (
+          <div
+            key={slide.title}
+            className={`auth-carousel__slide${index === activeSlide ? ' auth-carousel__slide--active' : ''}`}
+            aria-hidden={index !== activeSlide}
+          >
+            <img src={slide.image} alt="" className="auth-carousel__image" />
+          </div>
+        ))}
+        <div className="auth-carousel__overlay" />
+        <div className="auth-carousel__content">
+          <div key={activeSlide} className="auth-carousel__copy">
+            <span className="auth-carousel__eyebrow"><GraduationCap size={18} /> Capadmis</span>
+            <h2>{authSlides[activeSlide].title}</h2>
+            <p><MapPin size={16} /> {authSlides[activeSlide].subtitle}</p>
+          </div>
+          <div className="auth-carousel__dots">
+            {authSlides.map((slide, index) => (
+              <button
+                type="button"
+                key={slide.title}
+                className={`auth-carousel__dot${index === activeSlide ? ' auth-carousel__dot--active' : ''}`}
+                onClick={() => setActiveSlide(index)}
+                aria-label={`Image ${index + 1}`}
+              />
+            ))}
+          </div>
+          <a
+            className="auth-carousel__credit"
+            href="https://unsplash.com/license"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {authSlides[activeSlide].credit}
+          </a>
+        </div>
+      </div>
+
+      {/* ── Panneau formulaire ── */}
+      <div className="auth-panel">
+        <div className="auth-wrapper">
+          {/* Logo */}
+          <div className="auth-logo">
+            <Link to="/" className="auth-logo__link" style={{ padding: '0 .5rem' }}>
+              <img src={logoAuth} alt="Capadmis" style={{ height: 44, width: 'auto', display: 'block' }} />
+            </Link>
+          </div>
+
+          {/* Card */}
+          <div className="auth-card">
           <div className="auth-tabs">
             <button className={`auth-tab auth-tab--${mode === 'login' ? 'active' : 'inactive'}`} onClick={() => switchMode('login')}>
               Connexion
@@ -284,6 +356,12 @@ export default function Auth() {
           <a href="#">CGU</a> et notre{' '}
           <a href="#">politique de confidentialité</a>.
         </p>
+
+        <div className="auth-trust">
+          <span><Shield size={14} /> Données sécurisées</span>
+          <span><CheckCircle size={14} /> Plateforme certifiée</span>
+        </div>
+        </div>
       </div>
     </div>
   );

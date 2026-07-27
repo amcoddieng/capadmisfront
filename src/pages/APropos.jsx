@@ -35,7 +35,7 @@ const missionStats = [
 
 export default function APropos() {
   return (
-    <main>
+    <main className="public-page public-page--about">
       <Helmet>
         <title>À propos — Capadmis</title>
         <meta name="description" content="Découvrez Capadmis, la plateforme digitale qui accompagne les étudiants africains dans leurs études à l'étranger. Notre mission, nos valeurs et notre équipe." />
@@ -43,13 +43,13 @@ export default function APropos() {
       </Helmet>
 
       {/* Hero */}
-      <section className="page-hero">
+      <section className="page-hero public-hero public-hero--about">
         <div className="container">
           <div style={{ maxWidth: '48rem' }}>
             <span className="page-hero__badge">À propos</span>
-            <h1 className="page-hero__title">Votre partenaire pour les études à l'étranger</h1>
-            <p className="page-hero__desc" style={{ color: 'var(--slate-400)' }}>
-              Plateforme digitale combinant technologie et expertise humaine pour un accompagnement de qualité.
+            <h1 className="page-hero__title">L’expertise qui donne un cap à votre projet France</h1>
+            <p className="page-hero__desc">
+              Une équipe engagée, une méthode claire et une plateforme digitale pour vous accompagner de l’orientation jusqu’au visa.
             </p>
           </div>
         </div>
@@ -61,7 +61,7 @@ export default function APropos() {
           <div className="mission-grid">
             <div className="mission-text">
               <span className="section-label">Notre mission</span>
-              <h2 className="mission-title">Digitaliser l'accès aux études à l'étranger</h2>
+              <h2 className="mission-title">Rendre les études en France accessibles, claires et sereines</h2>
               <p className="mission-desc">
                 Beaucoup d'étudiants abandonnent leur projet faute d'accompagnement adapté ou de moyens financiers.
                 Capadmis. a été créé pour changer cela.
@@ -130,8 +130,8 @@ export default function APropos() {
       {/* CTA */}
       <section className="page-section--dark">
         <div className="container--tight" style={{ textAlign: 'center' }}>
-          <h2 className="page-cta__title">Prêt à commencer ?</h2>
-          <p className="page-cta__desc">Rejoignez des centaines d'étudiants qui ont réussi avec Capadmis.</p>
+          <h2 className="page-cta__title">Votre projet mérite une stratégie solide</h2>
+          <p className="page-cta__desc">Commencez aujourd’hui avec un accompagnement pensé pour votre profil et vos ambitions.</p>
           <div className="page-cta__actions">
             <Link to={getStartPath()} className="btn btn--cta-primary">
               Créer mon compte <ArrowRight size={18} />

@@ -128,7 +128,7 @@ const steps = [
 
 export default function Procedure() {
   return (
-    <main>
+    <main className="public-page public-page--procedure">
       <Helmet>
         <title>Procédure Campus France — Capadmis</title>
         <meta name="description" content="Découvrez les 8 étapes clés pour réussir votre admission et obtenir votre visa étudiant. Capadmis vous accompagne de l'orientation au départ." />
@@ -136,13 +136,13 @@ export default function Procedure() {
       </Helmet>
 
       {/* Hero */}
-      <section className="page-hero--gradient">
+      <section className="page-hero--gradient public-hero public-hero--procedure">
         <div className="container">
           <div style={{ maxWidth: '48rem' }}>
             <span className="page-hero__badge">Procédure Campus France</span>
-            <h1 className="page-hero__title">8 étapes pour réussir votre admission</h1>
+            <h1 className="page-hero__title">Votre parcours vers la France, étape par étape</h1>
             <p className="page-hero__desc">
-              De l'orientation jusqu'au visa, Capadmis. vous accompagne à chaque étape avec un suivi digital transparent et des experts dédiés.
+              De l’orientation jusqu’au visa, chaque démarche est expliquée, préparée et suivie avec un expert dédié.
             </p>
             <div className="page-hero__actions">
               <Link to="/inscription" className="btn btn--hero-primary">
@@ -161,7 +161,7 @@ export default function Procedure() {
         <div className="container--narrow">
           <div className="section-header">
             <span className="section-label">Les étapes</span>
-            <h2 className="section-title">La procédure en détail</h2>
+            <h2 className="section-title">8 étapes, un seul objectif : votre réussite</h2>
             <p style={{ color: 'var(--slate-500)', maxWidth: '36rem', margin: '.5rem auto 0' }}>
               Chaque étape est suivie par notre équipe et visible dans votre tableau de bord personnel.
             </p>

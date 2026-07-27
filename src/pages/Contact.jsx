@@ -21,7 +21,7 @@ export default function Contact() {
   };
 
   return (
-    <main>
+    <main className="public-page public-page--contact">
       <Helmet>
         <title>Contact — Capadmis</title>
         <meta name="description" content="Contactez Capadmis pour toute question sur votre procédure d'études à l'étranger. WhatsApp, email ou téléphone. Réponse rapide garantie." />
@@ -29,12 +29,12 @@ export default function Contact() {
       </Helmet>
 
       {/* Hero */}
-      <section className="page-hero--gradient page-hero--center">
+      <section className="page-hero--gradient page-hero--center public-hero public-hero--contact">
         <div className="container">
           <span className="page-hero__badge">Contact</span>
-          <h1 className="page-hero__title">Contactez-nous</h1>
+          <h1 className="page-hero__title">Parlons de votre projet d’études en France</h1>
           <p className="page-hero__desc">
-            Une question sur votre procédure, nos services ou nos tarifs ? Notre équipe vous répond rapidement.
+            Une question sur votre orientation, votre dossier ou nos tarifs ? Échangez avec notre équipe et obtenez une réponse claire.
           </p>
         </div>
       </section>
@@ -45,7 +45,8 @@ export default function Contact() {
           <div className="contact-layout">
             {/* Info */}
             <div>
-              <h2 className="contact-info__title">Nous sommes là pour vous</h2>
+              <span className="section-label">Un conseiller à votre écoute</span>
+              <h2 className="contact-info__title">Votre projet commence par une conversation</h2>
               <p className="contact-info__desc">
                 Que vous soyez au début de votre réflexion ou prêt à lancer votre procédure, notre équipe est disponible pour répondre à toutes vos questions.
               </p>

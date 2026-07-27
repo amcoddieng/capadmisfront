@@ -8,7 +8,6 @@ const navLinks = [
   { label: 'Procédure Campus France', path: '/procedure' },
   { label: 'Tarifs', path: '/tarifs' },
   { label: 'Pourquoi Capadmis.', path: '/pourquoi' },
-  { label: 'Témoignages', path: '/temoignages' },
   { label: 'FAQ', path: '/faq' },
 ];
 

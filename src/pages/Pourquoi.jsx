@@ -54,16 +54,9 @@ const differentiators = [
   },
 ];
 
-const testimonialHighlight = {
-  text: "Avant Capadmis., j'avais contacté deux agences classiques. Je ne savais jamais où en était mon dossier. Avec Capadmis., j'ai tout suivi en temps réel et j'ai été admis à Toulouse.",
-  name: "Ibrahima F.",
-  city: "Dakar",
-  school: "Université de Toulouse",
-};
-
 export default function Pourquoi() {
   return (
-    <main>
+    <main className="public-page public-page--why">
       <Helmet>
         <title>Pourquoi Capadmis — Accompagnement études à l'étranger</title>
         <meta name="description" content="Capadmis vs agences classiques : processus 100% digital, suivi transparent, tarif accessible. Découvrez pourquoi plus de 500 étudiants nous font confiance." />
@@ -71,7 +64,7 @@ export default function Pourquoi() {
       </Helmet>
 
       {/* Hero */}
-      <section className="page-hero--gradient">
+      <section className="page-hero--gradient public-hero public-hero--why">
         <div className="container">
           <div style={{ maxWidth: '48rem' }}>
             <span className="page-hero__badge">Pourquoi Capadmis. ?</span>
@@ -125,23 +118,6 @@ export default function Pourquoi() {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonial */}
-      <section className="page-section--gray">
-        <div className="container--tight">
-          <div className="quote-card">
-            <div className="quote-card__emoji">💬</div>
-            <blockquote className="quote-card__text">"{testimonialHighlight.text}"</blockquote>
-            <div className="quote-card__author">
-              <div className="quote-card__avatar">🇸🇳</div>
-              <div>
-                <div className="quote-card__name">{testimonialHighlight.name}</div>
-                <div className="quote-card__meta">{testimonialHighlight.city} · {testimonialHighlight.school}</div>
-              </div>
-            </div>
           </div>
         </div>
       </section>

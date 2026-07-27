@@ -8,7 +8,6 @@ import Procedure from './pages/Procedure';
 import Tarifs from './pages/Tarifs';
 import Pourquoi from './pages/Pourquoi';
 import Analyse from './pages/Analyse';
-import Temoignages from './pages/Temoignages';
 import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
 import Auth from './pages/Auth';
@@ -88,7 +87,6 @@ function App() {
           <Route path="/tarifs" element={<Layout><Tarifs /></Layout>} />
           <Route path="/pourquoi" element={<Layout><Pourquoi /></Layout>} />
           <Route path="/analyse" element={<Layout><Analyse /></Layout>} />
-          <Route path="/temoignages" element={<Layout><Temoignages /></Layout>} />
           <Route path="/faq" element={<Layout><FAQ /></Layout>} />
           <Route path="/contact" element={<Layout><Contact /></Layout>} />
           <Route path="/connexion" element={<Auth />} />

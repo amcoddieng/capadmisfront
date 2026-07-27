@@ -72,7 +72,7 @@ const faqs = [
 
 export default function Tarifs() {
   return (
-    <main>
+    <main className="public-page public-page--pricing">
       <Helmet>
         <title>Nos tarifs — Capadmis</title>
         <meta name="description" content="Découvrez nos tarifs transparents pour l'accompagnement études à l'étranger. À partir de 39 900 FCFA. 3x moins cher qu'une agence classique." />
@@ -80,13 +80,18 @@ export default function Tarifs() {
       </Helmet>
 
       {/* Hero */}
-      <section className="page-hero page-hero--center">
+      <section className="page-hero page-hero--center public-hero public-hero--pricing">
         <div className="container">
           <span className="page-hero__badge">Tarifs</span>
-          <h1 className="page-hero__title">Des prix accessibles</h1>
+          <h1 className="page-hero__title">Un accompagnement complet, au meilleur prix</h1>
           <p className="page-hero__desc">
-            Jusqu'à 3 fois moins cher qu'une agence traditionnelle, avec un accompagnement digital complet.
+            Commencez pour 39 900 FCFA. L’étape visa n’est payée qu’après votre admission : des tarifs clairs, sans surprise.
           </p>
+          <div className="pricing-hero__proof">
+            <span><CheckCircle size={16} /> Paiement sécurisé</span>
+            <span><CheckCircle size={16} /> Aucun frais caché</span>
+            <span><CheckCircle size={16} /> Jusqu’à 3× moins cher</span>
+          </div>
         </div>
       </section>
 
@@ -186,8 +191,8 @@ export default function Tarifs() {
       {/* CTA */}
       <section className="page-section--dark">
         <div className="container--tight" style={{ textAlign: 'center' }}>
-          <h2 className="page-cta__title">Commencez pour 39 900 FCFA</h2>
-          <p className="page-cta__desc">Un investissement accessible pour votre avenir.</p>
+          <h2 className="page-cta__title">Votre avenir commence à 39 900 FCFA</h2>
+          <p className="page-cta__desc">Un prix accessible, un suivi complet et une équipe engagée à vos côtés.</p>
           <div className="page-cta__actions">
             <Link to="/inscription" className="btn btn--cta-primary">
               Lancer ma procédure <ArrowRight size={18} />

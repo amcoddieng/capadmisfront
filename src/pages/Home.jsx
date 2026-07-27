@@ -1,8 +1,81 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { ArrowRight, CheckCircle, Star, BarChart3, Shield, Award, Globe, Zap, TrendingUp } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BarChart3, Check, CheckCircle, GraduationCap, Landmark, MapPin, Plane, Shield, TrendingUp, Zap } from 'lucide-react';
 import { getStartPath } from '../api/auth';
-import heroImage from '../assets/hero.png';
+
+const heroSlides = [
+  {
+    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=2200&q=85',
+    eyebrow: 'Cap sur la France',
+    title: 'Votre projet d’études en France commence ici',
+    description: 'Orientation, candidatures, Campus France et visa : un expert vous accompagne jusqu’à votre arrivée.',
+    location: 'Paris · Lyon · Bordeaux · Lille',
+    credit: 'Photo libre — Unsplash',
+  },
+  {
+    image: 'https://unsplash.com/photos/nsHO6mtOsc4/download?force=true&w=2200',
+    eyebrow: 'L’excellence académique française',
+    title: 'Intégrez la formation qui révèle votre potentiel',
+    description: 'Nous construisons une stratégie de candidature cohérente avec votre parcours, vos ambitions et votre budget.',
+    location: 'Universités · Écoles · Instituts',
+    credit: 'La Sorbonne — Robin Benzrihem / Unsplash',
+  },
+  {
+    image: 'https://unsplash.com/photos/-JonPZiIhII/download?force=true&w=2200',
+    eyebrow: 'De Dakar à votre campus',
+    title: 'Chaque étape maîtrisée, jusqu’à votre départ',
+    description: 'Votre dossier avance dans un espace digital clair, avec des conseils personnalisés et un suivi humain.',
+    location: 'Accompagnement depuis Dakar',
+    credit: 'Paris-Sorbonne — Chepe Nicoli / Unsplash',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1562774053-70193937158a?auto=format&fit=crop&w=2200&q=85',
+    eyebrow: 'Vie étudiante en France',
+    title: 'Intégrez une communauté internationale dynamique',
+    description: 'Plus de 370 000 étudiants étrangers choisissent la France chaque année. Devenez l’un d’entre eux.',
+    location: 'Campus · Résidences étudiantes · Vie associative',
+    credit: 'Campus universitaire — Unsplash',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1523240795612-9770540121d8?auto=format&fit=crop&w=2200&q=85',
+    eyebrow: 'Excellence académique',
+    title: 'Des campus d’exception pour votre formation',
+    description: 'Universités historiques, laboratoires de pointe, bibliothèques riches : la France investit dans votre réussite.',
+    location: 'Sorbonne · Sciences Po · Polytechnique',
+    credit: 'Campus français — Unsplash',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?auto=format&fit=crop&w=2200&q=85',
+    eyebrow: 'Étudiants du monde entier',
+    title: 'La France, 1ère destination d’études non anglophone',
+    description: 'Rejoignez une communauté d’étudiants venus du monde entier dans un pays reconnu pour sa qualité de vie et ses diplômes.',
+    location: 'Lyon · Toulouse · Montpellier · Strasbourg',
+    credit: 'Étudiants internationaux — Unsplash',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=2200&q=85',
+    eyebrow: 'Bibliothèques & recherche',
+    title: 'Un environnement d’apprentissage d’exception',
+    description: 'Accédez à des bibliothèques universitaires centenaires, des centres de recherche et un accompagnement pédagogique reconnu.',
+    location: 'Bibliothèque Sainte-Geneviève · BnF · SCD',
+    credit: 'Bibliothèque universitaire — Unsplash',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=2200&q=85',
+    eyebrow: 'Diplômes reconnus',
+    title: 'Un diplôme français, un passeport pour le monde',
+    description: 'Les diplômes français sont reconnus dans toute l’Europe et au-delà. Votre investissement ouvre des portes internationales.',
+    location: 'LMD · Diplômes nationaux · ECTS',
+    credit: 'Sorbonne — Unsplash',
+  },
+];
+
+const franceHighlights = [
+  { icon: GraduationCap, value: '3 500+', label: 'établissements d’enseignement supérieur' },
+  { icon: Landmark, value: 'Des diplômes', label: 'reconnus dans le monde entier' },
+  { icon: Plane, value: 'Une expérience', label: 'académique et culturelle unique' },
+];
 
 const steps = [
   { title: 'Analyse du profil', desc: 'Évaluation complète de votre parcours académique et de vos objectifs.' },
@@ -20,10 +93,21 @@ const features = [
   { icon: <TrendingUp size={20} />, title: 'Tarif accessible', desc: "Jusqu'à 3x moins cher qu'une agence" },
 ];
 
-const testimonials = [
-  { name: 'Aminata D.', origin: 'Sénégal', text: 'Admission à Lyon 2 obtenue grâce à un suivi parfait.', school: 'Université Lyon 2' },
-  { name: 'Moussa K.', origin: 'Guinée', text: "L'analyse m'a dirigé vers la bonne université. Visa en poche !", school: 'Université de Bordeaux' },
-  { name: 'Fatou S.', origin: 'Sénégal', text: "Le dashboard m'a rassurée à chaque étape.", school: 'Université Paris-Saclay' },
+const homePlans = [
+  {
+    step: 'Étape 1',
+    title: 'Admission',
+    price: '39 900',
+    description: 'Tout pour construire, déposer et suivre vos candidatures en France.',
+    features: ['Analyse complète du profil', 'Choix des filières et universités', 'Dépôt et suivi des candidatures', 'Préparation Campus France'],
+  },
+  {
+    step: 'Étape 2',
+    title: 'Visa étudiant',
+    price: '49 900',
+    description: 'Payable uniquement après votre admission universitaire.',
+    features: ['Constitution du dossier visa', 'Justificatifs et hébergement', 'Préparation à l’entretien', 'Suivi jusqu’au résultat'],
+  },
 ];
 
 const stats = [
@@ -33,17 +117,27 @@ const stats = [
   { value: '39 900', label: 'FCFA pour démarrer' },
 ];
 
-const dashboardItems = [
-  { label: 'Analyse du profil',       done: true },
-  { label: 'Orientation validée',     done: true },
-  { label: 'Dossier soumis',          done: true },
-  { label: 'Entretien Campus France', done: false },
-  { label: 'Préparation visa',        done: false },
-];
-
 export default function Home() {
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveSlide((current) => (current + 1) % heroSlides.length);
+    }, 6500);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const showPreviousSlide = () => {
+    setActiveSlide((current) => (current - 1 + heroSlides.length) % heroSlides.length);
+  };
+
+  const showNextSlide = () => {
+    setActiveSlide((current) => (current + 1) % heroSlides.length);
+  };
+
   return (
-    <main>
+    <main className="home-page">
       <Helmet>
         <title>Capadmis | Études en France, Campus France et études à l'étranger</title>
         <meta name="description" content="Capadmis accompagne les étudiants dans leurs études en France et à l'étranger : orientation, admission universitaire, procédure Campus France, visa étudiant et suivi personnalisé." />
@@ -51,24 +145,67 @@ export default function Home() {
       </Helmet>
 
       {/* ── HERO ── */}
-      <section className="hero">
-        <img
-          src={heroImage}
-          alt="Étudiants africains préparant leur admission en France"
-          className="hero__image"
-        />
+      <section className="hero" aria-roledescription="carrousel" aria-label="Destinations et accompagnement Capadmis">
+        <div className="hero__slides">
+          {heroSlides.map((slide, index) => (
+            <div
+              key={slide.title}
+              className={`hero__slide${index === activeSlide ? ' hero__slide--active' : ''}`}
+              aria-hidden={index !== activeSlide}
+            >
+              <img src={slide.image} alt="" className="hero__image" />
+            </div>
+          ))}
+        </div>
         <div className="hero__overlay" />
         <div className="hero__content">
-          <h1>Études en France et à l'étranger avec Capadmis</h1>
-          <p>Votre accompagnement pour l'orientation, l'admission universitaire, la procédure Campus France et le visa étudiant.</p>
-          <div className="hero__actions">
-            <Link to={getStartPath()} className="btn btn--hero-primary">
-              Commencer ma procédure <ArrowRight size={18} />
-            </Link>
-            <Link to="/analyse" className="btn btn--hero-secondary">
-              Analyser mes chances
-            </Link>
+          <div className="hero__copy" key={activeSlide}>
+            <span className="hero__eyebrow"><span />{heroSlides[activeSlide].eyebrow}</span>
+            <h1>{heroSlides[activeSlide].title}</h1>
+            <p>{heroSlides[activeSlide].description}</p>
+            <div className="hero__location"><MapPin size={16} /> {heroSlides[activeSlide].location}</div>
+            <div className="hero__actions">
+              <Link to={getStartPath()} className="btn btn--hero-primary">
+                Commencer mon projet <ArrowRight size={18} />
+              </Link>
+              <Link to="/analyse" className="btn btn--hero-secondary">
+                Analyser mes chances
+              </Link>
+            </div>
+            <div className="hero__reassurance">
+              <span><Check size={15} /> Diagnostic personnalisé</span>
+              <span><Check size={15} /> Conseiller dédié</span>
+              <span><Check size={15} /> Suivi jusqu’au visa</span>
+            </div>
           </div>
+        </div>
+        <a
+          className="hero__credit"
+          href="https://unsplash.com/license"
+          target="_blank"
+          rel="noreferrer"
+        >
+          {heroSlides[activeSlide].credit}
+        </a>
+        <div className="hero__navigation">
+          <button type="button" className="hero__arrow" onClick={showPreviousSlide} aria-label="Image précédente">
+            <ArrowLeft size={20} />
+          </button>
+          <div className="hero__dots">
+            {heroSlides.map((slide, index) => (
+              <button
+                type="button"
+                key={slide.title}
+                className={`hero__dot${index === activeSlide ? ' hero__dot--active' : ''}`}
+                onClick={() => setActiveSlide(index)}
+                aria-label={`Afficher l’image ${index + 1}`}
+                aria-current={index === activeSlide ? 'true' : undefined}
+              />
+            ))}
+          </div>
+          <button type="button" className="hero__arrow" onClick={showNextSlide} aria-label="Image suivante">
+            <ArrowRight size={20} />
+          </button>
         </div>
       </section>
 
@@ -86,12 +223,51 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="france-section">
+        <div className="container france-section__grid">
+          <div className="france-section__visual">
+            <img
+              className="france-section__main-image"
+              src="https://unsplash.com/photos/nsHO6mtOsc4/download?force=true&w=1400"
+              alt="Façade de la Sorbonne à Paris"
+              loading="lazy"
+            />
+            <img
+              className="france-section__detail-image"
+              src="https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=800&q=85"
+              alt="Rue parisienne près de la Tour Eiffel"
+              loading="lazy"
+            />
+            <span className="france-section__badge"><MapPin size={16} /> Étudier en France</span>
+          </div>
+          <div className="france-section__content">
+            <span className="section-label">Votre destination, notre expertise</span>
+            <h2 className="section-title">La France, bien plus qu’une destination d’études</h2>
+            <p className="france-section__intro">
+              Construisez un projet académique solide dans un pays reconnu pour la qualité de ses formations, sa recherche et son ouverture internationale.
+            </p>
+            <div className="france-section__highlights">
+              {franceHighlights.map(({ icon: Icon, value, label }) => (
+                <div className="france-highlight" key={value}>
+                  <span className="france-highlight__icon"><Icon size={20} /></span>
+                  <span><strong>{value}</strong>{label}</span>
+                </div>
+              ))}
+            </div>
+            <Link to="/procedure" className="france-section__link">
+              Découvrir la procédure <ArrowRight size={18} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ── FEATURES ── */}
       <section className="features-section">
         <div className="container">
           <div className="features-section__header">
-            <span className="section-label">Pourquoi nous choisir</span>
-            <h2 className="section-title">Un accompagnement pensé pour vous</h2>
+            <span className="section-label">L’expertise Capadmis</span>
+            <h2 className="section-title">Tout ce qu’il faut pour réussir votre projet France</h2>
+            <p className="section-subtitle">Une méthode rigoureuse, des outils simples et un conseiller qui connaît réellement votre dossier.</p>
           </div>
           <div className="features-section__grid">
             {features.map((f) => (
@@ -109,8 +285,9 @@ export default function Home() {
       <section className="steps-section">
         <div className="container--narrow">
           <div className="steps-section__header">
-            <span className="section-label">Comment ça marche</span>
-            <h2 className="section-title">Votre parcours en 6 étapes</h2>
+            <span className="section-label">Un chemin clair vers la France</span>
+            <h2 className="section-title">Votre parcours, maîtrisé en 6 étapes</h2>
+            <p className="section-subtitle">De la première analyse à l’embarquement, chaque décision est préparée avec vous.</p>
           </div>
           <div className="steps-section__wrapper">
             <div className="steps-section__line" />
@@ -127,40 +304,53 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── TESTIMONIALS ── */}
-      <section className="testimonials-section">
+      <section className="home-pricing">
         <div className="container">
-          <div className="testimonials-section__header">
-            <span className="section-label">Témoignages</span>
-            <h2 className="section-title">Ils nous font confiance</h2>
+          <div className="home-pricing__header">
+            <div>
+              <span className="section-label">Des tarifs sans surprise</span>
+              <h2 className="section-title">Le meilleur accompagnement, au prix juste</h2>
+            </div>
+            <p>Deux paiements séparés, aucune dépense inutile : vous ne payez l’étape visa qu’après avoir obtenu votre admission.</p>
           </div>
-          <div className="testimonials-section__grid">
-            {testimonials.map((t) => (
-              <div key={t.name} className="testimonial-card">
-                <div className="testimonial-card__stars">
-                  {[1,2,3,4,5].map((s) => <Star key={s} size={18} fill="currentColor" />)}
+          <div className="home-pricing__grid">
+            {homePlans.map((plan, index) => (
+              <article className={`home-price-card${index === 0 ? ' home-price-card--featured' : ''}`} key={plan.title}>
+                <div className="home-price-card__top">
+                  <span>{plan.step}</span>
+                  {index === 0 && <strong>Pour commencer</strong>}
                 </div>
-                <p className="testimonial-card__text">"{t.text}"</p>
-                <div className="testimonial-card__author">
-                  <div className="testimonial-card__avatar">{t.name.charAt(0)}</div>
-                  <div>
-                    <div className="testimonial-card__name">{t.name}</div>
-                    <div className="testimonial-card__meta">{t.origin} · {t.school}</div>
-                  </div>
-                </div>
-              </div>
+                <h3>{plan.title}</h3>
+                <div className="home-price-card__price">{plan.price}<small> FCFA</small></div>
+                <p>{plan.description}</p>
+                <ul>
+                  {plan.features.map((feature) => (
+                    <li key={feature}><CheckCircle size={17} /> {feature}</li>
+                  ))}
+                </ul>
+                <Link to={index === 0 ? getStartPath() : '/tarifs'} className="home-price-card__cta">
+                  {index === 0 ? 'Lancer mon projet' : 'Voir les conditions'} <ArrowRight size={17} />
+                </Link>
+              </article>
             ))}
+          </div>
+          <div className="home-pricing__footer">
+            <span><Check size={16} /> Jusqu’à 3 fois moins cher qu’une agence traditionnelle</span>
+            <Link to="/tarifs">Comparer toutes les prestations <ArrowRight size={17} /></Link>
           </div>
         </div>
       </section>
 
       {/* ── CTA ── */}
       <section className="cta-section">
+        <div className="cta-section__image" />
+        <div className="cta-section__overlay" />
         <div className="container--tight">
           <div className="cta-section__content">
-            <h2 className="cta-section__title">Prêt à commencer votre procédure ?</h2>
+            <span className="cta-section__eyebrow">Votre avenir n’attend pas</span>
+            <h2 className="cta-section__title">Faites de la France votre prochain campus</h2>
             <p className="cta-section__desc">
-              Rejoignez plus de 500 étudiants qui ont réussi leur admission avec notre accompagnement.
+              Recevez une première analyse de votre projet et avancez avec une stratégie adaptée à votre profil.
             </p>
             <div className="cta-section__actions">
               <Link to="/inscription" className="btn btn--cta-primary">
