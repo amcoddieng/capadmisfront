@@ -4,7 +4,7 @@ import {
   LogOut, User, FolderOpen,
   Bell, MessageSquare, ChevronDown, Pencil, X,
   Loader, AlertCircle, CheckCircle, FolderSearch, Lock,
-  Download, Trash2, Upload, RefreshCw, Eye, School,
+  Download, Trash2, Upload, RefreshCw, Eye, School, AlertTriangle,
 } from 'lucide-react';
 import logoHeader from '../assets/les images du site/logo-horizontal-2x.png';
 import {
@@ -952,6 +952,7 @@ function SectionPiecesJointes({ token, codeDossier }) {
   const [deleting, setDeleting]           = useState(null);
   const [previewLoading, setPreviewLoading] = useState(null);
   const [preview, setPreview]             = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   const fetchPieces = useCallback(async () => {
     setLoading(true);
@@ -997,6 +998,7 @@ function SectionPiecesJointes({ token, codeDossier }) {
     try {
       await apiDeletePieceJointe(token, id);
       setPieces(prev => prev.filter(p => p.id !== id));
+      setDeleteConfirm(null);
     } catch (e) {
       setActionErr(e.message);
       setPieces(oldPieces);
@@ -1113,7 +1115,7 @@ function SectionPiecesJointes({ token, codeDossier }) {
                     </button>
                     <button
                       className="pj-action-btn pj-action-btn--delete"
-                      onClick={() => handleDelete(p.id)}
+                      onClick={() => { setDeleteConfirm(p); setActionErr(''); }}
                       disabled={deleting === p.id}
                       title="Supprimer"
                     >
@@ -1151,6 +1153,57 @@ function SectionPiecesJointes({ token, codeDossier }) {
           url={preview.url}
           onClose={() => setPreview(null)}
         />
+      )}
+      {deleteConfirm && (
+        <div className="modal-overlay" onClick={() => !deleting && setDeleteConfirm(null)}>
+          <div className="modal modal--confirm" onClick={e => e.stopPropagation()}>
+            <div className="modal__header modal__header--danger">
+              <div className="modal__header-icon">
+                <AlertTriangle size={20} />
+              </div>
+              <h3 className="modal__title">Supprimer le document</h3>
+              <button className="modal__close" onClick={() => setDeleteConfirm(null)} disabled={!!deleting}><X size={18} /></button>
+            </div>
+            <div className="modal__body">
+              <div className="confirm-icon">
+                <AlertTriangle size={36} />
+              </div>
+              <p className="confirm-text">
+                Êtes-vous sûr de vouloir supprimer ce document ?
+              </p>
+              <div className="confirm-doc">
+                <strong>{TYPES_PJ[deleteConfirm.type] || deleteConfirm.type}</strong>
+                {deleteConfirm.nom && <span>{deleteConfirm.nom}</span>}
+              </div>
+              <p className="confirm-warning">
+                Cette action est irréversible. Le document sera définitivement supprimé de votre dossier.
+              </p>
+              {actionErr && (
+                <div className="auth-error auth-error--inline" style={{ marginTop: '.75rem', width: '100%' }}>
+                  <AlertCircle size={15} /> {actionErr}
+                </div>
+              )}
+            </div>
+            <div className="modal__footer">
+              <button
+                className="btn btn--cancel"
+                onClick={() => setDeleteConfirm(null)}
+                disabled={!!deleting}
+              >
+                Annuler
+              </button>
+              <button
+                className="btn btn--delete"
+                onClick={() => handleDelete(deleteConfirm.id)}
+                disabled={!!deleting}
+              >
+                {deleting === deleteConfirm.id
+                  ? <><Loader size={16} className="auth-spinner" /> Suppression…</>
+                  : <><Trash2 size={16} /> Supprimer</>}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
