@@ -60,7 +60,7 @@ const compare = [
   { feature: 'Notifications automatiques', capadmis: true, agence: false },
   { feature: 'Documents sécurisés en ligne', capadmis: true, agence: false },
   { feature: 'Accompagnement visa', capadmis: true, agence: true },
-  { feature: 'Tarif accessible', capadmis: true, agence: false },
+  { feature: 'Tarifs accessibles', capadmis: true, agence: false },
   { feature: 'Disponibilité 7j/7', capadmis: true, agence: false },
 ];
 
@@ -76,7 +76,7 @@ export default function Tarifs() {
   return (
     <main className="public-page public-page--pricing">
       <Helmet>
-        <title>Nos tarifs — Capadmis</title>
+        <title>Nos tarifs — CapAdmis</title>
         <meta name="description" content="Découvrez nos tarifs transparents pour l'accompagnement études à l'étranger. À partir de 39 900 FCFA. 3x moins cher qu'une agence classique." />
         <link rel="canonical" href="https://capadmis.com/tarifs" />
       </Helmet>
@@ -137,7 +137,7 @@ export default function Tarifs() {
           <div className="notice-box">
             <HelpCircle size={18} className="notice-box__icon" />
             <div>
-              <div className="notice-box__title">Frais Campus France (~80 000 FCFA)</div>
+              <div className="notice-box__title">Frais Campus France (~85 000 FCFA)</div>
               <p className="notice-box__text">Frais officiels payés directement à Campus France, indépendants de notre accompagnement.</p>
             </div>
           </div>
@@ -149,12 +149,12 @@ export default function Tarifs() {
         <div className="container--tight">
           <div className="section-header">
             <span className="section-label">Comparaison</span>
-            <h2 className="section-title">Capadmis vs Agences</h2>
+            <h2 className="section-title">CapAdmis vs Autres Agences</h2>
           </div>
           <div className="compare-table">
             <div className="compare-table__head">
               <div className="compare-table__head-cell">Service</div>
-              <div className="compare-table__head-cell compare-table__head-cell--cap">Capadmis</div>
+              <div className="compare-table__head-cell compare-table__head-cell--cap">CapAdmis</div>
               <div className="compare-table__head-cell compare-table__head-cell--age">Agence</div>
             </div>
             {compare.map(row => (

@@ -11,7 +11,7 @@ const filieres = [
   'Communication / Journalisme', 'Sciences politiques', 'Psychologie', 'Autre',
 ];
 
-const pays = ['France', 'Canada', 'Allemagne', 'Autriche', 'Pays-Bas', 'Belgique'];
+const pays = ['France','Allemagne'];
 
 const niveaux = ['Terminale (en cours)', 'Baccalauréat obtenu', 'Bac+1', 'Bac+2', 'Bac+3 et plus'];
 
@@ -76,7 +76,7 @@ export default function Analyse() {
   return (
     <main>
       <Helmet>
-        <title>Analyse gratuite — Capadmis</title>
+        <title>Analyse gratuite — CapAdmis</title>
         <meta name="description" content="Analysez gratuitement vos chances d'admission en France. Évaluez votre profil académique et recevez des recommandations personnalisées d'universités." />
         <link rel="canonical" href="https://capadmis.com/analyse" />
       </Helmet>

@@ -28,9 +28,9 @@ const steps = [
     duration: 'Semaines 2-3',
     description: 'Vous préparez et téléchargez tous vos documents académiques sur votre espace sécurisé.',
     items: [
-      'Relevés de notes (seconde, première, terminale)',
+      'Relevés de notes trois dernières années d\'étude',
       'Bulletins scolaires',
-      'Diplôme ou attestation du baccalauréat',
+      'Derniers diplômes ou attestation obtenue',
       'CV mis à jour',
       'Lettre de motivation',
       'Passeport valide',
@@ -43,7 +43,7 @@ const steps = [
     title: 'Dépôt des candidatures',
     color: 'bg-violet-600',
     duration: 'Semaines 3-5',
-    description: "L'équipe Capadmis. prépare et soumet vos demandes d'admission auprès des universités ciblées.",
+    description: "L'équipe CapAdmis. prépare et soumet vos demandes d'admission auprès des universités ciblées.",
     items: [
       'Universités ciblées sélectionnées',
       'Filières ciblées validées',
@@ -132,8 +132,8 @@ export default function Procedure() {
   return (
     <main className="public-page public-page--procedure">
       <Helmet>
-        <title>Procédure Campus France — Capadmis</title>
-        <meta name="description" content="Découvrez les 8 étapes clés pour réussir votre admission et obtenir votre visa étudiant. Capadmis vous accompagne de l'orientation au départ." />
+        <title>Procédure Campus France — CapAdmis</title>
+        <meta name="description" content="Découvrez les 8 étapes clés pour réussir votre admission et obtenir votre visa étudiant. CapAdmis vous accompagne de l'orientation au départ." />
         <link rel="canonical" href="https://capadmis.com/procedure" />
       </Helmet>
 
@@ -203,7 +203,7 @@ export default function Procedure() {
       <section className="page-section--blue" data-reveal>
         <div className="container--tight" data-reveal data-reveal-delay="100">
           <h2 className="page-cta__title">Prêt à démarrer votre procédure ?</h2>
-          <p className="page-cta__desc">Rejoignez des centaines d'étudiants qui ont réussi leurs études à l'étranger grâce à Capadmis.</p>
+          <p className="page-cta__desc">Rejoignez des centaines d'étudiants qui ont réussi leurs études à l'étranger grâce à CapAdmis.</p>
           <div className="page-cta__actions">
             <Link to={getStartPath()} className="btn btn--cta-white">
               Commencer maintenant <ArrowRight size={18} />

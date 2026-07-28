@@ -2107,6 +2107,100 @@ a { text-decoration: none; color: inherit; }
 .auth-spinner { animation: spin .7s linear infinite; flex-shrink: 0; }
 
 /* ===============================================
+   AUTH PERSONNEL — styles spécifiques
+   =============================================== */
+.auth-page--personnel { background: var(--slate-100); }
+
+.personnel-shield {
+  width: 56px;
+  height: 56px;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, var(--accent), #b8923f);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  box-shadow: 0 8px 24px rgba(197,161,80,.3);
+  animation: shieldPulse 3s ease-in-out infinite;
+}
+@keyframes shieldPulse {
+  0%, 100% { box-shadow: 0 8px 24px rgba(197,161,80,.3); transform: scale(1); }
+  50%      { box-shadow: 0 8px 36px rgba(197,161,80,.45); transform: scale(1.03); }
+}
+
+.auth-card--personnel {
+  border: 1px solid rgba(197,161,80,.12);
+  animation: cardSlideIn .6s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes cardSlideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.auth-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.auth-input-icon {
+  position: absolute;
+  left: .85rem;
+  color: var(--slate-400);
+  pointer-events: none;
+  transition: color .2s;
+}
+.auth-input-field {
+  padding-left: 2.5rem !important;
+  transition: border-color .2s, box-shadow .2s;
+}
+.auth-input-field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(197,161,80,.12);
+}
+.auth-input-field:focus + .auth-input-icon,
+.auth-input-wrap:focus-within .auth-input-icon {
+  color: var(--accent);
+}
+.auth-input-field--pwd { padding-right: 2.5rem !important; }
+
+.auth-error--inline {
+  margin: 0;
+  animation: shakeError .4s ease;
+}
+@keyframes shakeError {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-6px); }
+  75%      { transform: translateX(6px); }
+}
+
+.personnel-submit {
+  width: 100%;
+  justify-content: center;
+  margin-top: .25rem;
+  padding: .85rem;
+  font-size: .95rem;
+  gap: .5rem;
+  background: linear-gradient(135deg, var(--blue-700), var(--blue-600));
+  color: #fff;
+  border: none;
+  border-radius: .75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .2s, box-shadow .2s;
+}
+.personnel-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(12,28,63,.25);
+}
+.personnel-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+.personnel-submit:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+/* ===============================================
    DASHBOARD ÉTUDIANT
    =============================================== */
 .db-layout {
@@ -3519,6 +3613,8 @@ a { text-decoration: none; color: inherit; }
 .public-hero--pricing { background-image: url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=2000&q=85'); }
 .public-hero--contact { background-image: url('https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=2000&q=85'); }
 .public-hero--why { background-image: url('https://unsplash.com/photos/-JonPZiIhII/download?force=true&w=2000'); }
+.public-hero--procedure::before { background: linear-gradient(90deg, rgba(6,18,44,.94), rgba(6,18,44,.85) 50%, rgba(6,18,44,.65)); }
+.public-hero--why::before { background: linear-gradient(90deg, rgba(6,18,44,.88), rgba(6,18,44,.72) 50%, rgba(6,18,44,.45)); }
 .public-hero.page-hero--center::before { background: rgba(6,18,44,.78); }
 .public-hero .page-hero__badge {
   color: #ead49f;

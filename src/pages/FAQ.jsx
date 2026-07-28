@@ -8,9 +8,9 @@ const faqCategories = [
   {
     category: 'Général',
     items: [
-      { q: "Qu'est-ce que Capadmis. ?", a: "Capadmis. est une plateforme digitale d'accompagnement pour les étudiants souhaitant poursuivre leurs études à l'étranger, principalement en France. Nous combinons conseil en orientation, optimisation des candidatures, suivi digital du dossier et préparation au visa." },
-      { q: "Dans quels pays Capadmis. accompagne-t-il les étudiants ?", a: "Actuellement, Capadmis. se concentre principalement sur la France. Nous étendrons progressivement nos services à l'Allemagne, l'Autriche, les Pays-Bas et le Canada." },
-      { q: "Capadmis. est-il réservé aux étudiants sénégalais ?", a: "Non, Capadmis. est ouvert à tous les étudiants africains souhaitant étudier à l'étranger, quel que soit leur pays d'origine." },
+      { q: "Qu'est-ce que CapAdmis. ?", a: "CapAdmis. est une plateforme digitale d'accompagnement pour les étudiants souhaitant poursuivre leurs études à l'étranger, principalement en France. Nous combinons conseil en orientation, optimisation des candidatures, suivi digital du dossier et préparation au visa." },
+      { q: "Dans quels pays CapAdmis. accompagne-t-il les étudiants ?", a: "Actuellement, CapAdmis. se concentre principalement sur la France. Nous étendrons progressivement nos services à l'Allemagne, l'Autriche, les Pays-Bas et le Canada." },
+      { q: "CapAdmis. est-il réservé aux étudiants sénégalais ?", a: "Non, CapAdmis. est ouvert à tous les étudiants africains souhaitant étudier à l'étranger, quel que soit leur pays d'origine." },
       { q: "Combien de temps dure la procédure ?", a: "La durée varie selon les dossiers, mais comptez en général 3 à 6 mois de la première orientation jusqu'à l'obtention du visa." },
     ],
   },
@@ -20,13 +20,13 @@ const faqCategories = [
       { q: "Quels documents dois-je préparer ?", a: "Les documents principaux sont : relevés de notes (seconde, première, terminale), bulletins scolaires, diplôme ou attestation du bac, CV, lettre de motivation, passeport en cours de validité, et une photo. Des documents supplémentaires peuvent être demandés selon la filière." },
       { q: "Que se passe-t-il si ma candidature est refusée ?", a: "En cas de refus, notre équipe analyse les motifs et vous propose des alternatives : autres universités, autres filières ou stratégie pour la prochaine campagne. Nous ne vous abandonnons pas en cas de refus." },
       { q: "Comment fonctionne le suivi de mon dossier ?", a: "Vous avez accès à un tableau de bord personnel disponible 24h/24. Il affiche l'état exact de votre dossier à chaque étape, les documents manquants, les notifications et les messages de votre conseiller." },
-      { q: "Puis-je suivre ma procédure depuis mon téléphone ?", a: "Oui, la plateforme Capadmis. est totalement responsive et accessible depuis n'importe quel appareil (téléphone, tablette, ordinateur)." },
+      { q: "Puis-je suivre ma procédure depuis mon téléphone ?", a: "Oui, la plateforme CapAdmis. est totalement responsive et accessible depuis n'importe quel appareil (téléphone, tablette, ordinateur)." },
     ],
   },
   {
     category: 'Tarifs & Paiement',
     items: [
-      { q: "Combien coûte l'accompagnement Capadmis. ?", a: "L'accompagnement est structuré en deux étapes : 39 900 FCFA pour lancer la procédure d'admission, et 49 900 FCFA après obtention de l'admission pour la préparation du visa. Les frais Campus France (~80 000 FCFA) sont payés séparément directement à Campus France." },
+      { q: "Combien coûte l'accompagnement CapAdmis. ?", a: "L'accompagnement est structuré en deux étapes : 39 900 FCFA pour lancer la procédure d'admission, et 49 900 FCFA après obtention de l'admission pour la préparation du visa. Les frais Campus France (~85 000 FCFA) sont payés séparément directement à Campus France." },
       { q: "Comment puis-je payer ?", a: "Nous acceptons Wave, Orange Money, carte bancaire et virement bancaire. Le paiement est sécurisé et son statut est visible dans votre tableau de bord." },
       { q: "Dois-je payer l'étape 2 si je n'obtiens pas d'admission ?", a: "Non. Le paiement de l'étape 2 (49 900 FCFA) n'intervient qu'après l'obtention d'une admission universitaire. Si vous n'obtenez pas d'admission, seule l'étape 1 est facturée." },
       { q: "Y a-t-il des frais cachés ?", a: "Non. Nos tarifs sont 100% transparents. Les seuls frais supplémentaires sont les frais Campus France (officiels, payés directement à Campus France) et éventuellement des services additionnels spécifiques." },
@@ -36,9 +36,9 @@ const faqCategories = [
     category: 'Campus France & Visa',
     items: [
       { q: "Qu'est-ce que Campus France ?", a: "Campus France est l'agence française chargée de la promotion de l'enseignement supérieur français à l'étranger. La majorité des étudiants africains doivent passer par Campus France pour obtenir un visa étudiant pour la France." },
-      { q: "Capadmis. m'aide-t-il à préparer l'entretien Campus France ?", a: "Oui, c'est une partie intégrante de notre accompagnement. Nous vous préparons à comprendre et articuler votre projet d'études, à répondre aux questions fréquentes et à éviter les erreurs classiques lors de l'entretien." },
+      { q: "CapAdmis. m'aide-t-il à préparer l'entretien Campus France ?", a: "Oui, c'est une partie intégrante de notre accompagnement. Nous vous préparons à comprendre et articuler votre projet d'études, à répondre aux questions fréquentes et à éviter les erreurs classiques lors de l'entretien." },
       { q: "Que se passe-t-il si mon visa est refusé ?", a: "En cas de refus de visa, notre équipe analyse les motifs du refus et vous propose des recommandations pour maximiser vos chances lors d'une nouvelle tentative." },
-      { q: "Combien de temps faut-il pour obtenir un visa étudiant ?", a: "Généralement, le traitement d'une demande de visa étudiant prend entre 2 et 8 semaines après le dépôt du dossier complet. Capadmis. vous aide à anticiper et à déposer votre dossier dans les meilleurs délais." },
+      { q: "Combien de temps faut-il pour obtenir un visa étudiant ?", a: "Généralement, le traitement d'une demande de visa étudiant prend entre 2 et 8 semaines après le dépôt du dossier complet. CapAdmis. vous aide à anticiper et à déposer votre dossier dans les meilleurs délais." },
     ],
   },
   {
@@ -73,8 +73,8 @@ export default function FAQ() {
   return (
     <main>
       <Helmet>
-        <title>FAQ — Capadmis</title>
-        <meta name="description" content="Trouvez les réponses à vos questions sur la procédure Campus France, le visa étudiant, les tarifs et la plateforme Capadmis." />
+        <title>FAQ — CapAdmis</title>
+        <meta name="description" content="Trouvez les réponses à vos questions sur la procédure Campus France, le visa étudiant, les tarifs et la plateforme CapAdmis." />
         <link rel="canonical" href="https://capadmis.com/faq" />
       </Helmet>
 
@@ -84,7 +84,7 @@ export default function FAQ() {
           <span className="page-hero__badge">FAQ</span>
           <h1 className="page-hero__title">Questions fréquentes</h1>
           <p className="page-hero__desc">
-            Tout ce que vous devez savoir sur Capadmis., la procédure d'admission et le visa étudiant.
+            Tout ce que vous devez savoir sur CapAdmis., la procédure d'admission et le visa étudiant.
           </p>
         </div>
       </section>

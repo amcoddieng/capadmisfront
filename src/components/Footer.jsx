@@ -7,7 +7,7 @@ const navLinks = [
   { label: 'À propos', path: '/a-propos' },
   { label: 'Procédure Campus France', path: '/procedure' },
   { label: 'Tarifs', path: '/tarifs' },
-  { label: 'Pourquoi Capadmis.', path: '/pourquoi' },
+  { label: 'Pourquoi CapAdmis.', path: '/pourquoi' },
   { label: 'FAQ', path: '/faq' },
 ];
 
@@ -90,7 +90,7 @@ export default function Footer() {
       </div>
 
       <div className="footer__bottom">
-        <p>© {new Date().getFullYear()} capadmis. Tous droits réservés.</p>
+        <p>© {new Date().getFullYear()} capAdmis. Tous droits réservés.</p>
         <div className="footer__bottom-links">
           <a href="#" className="footer__bottom-link">Mentions légales</a>
           <a href="#" className="footer__bottom-link">Confidentialité</a>

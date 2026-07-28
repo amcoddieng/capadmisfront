@@ -142,13 +142,13 @@ export default function Home() {
   return (
     <main className="home-page">
       <Helmet>
-        <title>Capadmis | Études en France, Campus France et études à l'étranger</title>
-        <meta name="description" content="Capadmis accompagne les étudiants dans leurs études en France et à l'étranger : orientation, admission universitaire, procédure Campus France, visa étudiant et suivi personnalisé." />
+        <title>CapAdmis | Études en France, Campus France et études à l'étranger</title>
+        <meta name="description" content="CapAdmis accompagne les étudiants dans leurs études en France et à l'étranger : orientation, admission universitaire, procédure Campus France, visa étudiant et suivi personnalisé." />
         <link rel="canonical" href="https://capadmis.com/" />
       </Helmet>
 
       {/* ── HERO ── */}
-      <section className="hero" aria-roledescription="carrousel" aria-label="Destinations et accompagnement Capadmis">
+      <section className="hero" aria-roledescription="carrousel" aria-label="Destinations et accompagnement CapAdmis">
         <div className="hero__slides">
           {heroSlides.map((slide, index) => (
             <div
@@ -268,7 +268,7 @@ export default function Home() {
       <section className="features-section" data-reveal>
         <div className="container">
           <div className="features-section__header">
-            <span className="section-label">L’expertise Capadmis</span>
+            <span className="section-label">L’expertise CapAdmis</span>
             <h2 className="section-title">Tout ce qu’il faut pour réussir votre projet France</h2>
             <p className="section-subtitle">Une méthode rigoureuse, des outils simples et un conseiller qui connaît réellement votre dossier.</p>
           </div>

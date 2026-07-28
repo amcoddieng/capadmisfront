@@ -6,7 +6,7 @@ export default function NotFound() {
   return (
     <main className="public-page">
       <Helmet>
-        <title>Page introuvable — Capadmis</title>
+        <title>Page introuvable — CapAdmis</title>
         <meta name="description" content="La page que vous recherchez n'existe pas ou a été déplacée." />
         <meta name="robots" content="noindex, follow" />
       </Helmet>
@@ -33,7 +33,7 @@ export default function NotFound() {
             <span>·</span>
             <Link to="/a-propos">À propos</Link>
             <span>·</span>
-            <Link to="/pourquoi">Pourquoi Capadmis</Link>
+            <Link to="/pourquoi">Pourquoi CapAdmis</Link>
           </div>
         </div>
       </section>

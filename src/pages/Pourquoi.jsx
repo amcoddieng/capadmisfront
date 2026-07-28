@@ -60,7 +60,7 @@ export default function Pourquoi() {
   return (
     <main className="public-page public-page--why">
       <Helmet>
-        <title>Pourquoi Capadmis — Accompagnement études à l'étranger</title>
+        <title>Pourquoi CapAdmis — Accompagnement études à l'étranger</title>
         <meta name="description" content="Capadmis vs agences classiques : processus 100% digital, suivi transparent, tarif accessible. Découvrez pourquoi plus de 500 étudiants nous font confiance." />
         <link rel="canonical" href="https://capadmis.com/pourquoi" />
       </Helmet>
@@ -69,10 +69,10 @@ export default function Pourquoi() {
       <section className="page-hero--gradient public-hero public-hero--why">
         <div className="container">
           <div style={{ maxWidth: '48rem' }}>
-            <span className="page-hero__badge">Pourquoi Capadmis. ?</span>
+            <span className="page-hero__badge">Pourquoi CapAdmis. ?</span>
             <h1 className="page-hero__title">Une approche radicalement différente des agences traditionnelles</h1>
             <p className="page-hero__desc">
-              Capadmis. structure le traitement de chaque dossier avec un suivi digital et des étapes clairement visibles. Une transparence totale, un coût accessible, une qualité irréprochable.
+              CapAdmis. structure le traitement de chaque dossier avec un suivi digital et des étapes clairement visibles. Une transparence totale, un coût accessible, une qualité irréprochable.
             </p>
           </div>
         </div>
@@ -83,7 +83,7 @@ export default function Pourquoi() {
         <div className="container--tight" data-reveal data-reveal-delay="100">
           <p className="key-message">
             "Contrairement aux agences où un conseiller peut gérer trop de dossiers à la fois,{' '}
-            <strong>Capadmis. structure le traitement de chaque dossier</strong> avec un suivi digital et des étapes clairement visibles par l'étudiant."
+            <strong>CapAdmis. structure le traitement de chaque dossier</strong> avec un suivi digital et des étapes clairement visibles par l'étudiant."
           </p>
         </div>
       </section>
@@ -106,7 +106,7 @@ export default function Pourquoi() {
                   <div className="diff-col diff-col--good">
                     <div className="diff-col__badge">
                       <CheckCircle size={13} className="diff-col__badge-icon" />
-                      <span>Capadmis.</span>
+                      <span>CapAdmis.</span>
                     </div>
                     <p className="diff-col__text">{d.capadmis}</p>
                   </div>
@@ -127,7 +127,7 @@ export default function Pourquoi() {
       {/* CTA */}
       <section className="page-section--blue" data-reveal>
         <div className="container--tight" data-reveal data-reveal-delay="100">
-          <h2 className="page-cta__title">Faites l'expérience Capadmis.</h2>
+          <h2 className="page-cta__title">Faites l'expérience CapAdmis.</h2>
           <p className="page-cta__desc">Rejoignez une plateforme pensée pour vous simplifier la vie.</p>
           <div className="page-cta__actions">
             <Link to={getStartPath()} className="btn btn--cta-white">

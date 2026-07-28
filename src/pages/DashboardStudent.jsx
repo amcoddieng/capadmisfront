@@ -28,7 +28,7 @@ const NAV_ITEMS = [
 
 const PAYS_LISTE       = ['Sénégal', 'Côte d\'Ivoire', 'Mali', 'Guinée', 'Cameroun', 'Maroc', 'Burkina Faso', 'Togo', 'Bénin', 'Niger', 'Autre'];
 const NIVEAUX_LISTE    = ['Licence 1', 'Licence 2', 'Licence 3', 'Master 1', 'Master 2', 'Doctorat', 'BTS', 'DUT', 'Prépa', 'Autre'];
-const PAYS_CIBLE_LISTE = ['France', 'Canada', 'Belgique', 'Suisse', 'Espagne', 'Allemagne', 'Royaume-Uni', 'Italie', 'Portugal', 'Maroc', 'Autre'];
+const PAYS_CIBLE_LISTE = ['France','Allemagne','Autre'];
 
 const TYPES_PJ = {
   PHOTO_PROFIL:                'Photo de profil',
@@ -48,9 +48,19 @@ const TYPES_PJ = {
   BULLETIN_NOTES_DOCTORAT:     'Bulletin Doctorat',
   LETTRE_MOTIVATION:           'Lettre de motivation',
   CV:                          'CV',
-  BULLETIN_NOTES_SECONDE:      'Bulletin Seconde',
-  BULLETIN_NOTES_PREMIERE:     'Bulletin Première',
-  BULLETIN_NOTES_TERMINALE:    'Bulletin Terminale',
+  BULLETIN_NOTES_SECONDE1:     'Bulletin Seconde SEMESTRE 1',
+  BULLETIN_NOTES_SECONDE2:     'Bulletin Seconde SEMESTRE 2',
+  BULLETIN_NOTES_PREMIERE1:    'Bulletin Première SEMESTRE 1',
+  BULLETIN_NOTES_PREMIERE2:    'Bulletin Première SEMESTRE 2',
+  BULLETIN_NOTES_TERMINALE1:   'Bulletin Terminale SEMESTRE 1',
+  BULLETIN_NOTES_TERMINALE2:   'Bulletin Terminale SEMESTRE 2',
+  BULLETIN_NOTES_BT1_S1:       'Bulletin BT1 SEMESTRE 1',
+  BULLETIN_NOTES_BT1_S2:       'Bulletin BT1 SEMESTRE 2',
+  BULLETIN_NOTES_BT2_S1:       'Bulletin BT2 SEMESTRE 1',
+  BULLETIN_NOTES_BT2_S2:       'Bulletin BT2 SEMESTRE 2',
+  BULLETIN_NOTES_BT3_S1:       'Bulletin BT3 SEMESTRE 1',
+  BULLETIN_NOTES_BT3_S2:       'Bulletin BT3 SEMESTRE 2',
+
   AUTRE:                       'Autre document',
 };
 
@@ -763,11 +773,11 @@ function ModalInfosDossier({ token, codeDossier, infos, onClose, onSuccess }) {
                   <input
                     required className="form-input"
                     value={form.serie_bac} onChange={e => set('serie_bac', e.target.value)}
-                    placeholder="Ex: S2, L, SMS"
+                    placeholder="Ex: S1, S2, L2, STEG, ..."
                   />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Nombre de fois au bac *</label>
+                  <label className="form-label">Nombre de tentatives au Bac *</label>
                   <input
                     required type="number" className="form-input" min={1}
                     value={form.nombre_fois_bac} onChange={e => set('nombre_fois_bac', e.target.value)}
@@ -775,7 +785,7 @@ function ModalInfosDossier({ token, codeDossier, infos, onClose, onSuccess }) {
                 </div>
               </div>
               <div className="form-group">
-                <label className="form-label">Formation en cours (facultatif) *</label>
+                <label className="form-label">Formation en cours (facultatif)</label>
                 <input
                   required className="form-input"
                   value={form.formation_en_cours} onChange={e => set('formation_en_cours', e.target.value)}

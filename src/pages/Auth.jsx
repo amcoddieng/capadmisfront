@@ -100,8 +100,8 @@ export default function Auth() {
   return (
     <div className="auth-page">
       <Helmet>
-        <title>Connexion / Inscription — Capadmis</title>
-        <meta name="description" content="Connectez-vous ou créez votre compte Capadmis pour démarrer votre procédure d'études à l'étranger." />
+        <title>Connexion / Inscription — CapAdmis</title>
+        <meta name="description" content="Connectez-vous ou créez votre compte CapAdmis pour démarrer votre procédure d'études à l'étranger." />
         <meta name="robots" content="noindex, follow" />
       </Helmet>
 
@@ -119,7 +119,7 @@ export default function Auth() {
         <div className="auth-carousel__overlay" />
         <div className="auth-carousel__content">
           <div key={activeSlide} className="auth-carousel__copy">
-            <span className="auth-carousel__eyebrow"><GraduationCap size={18} /> Capadmis</span>
+            <span className="auth-carousel__eyebrow"><GraduationCap size={18} /> CapAdmis</span>
             <h2>{authSlides[activeSlide].title}</h2>
             <p><MapPin size={16} /> {authSlides[activeSlide].subtitle}</p>
           </div>

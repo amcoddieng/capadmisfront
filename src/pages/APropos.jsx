@@ -39,8 +39,8 @@ export default function APropos() {
   return (
     <main className="public-page public-page--about">
       <Helmet>
-        <title>À propos — Capadmis</title>
-        <meta name="description" content="Découvrez Capadmis, la plateforme digitale qui accompagne les étudiants africains dans leurs études à l'étranger. Notre mission, nos valeurs et notre équipe." />
+        <title>À propos — CapAdmis</title>
+        <meta name="description" content="Découvrez CapAdmis, la plateforme digitale qui accompagne les étudiants africains dans leurs études à l'étranger. Notre mission, nos valeurs et notre équipe." />
         <link rel="canonical" href="https://capadmis.com/a-propos" />
       </Helmet>
 
@@ -66,7 +66,7 @@ export default function APropos() {
               <h2 className="mission-title">Rendre les études en France accessibles, claires et sereines</h2>
               <p className="mission-desc">
                 Beaucoup d'étudiants abandonnent leur projet faute d'accompagnement adapté ou de moyens financiers.
-                Capadmis. a été créé pour changer cela.
+                CapAdmis a été créé pour changer cela.
               </p>
               <ul className="mission-list">
                 {missionItems.map(item => (
