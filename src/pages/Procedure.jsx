@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { ArrowRight, CheckCircle, FileText, Users, BookOpen, Trophy, Plane, Stamp, Star } from 'lucide-react';
+import { ArrowRight, CheckCircle, FileText, Users, BookOpen, Trophy, Plane, Stamp, Star, ClipboardCheck, CreditCard } from 'lucide-react';
 import { getStartPath } from '../api/auth';
 import useAdvancedScroll from '../hooks/useAdvancedScroll';
 
@@ -54,10 +54,25 @@ const steps = [
   },
   {
     number: '04',
+    icon: <ClipboardCheck className="w-7 h-7 text-white" />,
+    title: 'Validation du dossier & paiement des frais Campus France',
+    color: 'bg-fuchsia-600',
+    duration: 'Semaines 5-6',
+    description: 'Avant l\'entretien, nous vérifions que votre dossier est complet et nous vous accompagnons dans le paiement des frais pédagogiques Campus France.',
+    items: [
+      'Vérification finale de la complétude du dossier',
+      'Validation des pièces jointes par notre équipe',
+      'Paiement des frais Campus France (~85 000 FCFA)',
+      'Confirmation de l\'inscription sur la plateforme Campus France',
+      'Aucune étape oubliée avant l\'entretien',
+    ],
+  },
+  {
+    number: '05',
     icon: <Users className="w-7 h-7 text-white" />,
     title: 'Préparation entretien Campus France',
     color: 'bg-purple-600',
-    duration: 'Semaines 5-7',
+    duration: 'Semaines 6-7',
     description: "Après les candidatures, nous vous accompagnons pour préparer votre entretien Campus France.",
     items: [
       'Compréhension et articulation du projet d\'études',
@@ -68,7 +83,7 @@ const steps = [
     ],
   },
   {
-    number: '05',
+    number: '06',
     icon: <Trophy className="w-7 h-7 text-white" />,
     title: 'Suivi des admissions',
     color: 'bg-amber-500',
@@ -83,7 +98,7 @@ const steps = [
     ],
   },
   {
-    number: '06',
+    number: '07',
     icon: <Plane className="w-7 h-7 text-white" />,
     title: 'Préparation du dossier visa',
     color: 'bg-teal-600',
@@ -98,7 +113,7 @@ const steps = [
     ],
   },
   {
-    number: '07',
+    number: '08',
     icon: <Stamp className="w-7 h-7 text-white" />,
     title: 'Dépôt de la demande de visa',
     color: 'bg-cyan-600',
@@ -112,7 +127,7 @@ const steps = [
     ],
   },
   {
-    number: '08',
+    number: '09',
     icon: <Star className="w-7 h-7 text-white" />,
     title: 'Résultat du visa',
     color: 'bg-green-600',
@@ -133,7 +148,7 @@ export default function Procedure() {
     <main className="public-page public-page--procedure">
       <Helmet>
         <title>Procédure Campus France — CapAdmis</title>
-        <meta name="description" content="Découvrez les 8 étapes clés pour réussir votre admission et obtenir votre visa étudiant. CapAdmis vous accompagne de l'orientation au départ." />
+        <meta name="description" content="Découvrez les 9 étapes clés pour réussir votre admission et obtenir votre visa étudiant. CapAdmis vous accompagne de l'orientation au départ." />
         <link rel="canonical" href="https://capadmis.com/procedure" />
       </Helmet>
 
@@ -163,7 +178,7 @@ export default function Procedure() {
         <div className="container--narrow">
           <div className="section-header">
             <span className="section-label">Les étapes</span>
-            <h2 className="section-title">8 étapes, un seul objectif : votre réussite</h2>
+            <h2 className="section-title">9 étapes, un seul objectif : votre réussite</h2>
             <p style={{ color: 'var(--slate-500)', maxWidth: '36rem', margin: '.5rem auto 0' }}>
               Chaque étape est suivie par notre équipe et visible dans votre tableau de bord personnel.
             </p>
