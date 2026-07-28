@@ -4,6 +4,7 @@ import {
   LogOut, LayoutDashboard, FolderOpen, Users, UserCheck,
   History, MessageSquare, Bell, Menu, X, CreditCard, Plus, Pencil,
   Trash2, Lock, Unlock, Loader, AlertCircle, CheckCircle, Send, Eye, Award, Globe,
+  AlertTriangle, Check, XCircle,
 } from 'lucide-react';
 import logoHeader from '../assets/les images du site/logo-horizontal-2x.png';
 import DossierDetailConseiller from '../components/DossierDetailConseiller';
@@ -12,7 +13,7 @@ import {
   apiListPersonnel, apiCreatePersonnel, apiUpdatePersonnel, apiDeletePersonnel, apiToggleBlockPersonnel,
   apiListEtudiants, apiCreateEtudiant, apiUpdateEtudiant, apiDeleteEtudiant, apiToggleBlockEtudiant,
   apiListDossiers, apiAssignConseiller, apiUpdateDossierStatus, apiListConseillers,
-  apiGetDashboardAdmin,
+  apiGetDashboardAdmin, apiPatchPaiement,
 } from '../api/auth';
 import { useNotifications } from '../hooks/useNotifications';
 import NotificationsPanel from '../components/NotificationsPanel';
@@ -864,7 +865,221 @@ function PageMessages(props) {
     </div>
   );
 }
-function PagePaiement()      { return <div className="cons-page"><h2 className="cons-page__title">Paiement</h2><p className="cons-page__sub">Suivi des paiements.</p><div className="cons-empty"><CreditCard size={40} strokeWidth={1.2}/><p>Aucun paiement enregistré.</p></div></div>; }
+function PagePaiement({ token }) {
+  const [dossiers, setDossiers]       = useState([]);
+  const [loading, setLoading]         = useState(true);
+  const [error, setError]             = useState('');
+  const [search, setSearch]           = useState('');
+  const [filterPaiement, setFilterPaiement] = useState('');
+  const [confirmModal, setConfirmModal] = useState(null);
+  const [updating, setUpdating]       = useState(null);
+  const [actionErr, setActionErr]     = useState('');
+
+  const fetch = useCallback(async () => {
+    setLoading(true); setError('');
+    try { setDossiers(await apiListDossiers(token)); } catch (e) { setError(e.message); } finally { setLoading(false); }
+  }, [token]);
+  useEffect(() => { fetch(); }, [fetch]);
+
+  const filtered = dossiers.filter(d => {
+    const q = search.trim().toLowerCase();
+    const matchSearch = !q ||
+      d.code_dossier?.toLowerCase().includes(q) ||
+      d.etudiant?.prenom?.toLowerCase().includes(q) ||
+      d.etudiant?.nom?.toLowerCase().includes(q) ||
+      d.etudiant?.email?.toLowerCase().includes(q);
+    const p = d.infos_dossier?.paiement;
+    const matchPaiement = !filterPaiement ||
+      (filterPaiement === 'paye' && p === true) ||
+      (filterPaiement === 'non_paye' && p !== true);
+    return matchSearch && matchPaiement;
+  });
+
+  const handleConfirmPaiement = async (codeDossier, valeur) => {
+    setUpdating(codeDossier);
+    setActionErr('');
+    try {
+      await apiPatchPaiement(token, codeDossier, valeur);
+      setDossiers(prev => prev.map(d =>
+        d.code_dossier === codeDossier
+          ? { ...d, infos_dossier: { ...d.infos_dossier, paiement: valeur } }
+          : d
+      ));
+      setConfirmModal(null);
+    } catch (e) {
+      setActionErr(e.message);
+    } finally {
+      setUpdating(null);
+    }
+  };
+
+  const nbPayes = dossiers.filter(d => d.infos_dossier?.paiement === true).length;
+  const nbNonPayes = dossiers.length - nbPayes;
+
+  return (
+    <div className="cons-page">
+      <h2 className="cons-page__title">Paiement</h2>
+      <p className="cons-page__sub">Suivi des paiements des frais de dossier.</p>
+
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'.75rem', marginBottom:'1.25rem' }}>
+        <div style={{ background:'#fff', border:'1px solid #e2e8f0', borderRadius:'.5rem', padding:'1rem 1.25rem' }}>
+          <div style={{ fontSize:'.75rem', color:'#94a3b8', fontWeight:600, textTransform:'uppercase', letterSpacing:'.05em' }}>Total dossiers</div>
+          <div style={{ fontSize:'1.75rem', fontWeight:700, color:'#1e293b', marginTop:'.25rem' }}>{dossiers.length}</div>
+        </div>
+        <div style={{ background:'#fff', border:'1px solid #e2e8f0', borderRadius:'.5rem', padding:'1rem 1.25rem' }}>
+          <div style={{ fontSize:'.75rem', color:'#94a3b8', fontWeight:600, textTransform:'uppercase', letterSpacing:'.05em' }}>Payés</div>
+          <div style={{ fontSize:'1.75rem', fontWeight:700, color:'#16a34a', marginTop:'.25rem' }}>{nbPayes}</div>
+        </div>
+        <div style={{ background:'#fff', border:'1px solid #e2e8f0', borderRadius:'.5rem', padding:'1rem 1.25rem' }}>
+          <div style={{ fontSize:'.75rem', color:'#94a3b8', fontWeight:600, textTransform:'uppercase', letterSpacing:'.05em' }}>Non payés</div>
+          <div style={{ fontSize:'1.75rem', fontWeight:700, color:'#dc2626', marginTop:'.25rem' }}>{nbNonPayes}</div>
+        </div>
+      </div>
+
+      <div style={{ display:'flex', gap:'.75rem', flexWrap:'wrap', alignItems:'center', marginBottom:'1.25rem', background:'#fff', padding:'.75rem 1rem', borderRadius:'.5rem', border:'1px solid #e2e8f0' }}>
+        <input
+          type="text"
+          placeholder="Rechercher (code, nom, email...)"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ flex:1, minWidth:200, padding:'.4rem .6rem', border:'1px solid #cbd5e1', borderRadius:'.4rem', fontSize:'.85rem' }}
+        />
+        <select value={filterPaiement} onChange={e => setFilterPaiement(e.target.value)} style={{ padding:'.4rem .6rem', border:'1px solid #cbd5e1', borderRadius:'.4rem', fontSize:'.85rem' }}>
+          <option value="">Tous</option>
+          <option value="paye">Payés</option>
+          <option value="non_paye">Non payés</option>
+        </select>
+      </div>
+
+      {loading && <div style={{ color:'#94a3b8', textAlign:'center', padding:'2rem' }}><Loader size={24} className="auth-spinner"/> Chargement…</div>}
+      {error && <div className="auth-error" style={{ margin:0 }}><AlertCircle size={15}/> {error}</div>}
+
+      {!loading && !error && (
+        <TableWrap>
+          <div style={{ overflowX:'auto' }}>
+            <table className="sa-table">
+              <thead>
+                <tr>
+                  <th>Code dossier</th>
+                  <th>Étudiant</th>
+                  <th>Email</th>
+                  <th>Niveau</th>
+                  <th>Statut paiement</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.length === 0 && (
+                  <tr><td colSpan={6} style={{ textAlign:'center', color:'#94a3b8', padding:'2rem' }}>Aucun dossier trouvé.</td></tr>
+                )}
+                {filtered.map(d => (
+                  <tr key={d.code_dossier}>
+                    <td style={{ fontWeight:600 }}>{d.code_dossier}</td>
+                    <td>{d.etudiant?.prenom} {d.etudiant?.nom}</td>
+                    <td style={{ fontSize:'.8rem' }}>{d.etudiant?.email || '—'}</td>
+                    <td style={{ fontSize:'.8rem' }}>{d.infos_dossier?.niveau_etude || '—'}</td>
+                    <td>
+                      {d.infos_dossier?.paiement === true
+                        ? <span className="status-badge status-badge--green"><Check size={12} style={{ display:'inline', marginRight:'.25rem' }}/>Payé</span>
+                        : <span className="status-badge status-badge--red"><XCircle size={12} style={{ display:'inline', marginRight:'.25rem' }}/>Non payé</span>}
+                    </td>
+                    <td>
+                      <div className="sa-actions">
+                        {d.infos_dossier?.paiement !== true && (
+                          <button
+                            className="sa-btn sa-btn--green"
+                            onClick={() => { setConfirmModal({ dossier: d, action: 'valider' }); setActionErr(''); }}
+                            disabled={updating === d.code_dossier}
+                            title="Valider le paiement"
+                          >
+                            {updating === d.code_dossier ? <Loader size={14} className="auth-spinner"/> : <CheckCircle size={14}/>}
+                          </button>
+                        )}
+                        {d.infos_dossier?.paiement === true && (
+                          <button
+                            className="sa-btn sa-btn--orange"
+                            onClick={() => { setConfirmModal({ dossier: d, action: 'invalider' }); setActionErr(''); }}
+                            disabled={updating === d.code_dossier}
+                            title="Invalider le paiement"
+                          >
+                            {updating === d.code_dossier ? <Loader size={14} className="auth-spinner"/> : <XCircle size={14}/>}
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </TableWrap>
+      )}
+
+      {confirmModal && (
+        <div className="modal-overlay" onClick={() => !updating && setConfirmModal(null)}>
+          <div className="modal modal--confirm" onClick={e => e.stopPropagation()}>
+            <div className={`modal__header ${confirmModal.action === 'valider' ? 'modal__header--success' : 'modal__header--danger'}`}>
+              <div className={`modal__header-icon ${confirmModal.action === 'valider' ? 'modal__header-icon--success' : ''}`}>
+                {confirmModal.action === 'valider' ? <CheckCircle size={20}/> : <AlertTriangle size={20}/>}
+              </div>
+              <h3 className="modal__title">
+                {confirmModal.action === 'valider' ? 'Valider le paiement' : 'Invalider le paiement'}
+              </h3>
+              <button className="modal__close" onClick={() => setConfirmModal(null)} disabled={!!updating}><X size={18}/></button>
+            </div>
+            <div className="modal__body">
+              <div className={`confirm-icon ${confirmModal.action === 'valider' ? 'confirm-icon--success' : ''}`}>
+                {confirmModal.action === 'valider' ? <CheckCircle size={36}/> : <AlertTriangle size={36}/>}
+              </div>
+              <p className="confirm-text">
+                {confirmModal.action === 'valider'
+                  ? 'Confirmer la validation du paiement pour ce dossier ?'
+                  : 'Confirmer l\'invalidation du paiement pour ce dossier ?'}
+              </p>
+              <div className="confirm-doc">
+                <strong>{confirmModal.dossier.code_dossier}</strong>
+                <span>{confirmModal.dossier.etudiant?.prenom} {confirmModal.dossier.etudiant?.nom}</span>
+                <span style={{ color: confirmModal.action === 'valider' ? '#16a34a' : '#dc2626', fontWeight:600 }}>
+                  {confirmModal.action === 'valider' ? 'Sera marqué comme PAYÉ' : 'Sera marqué comme NON PAYÉ'}
+                </span>
+              </div>
+              <p className="confirm-warning">
+                {confirmModal.action === 'valider'
+                  ? 'L\'étudiant pourra accéder aux étapes suivantes de sa procédure.'
+                  : 'L\'étudiant ne pourra plus accéder aux étapes suivantes de sa procédure.'}
+              </p>
+              {actionErr && (
+                <div className="auth-error auth-error--inline" style={{ marginTop:'.75rem', width:'100%' }}>
+                  <AlertCircle size={15}/> {actionErr}
+                </div>
+              )}
+            </div>
+            <div className="modal__footer">
+              <button
+                className="btn btn--cancel"
+                onClick={() => setConfirmModal(null)}
+                disabled={!!updating}
+              >
+                Annuler
+              </button>
+              <button
+                className={`btn ${confirmModal.action === 'valider' ? 'btn--success' : 'btn--delete'}`}
+                onClick={() => handleConfirmPaiement(confirmModal.dossier.code_dossier, confirmModal.action === 'valider')}
+                disabled={!!updating}
+              >
+                {updating === confirmModal.dossier.code_dossier
+                  ? <><Loader size={16} className="auth-spinner"/> Traitement…</>
+                  : confirmModal.action === 'valider'
+                    ? <><CheckCircle size={16}/> Valider le paiement</>
+                    : <><XCircle size={16}/> Invalider le paiement</>}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 function PageNotifications(props) {
   return (
     <div className="cons-page">
@@ -906,7 +1121,7 @@ export default function DashboardSuperAdmin() {
       case 'dossiers':      return <PageDossiers token={token} personnel={personnel} />;
       case 'etudiants':     return <PageEtudiants token={token} personnel={personnel} />;
       case 'conseillers':   return <PageConseillers token={token} />;
-      case 'paiement':      return <PagePaiement />;
+      case 'paiement':      return <PagePaiement token={token} />;
       case 'historique':    return <PageHistorique />;
       case 'messages':      return <PageMessages conversations={msg.conversations} messages={msg.messages} activeChat={msg.activeChat} unreadCount={msg.unreadCount} userEmail={personnel.email} onSelectChat={msg.loadConversation} onSend={msg.send} />;
       case 'notifications': return <PageNotifications notifications={notifications} loading={notifLoading} unread={unread} markRead={markRead} markAllRead={markAllRead} />;
