@@ -4,7 +4,7 @@ import {
   LogOut, LayoutDashboard, FolderOpen, Users, UserCheck,
   History, MessageSquare, Bell, Menu, X, CreditCard, Plus, Pencil,
   Trash2, Lock, Unlock, Loader, AlertCircle, CheckCircle, Send, Eye, Award, Globe,
-  AlertTriangle, Check, XCircle,
+  AlertTriangle, Check, XCircle, School,
 } from 'lucide-react';
 import logoHeader from '../assets/les images du site/logo-horizontal-2x.png';
 import DossierDetailConseiller from '../components/DossierDetailConseiller';
@@ -713,12 +713,28 @@ function PageDashboard({ token }) {
     return () => { mounted = false; };
   }, [token]);
 
-  const statCard = (label, value, color = 'blue') => (
-    <div className="cons-stat-card" style={{ borderTop: `3px solid var(--${color}-600, #2563eb)` }}>
-      <span className="cons-stat-card__value">{value}</span>
-      <span className="cons-stat-card__label">{label}</span>
-    </div>
-  );
+  const TINTS = {
+    blue:   { bg: '#eff6ff', fg: '#2563eb' },
+    indigo: { bg: '#eef2ff', fg: '#4f46e5' },
+    amber:  { bg: '#fffbeb', fg: '#d97706' },
+    violet: { bg: '#f5f3ff', fg: '#7c3aed' },
+    green:  { bg: '#f0fdf4', fg: '#16a34a' },
+    orange: { bg: '#fff7ed', fg: '#ea580c' },
+  };
+  const statCard = (label, value, color = 'blue', Icon) => {
+    const tint = TINTS[color] || TINTS.blue;
+    return (
+      <div className="cons-stat-card" style={{ borderTop: `3px solid var(--${color}-600, #2563eb)` }}>
+        {Icon && (
+          <span className="cons-stat-card__icon" style={{ background: tint.bg, color: tint.fg }}>
+            <Icon size={18}/>
+          </span>
+        )}
+        <span className="cons-stat-card__value">{value}</span>
+        <span className="cons-stat-card__label">{label}</span>
+      </div>
+    );
+  };
 
   const listBlock = (title, items, keyField, countField) => (
     <div style={{ background: '#fff', borderRadius: '.5rem', border: '1px solid #e2e8f0', padding: '1rem', marginBottom: '1rem' }}>
@@ -760,18 +776,18 @@ function PageDashboard({ token }) {
       <p className="cons-page__sub">Vue d'ensemble de la plateforme</p>
 
       <div className="cons-stats">
-        {statCard('Étudiants', stats?.totalEtudiants ?? 0, 'blue')}
-        {statCard('Dossiers', stats?.totalDossiers ?? 0, 'indigo')}
-        {statCard('Personnel', stats?.totalPersonnel ?? 0, 'amber')}
-        {statCard('Dossiers univ.', stats?.totalDossiersUniversite ?? 0, 'violet')}
-        {statCard('Messages non lus', stats?.totalMessagesNonLus ?? 0, 'green')}
-        {statCard('Notifications', stats?.totalNotificationsNonLues ?? 0, 'orange')}
+        {statCard('Étudiants', stats?.totalEtudiants ?? 0, 'blue', Users)}
+        {statCard('Dossiers', stats?.totalDossiers ?? 0, 'indigo', FolderOpen)}
+        {statCard('Personnel', stats?.totalPersonnel ?? 0, 'amber', UserCheck)}
+        {statCard('Dossiers univ.', stats?.totalDossiersUniversite ?? 0, 'violet', School)}
+        {statCard('Messages non lus', stats?.totalMessagesNonLus ?? 0, 'green', MessageSquare)}
+        {statCard('Notifications', stats?.totalNotificationsNonLues ?? 0, 'orange', Bell)}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem', marginTop: '1.5rem' }}>
         {/* BarChart — Dossiers par statut général */}
-        <div style={{ background: '#fff', borderRadius: '.5rem', border: '1px solid #e2e8f0', padding: '1rem' }}>
-          <h4 style={{ margin: '0 0 .75rem', fontSize: '.9rem', color: '#1e293b' }}>Dossiers par statut général</h4>
+        <div className="cons-chart-card">
+          <h4 className="cons-chart-card__title"><FolderOpen size={15} color="#64748b"/> Dossiers par statut général</h4>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={stats?.dossiersParStatus || []}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -788,8 +804,8 @@ function PageDashboard({ token }) {
         </div>
 
         {/* PieChart — Personnel par rôle */}
-        <div style={{ background: '#fff', borderRadius: '.5rem', border: '1px solid #e2e8f0', padding: '1rem' }}>
-          <h4 style={{ margin: '0 0 .75rem', fontSize: '.9rem', color: '#1e293b' }}>Personnel par rôle</h4>
+        <div className="cons-chart-card">
+          <h4 className="cons-chart-card__title"><UserCheck size={15} color="#64748b"/> Personnel par rôle</h4>
           <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie
@@ -812,8 +828,8 @@ function PageDashboard({ token }) {
         </div>
 
         {/* BarChart — Dossiers par statut admission */}
-        <div style={{ background: '#fff', borderRadius: '.5rem', border: '1px solid #e2e8f0', padding: '1rem' }}>
-          <h4 style={{ margin: '0 0 .75rem', fontSize: '.9rem', color: '#1e293b' }}>Dossiers par statut admission</h4>
+        <div className="cons-chart-card">
+          <h4 className="cons-chart-card__title"><Award size={15} color="#64748b"/> Dossiers par statut admission</h4>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={stats?.dossiersParStatusAdmission || []}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -830,8 +846,8 @@ function PageDashboard({ token }) {
         </div>
 
         {/* PieChart — Dossiers par statut visa */}
-        <div style={{ background: '#fff', borderRadius: '.5rem', border: '1px solid #e2e8f0', padding: '1rem' }}>
-          <h4 style={{ margin: '0 0 .75rem', fontSize: '.9rem', color: '#1e293b' }}>Dossiers par statut visa</h4>
+        <div className="cons-chart-card">
+          <h4 className="cons-chart-card__title"><Globe size={15} color="#64748b"/> Dossiers par statut visa</h4>
           <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie
@@ -921,18 +937,21 @@ function PagePaiement({ token }) {
       <h2 className="cons-page__title">Paiement</h2>
       <p className="cons-page__sub">Suivi des paiements des frais de dossier.</p>
 
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'.75rem', marginBottom:'1.25rem' }}>
-        <div style={{ background:'#fff', border:'1px solid #e2e8f0', borderRadius:'.5rem', padding:'1rem 1.25rem' }}>
-          <div style={{ fontSize:'.75rem', color:'#94a3b8', fontWeight:600, textTransform:'uppercase', letterSpacing:'.05em' }}>Total dossiers</div>
-          <div style={{ fontSize:'1.75rem', fontWeight:700, color:'#1e293b', marginTop:'.25rem' }}>{dossiers.length}</div>
+      <div className="cons-stats" style={{ marginBottom:'1.25rem' }}>
+        <div className="cons-stat-card" style={{ borderTop:'3px solid #64748b' }}>
+          <span className="cons-stat-card__icon" style={{ background:'#f1f5f9', color:'#475569' }}><CreditCard size={18}/></span>
+          <span className="cons-stat-card__value">{dossiers.length}</span>
+          <span className="cons-stat-card__label">Total dossiers</span>
         </div>
-        <div style={{ background:'#fff', border:'1px solid #e2e8f0', borderRadius:'.5rem', padding:'1rem 1.25rem' }}>
-          <div style={{ fontSize:'.75rem', color:'#94a3b8', fontWeight:600, textTransform:'uppercase', letterSpacing:'.05em' }}>Payés</div>
-          <div style={{ fontSize:'1.75rem', fontWeight:700, color:'#16a34a', marginTop:'.25rem' }}>{nbPayes}</div>
+        <div className="cons-stat-card" style={{ borderTop:'3px solid #16a34a' }}>
+          <span className="cons-stat-card__icon" style={{ background:'#f0fdf4', color:'#16a34a' }}><Check size={18}/></span>
+          <span className="cons-stat-card__value" style={{ color:'#16a34a' }}>{nbPayes}</span>
+          <span className="cons-stat-card__label">Payés</span>
         </div>
-        <div style={{ background:'#fff', border:'1px solid #e2e8f0', borderRadius:'.5rem', padding:'1rem 1.25rem' }}>
-          <div style={{ fontSize:'.75rem', color:'#94a3b8', fontWeight:600, textTransform:'uppercase', letterSpacing:'.05em' }}>Non payés</div>
-          <div style={{ fontSize:'1.75rem', fontWeight:700, color:'#dc2626', marginTop:'.25rem' }}>{nbNonPayes}</div>
+        <div className="cons-stat-card" style={{ borderTop:'3px solid #dc2626' }}>
+          <span className="cons-stat-card__icon" style={{ background:'#fef2f2', color:'#dc2626' }}><XCircle size={18}/></span>
+          <span className="cons-stat-card__value" style={{ color:'#dc2626' }}>{nbNonPayes}</span>
+          <span className="cons-stat-card__label">Non payés</span>
         </div>
       </div>
 

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   LogOut, LayoutDashboard, FolderOpen,
   MessageSquare, Bell, ChevronDown, Menu, X,
-  Loader, AlertCircle, Eye, Send,
+  Loader, AlertCircle, Eye, Send, School, Award, Globe,
 } from 'lucide-react';
 import logoHeader from '../assets/les images du site/logo-horizontal-2x.png';
 import { getPersonnelSession, clearPersonnelSession, apiLogout, apiGetMesDossiers, apiGetDashboardConseiller } from '../api/auth';
@@ -61,12 +61,26 @@ function PageDashboard({ token, personnel, onOpenChat }) {
 
   const roleLabel   = getRoleLabel(personnel.role);
 
-  const statCard = (label, value, color = 'blue') => (
-    <div className="cons-stat-card" style={{ borderTop: `3px solid var(--${color}-600, #2563eb)` }}>
-      <span className="cons-stat-card__value">{value}</span>
-      <span className="cons-stat-card__label">{label}</span>
-    </div>
-  );
+  const TINTS = {
+    blue:   { bg: '#eff6ff', fg: '#2563eb' },
+    indigo: { bg: '#eef2ff', fg: '#4f46e5' },
+    green:  { bg: '#f0fdf4', fg: '#16a34a' },
+    orange: { bg: '#fff7ed', fg: '#ea580c' },
+  };
+  const statCard = (label, value, color = 'blue', Icon) => {
+    const tint = TINTS[color] || TINTS.blue;
+    return (
+      <div className="cons-stat-card" style={{ borderTop: `3px solid var(--${color}-600, #2563eb)` }}>
+        {Icon && (
+          <span className="cons-stat-card__icon" style={{ background: tint.bg, color: tint.fg }}>
+            <Icon size={18}/>
+          </span>
+        )}
+        <span className="cons-stat-card__value">{value}</span>
+        <span className="cons-stat-card__label">{label}</span>
+      </div>
+    );
+  };
 
   const listBlock = (title, items, keyField, countField) => (
     <div style={{ background: '#fff', borderRadius: '.5rem', border: '1px solid #e2e8f0', padding: '1rem', marginBottom: '1rem' }}>
@@ -109,16 +123,16 @@ function PageDashboard({ token, personnel, onOpenChat }) {
       <h2 className="cons-page__title">Dashboard</h2>
       <p className="cons-page__sub">{roleLabel} — {personnel.prenom} {personnel.nom}</p>
       <div className="cons-stats">
-        {statCard('Dossiers assignés', stats?.totalDossiersAssignes ?? 0, 'blue')}
-        {statCard('Dossiers univ.', stats?.totalDossiersUniversite ?? 0, 'indigo')}
-        {statCard('Messages non lus', stats?.messagesNonLus ?? 0, 'green')}
-        {statCard('Notifications', stats?.notificationsNonLues ?? 0, 'orange')}
+        {statCard('Dossiers assignés', stats?.totalDossiersAssignes ?? 0, 'blue', FolderOpen)}
+        {statCard('Dossiers univ.', stats?.totalDossiersUniversite ?? 0, 'indigo', School)}
+        {statCard('Messages non lus', stats?.messagesNonLus ?? 0, 'green', MessageSquare)}
+        {statCard('Notifications', stats?.notificationsNonLues ?? 0, 'orange', Bell)}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem', marginTop: '1.5rem' }}>
         {/* BarChart — Dossiers par statut général */}
-        <div style={{ background: '#fff', borderRadius: '.5rem', border: '1px solid #e2e8f0', padding: '1rem' }}>
-          <h4 style={{ margin: '0 0 .75rem', fontSize: '.9rem', color: '#1e293b' }}>Dossiers par statut général</h4>
+        <div className="cons-chart-card">
+          <h4 className="cons-chart-card__title"><FolderOpen size={15} color="#64748b"/> Dossiers par statut général</h4>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={stats?.dossiersParStatus || []}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -135,8 +149,8 @@ function PageDashboard({ token, personnel, onOpenChat }) {
         </div>
 
         {/* PieChart — Dossiers par statut admission */}
-        <div style={{ background: '#fff', borderRadius: '.5rem', border: '1px solid #e2e8f0', padding: '1rem' }}>
-          <h4 style={{ margin: '0 0 .75rem', fontSize: '.9rem', color: '#1e293b' }}>Dossiers par statut admission</h4>
+        <div className="cons-chart-card">
+          <h4 className="cons-chart-card__title"><Award size={15} color="#64748b"/> Dossiers par statut admission</h4>
           <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie
@@ -159,8 +173,8 @@ function PageDashboard({ token, personnel, onOpenChat }) {
         </div>
 
         {/* BarChart — Dossiers par statut visa */}
-        <div style={{ background: '#fff', borderRadius: '.5rem', border: '1px solid #e2e8f0', padding: '1rem' }}>
-          <h4 style={{ margin: '0 0 .75rem', fontSize: '.9rem', color: '#1e293b' }}>Dossiers par statut visa</h4>
+        <div className="cons-chart-card">
+          <h4 className="cons-chart-card__title"><Globe size={15} color="#64748b"/> Dossiers par statut visa</h4>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={stats?.dossiersParStatusVisa || []}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -177,8 +191,8 @@ function PageDashboard({ token, personnel, onOpenChat }) {
         </div>
 
         {/* PieChart — Dossiers université par statut */}
-        <div style={{ background: '#fff', borderRadius: '.5rem', border: '1px solid #e2e8f0', padding: '1rem' }}>
-          <h4 style={{ margin: '0 0 .75rem', fontSize: '.9rem', color: '#1e293b' }}>Dossiers université par statut</h4>
+        <div className="cons-chart-card">
+          <h4 className="cons-chart-card__title"><School size={15} color="#64748b"/> Dossiers université par statut</h4>
           <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie

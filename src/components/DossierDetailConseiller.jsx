@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Loader, AlertCircle, Send, Pencil, Eye, User, FolderOpen, CheckCircle, Upload, MessageSquare, Mail, MapPin, Globe, BookOpen, FileText, Calendar, Shield, Award, School, Trash2, Plus, Download } from 'lucide-react';
-import { apiGetInfosDossier, apiListPiecesJointes, apiGetPieceJointeUrl, apiUpdateDossierStatus, apiAddPieceJointe, apiUpdatePieceJointeStatus, apiPutInfosDossier, apiPatchPaiement, apiListDossiersUniversite, apiListDossiersUniversiteByDossier, apiCreateDossierUniversite, apiUpdateDossierUniversite, apiDeleteDossierUniversite } from '../api/auth';
+import { apiGetInfosDossier, apiListPiecesJointes, apiGetPieceJointeUrl, apiUpdateDossierStatus, apiAddPieceJointe, apiUpdatePieceJointeStatus, apiPutInfosDossier, apiListDossiersUniversite, apiListDossiersUniversiteByDossier, apiCreateDossierUniversite, apiUpdateDossierUniversite, apiDeleteDossierUniversite } from '../api/auth';
 import { useMessageModal } from '../context/MessageModalContext';
 
-const STATUS_OPTIONS      = ['EN_COURS_D_ETUDE','VALIDE','INVALIDE','EN_ATTENTE','CHANGEMENT_A_APPORTER'];
+const DOSSIER_STATUS_OPTIONS = ['EN_COURS_D_ETUDE','VALIDE','CHANGEMENT_A_APPORTER'];
 const STATUS_ADM_OPTIONS  = ['ADMISSION_EN_COURS','ADMISSION_VALIDE','ADMISSION_INVALIDE'];
 const STATUS_VISA_OPTIONS = ['DEMANDE_VISA_EN_COURS','DEMANDE_VISA_VALIDE','DEMANDE_VISA_INVALIDE'];
 
@@ -42,7 +42,7 @@ function StatusBadge({ value, size = 'sm' }) {
 
 /* ── Modal changer statut ── */
 function ModalChangerStatut({ token, dossier, isAdmin, isAdmission, isVisa, mode, onClose, onSuccess }) {
-  const [status, setStatus] = useState(dossier.status || STATUS_OPTIONS[0]);
+  const [status, setStatus] = useState(dossier.status || DOSSIER_STATUS_OPTIONS[0]);
   const [statusAdmission, setStatusAdmission] = useState(dossier.status_admission || STATUS_ADM_OPTIONS[0]);
   const [statusVisa, setStatusVisa] = useState(dossier.status_visa || STATUS_VISA_OPTIONS[0]);
   const [saving, setSaving] = useState(false);
@@ -93,7 +93,7 @@ function ModalChangerStatut({ token, dossier, isAdmin, isAdmission, isVisa, mode
               <div className="form-group">
                 <label className="form-label">Statut global</label>
                 <select className="form-select" value={status} onChange={e => setStatus(e.target.value)}>
-                  {STATUS_OPTIONS.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
+                  {DOSSIER_STATUS_OPTIONS.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
                 </select>
               </div>
             )}
@@ -384,7 +384,6 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
   const [uploading, setUploading] = useState(false);
   const [updatingPj, setUpdatingPj] = useState(null);
   const [updatingInfos, setUpdatingInfos] = useState(false);
-  const [updatingPaiement, setUpdatingPaiement] = useState(false);
   const [uploadType, setUploadType] = useState('');
   const [dossiersUniv, setDossiersUniv] = useState([]);
   const [univModal, setUnivModal] = useState(null);
@@ -483,21 +482,9 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
     } finally { setUpdatingInfos(false); }
   };
 
-  const handleTogglePaiement = async () => {
-    if (!infos) return;
-    const oldValue = infos.paiement;
-    setInfos(prev => ({ ...prev, paiement: !oldValue }));
-    setUpdatingPaiement(true);
-    try {
-      await apiPatchPaiement(token, dossier.code_dossier, !oldValue);
-    } catch (err) {
-      setInfos(prev => ({ ...prev, paiement: oldValue }));
-      alert(err.message);
-    } finally { setUpdatingPaiement(false); }
-  };
-
-  const cardStyle = { background:'#fff', borderRadius:'.75rem', boxShadow:'0 1px 3px rgba(0,0,0,.06)', border:'1px solid #eef2f7', overflow:'hidden' };
-  const cardHeader = { padding:'.9rem 1.25rem', borderBottom:'1px solid #eef2f7', display:'flex', alignItems:'center', gap:'.5rem', fontWeight:700, fontSize:'.9rem', color:'#1e293b' };
+  const cardStyle = { background:'#fff', borderRadius:'.875rem', boxShadow:'0 1px 2px rgba(15,23,42,.05), 0 8px 20px rgba(15,23,42,.04)', border:'1px solid #eef2f7', overflow:'hidden' };
+  const cardHeader = { padding:'.9rem 1.25rem', borderBottom:'1px solid #eef2f7', background:'#fbfaf7', display:'flex', alignItems:'center', gap:'.6rem', fontWeight:700, fontSize:'.9rem', color:'#1e293b' };
+  const cardHeaderIcon = { width:28, height:28, borderRadius:'.5rem', background:'#f5f0e4', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 };
   const cardBody = { padding:'1.25rem' };
   const infoRow = { display:'flex', alignItems:'center', gap:'.6rem', padding:'.4rem 0', fontSize:'.875rem', color:'#334155' };
   const labelStyle = { color:'#64748b', minWidth:110, fontSize:'.8rem', fontWeight:500 };
@@ -507,7 +494,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
   const SectionCard = ({ icon: Icon, title, children, action }) => (
     <section style={cardStyle}>
       <div style={cardHeader}>
-        {Icon && <Icon size={16} color="#c5a150"/>}
+        {Icon && <span style={cardHeaderIcon}><Icon size={14} color="#0c1c3f"/></span>}
         <span style={{flex:1}}>{title}</span>
         {action}
       </div>
@@ -525,8 +512,8 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
         <div style={{display:'flex',flexDirection:'column',gap:'1.25rem'}}>
 
           {/* ── Header étudiant ── */}
-          <div style={{display:'flex',alignItems:'center',gap:'1.25rem',background:'#0c1c3f',borderRadius:'.75rem',padding:'1.25rem 1.5rem',color:'#fff'}}>
-            <div style={{width:56,height:56,borderRadius:'50%',background:'rgba(255,255,255,.2)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.25rem',fontWeight:700}}>
+          <div style={{display:'flex',alignItems:'center',gap:'1.25rem',background:'linear-gradient(135deg,#0c1c3f,#16244d)',borderRadius:'.875rem',padding:'1.25rem 1.5rem',color:'#fff',boxShadow:'0 8px 24px rgba(12,28,63,.25)'}}>
+            <div style={{width:56,height:56,borderRadius:'50%',background:'rgba(255,255,255,.15)',boxShadow:'0 0 0 3px rgba(255,255,255,.25)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.25rem',fontWeight:700}}>
               {dossier.etudiant?.prenom?.charAt(0)}{dossier.etudiant?.nom?.charAt(0)}
             </div>
             {/* un console.log pour dossier */}
@@ -586,14 +573,6 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
             <div style={{display:'flex',alignItems:'center',gap:'.5rem',flexWrap:'wrap'}}>
               <button style={{...btnGhost,fontSize:'.75rem',padding:'.2rem .5rem'}} onClick={() => setInfosModal(true)} title="Modifier">
                 <Pencil size={12}/> Modifier
-              </button>
-              <button
-                style={{...btnGhost,fontSize:'.75rem',padding:'.2rem .5rem',background:infos.paiement?'#dcfce7':'#fee2e2',color:infos.paiement?'#166534':'#991b1b',borderColor:infos.paiement?'#bbf7d0':'#fecaca'}}
-                onClick={() => handleTogglePaiement()}
-                disabled={updatingPaiement}
-              >
-                {updatingPaiement ? <Loader size={12} className="auth-spinner"/> : <CheckCircle size={12}/>}
-                {infos.paiement ? 'Payé' : 'Non payé'}
               </button>
               <span style={{fontSize:'.75rem',color:'#64748b'}}>Statut :</span>
               <select
