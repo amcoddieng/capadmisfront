@@ -143,8 +143,11 @@ export default function Home() {
     <main className="home-page">
       <Helmet>
         <title>CapAdmis | Études en France, Campus France et études à l'étranger</title>
-        <meta name="description" content="CapAdmis accompagne les étudiants dans leurs études en France et à l'étranger : orientation, admission universitaire, procédure Campus France, visa étudiant et suivi personnalisé." />
+        <meta name="description" content="CapAdmis accompagne les étudiants dans leurs études en France et à l'étranger : orientation, admission universitaire, procédure Campus France, visa étudiant et suivi personnalisé. Commencez votre projet d'études en France dès aujourd'hui." />
+        <meta name="keywords" content="études en France, etude en france, études à l'étranger, etude a l'etranger, Campus France, visa étudiant, admission université France, accompagnement étudiant, étudier en France, procédure Campus France" />
         <link rel="canonical" href="https://capadmis.com/" />
+        <meta property="og:title" content="CapAdmis | Études en France et à l'étranger — Accompagnement complet" />
+        <meta property="og:description" content="Orientation, admission universitaire, procédure Campus France et visa étudiant. Capadmis vous accompagne pour étudier en France et à l'étranger." />
       </Helmet>
 
       {/* ── HERO ── */}

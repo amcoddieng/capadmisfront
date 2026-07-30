@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Menu, X, Home, Info, FileText, CreditCard, Star,
-  Mail, BarChart3, ArrowRight,
+  Mail, BarChart3, ArrowRight, Quote, HelpCircle,
 } from 'lucide-react';
 import { getStartPath } from '../api/auth';
 import logoNavbar from '../assets/les images du site/logo-navbar-dark - Copie.png';
@@ -13,6 +13,8 @@ const navLinks = [
   { label: 'Procédure', path: '/procedure', icon: FileText },
   { label: 'Tarifs', path: '/tarifs', icon: CreditCard },
   { label: 'Pourquoi', path: '/pourquoi', icon: Star },
+  // { label: 'Témoignages', path: '/temoignages', icon: Quote },
+  // { label: 'FAQ', path: '/faq', icon: HelpCircle },
   { label: 'Contact', path: '/contact', icon: Mail },
 ];
 

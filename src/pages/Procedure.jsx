@@ -147,8 +147,9 @@ export default function Procedure() {
   return (
     <main className="public-page public-page--procedure">
       <Helmet>
-        <title>Procédure Campus France — CapAdmis</title>
-        <meta name="description" content="Découvrez les 9 étapes clés pour réussir votre admission et obtenir votre visa étudiant. CapAdmis vous accompagne de l'orientation au départ." />
+        <title>Procédure Campus France & études en France — CapAdmis</title>
+        <meta name="description" content="Découvrez les 9 étapes clés pour étudier en France : orientation, candidatures, procédure Campus France, visa étudiant. CapAdmis vous accompagne de l'orientation au départ." />
+        <meta name="keywords" content="procédure Campus France, études en France, étudier en France, visa étudiant, admission université France, candidature Campus France, démarche études France" />
         <link rel="canonical" href="https://capadmis.com/procedure" />
       </Helmet>
 
