@@ -189,19 +189,21 @@ export default function Auth() {
                     required type="email" className="form-input"
                     value={form.email} onChange={e => set('email', e.target.value)}
                     placeholder="votre@email.com"
+                    autoComplete="email" name="email"
                   />
                 </div>
 
                 <div className="form-group">
                   <div className="auth-forgot">
                     <label className="form-label">Mot de passe</label>
-                    <a href="#" className="auth-forgot-link">Mot de passe oublié ?</a>
+                    <Link to="/contact" className="auth-forgot-link">Mot de passe oublié ?</Link>
                   </div>
                   <div className="auth-pwd-field">
                     <input
                       required type={showPwd ? 'text' : 'password'} className="form-input"
                       value={form.mdp} onChange={e => set('mdp', e.target.value)}
                       placeholder="••••••••"
+                      autoComplete="current-password" name="password"
                     />
                     <button type="button" className="auth-pwd-toggle" onClick={() => setShowPwd(!showPwd)}>
                       {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -251,7 +253,7 @@ export default function Auth() {
 
                     <div className="form-group">
                       <label className="form-label">Email *</label>
-                      <input required type="email" className="form-input" value={form.email} onChange={e => set('email', e.target.value)} placeholder="votre@email.com" />
+                      <input required type="email" className="form-input" value={form.email} onChange={e => set('email', e.target.value)} placeholder="votre@email.com" autoComplete="email" name="email" />
                     </div>
 
                     <div className="form-group">
@@ -323,6 +325,7 @@ export default function Auth() {
                           value={form.mdp} onChange={e => set('mdp', e.target.value)}
                           placeholder="Minimum 8 caractères"
                           minLength={8}
+                          autoComplete="new-password" name="new-password"
                         />
                         <button type="button" className="auth-pwd-toggle" onClick={() => setShowPwd(!showPwd)}>
                           {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -353,8 +356,8 @@ export default function Auth() {
 
         <p className="auth-footer">
           En créant un compte, vous acceptez nos{' '}
-          <a href="#">CGU</a> et notre{' '}
-          <a href="#">politique de confidentialité</a>.
+          <Link to="/contact">CGU</Link> et notre{' '}
+          <Link to="/contact">politique de confidentialité</Link>.
         </p>
 
         <div className="auth-trust">

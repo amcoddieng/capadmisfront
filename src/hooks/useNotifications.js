@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 import { apiGetNotifications, apiMarkNotifRead, apiMarkAllNotifsRead } from '../api/auth';
 import { playNotificationSound, registerAudioUnlock } from '../utils/sound';
 
-const WS_URL = import.meta.env.VITE_WS_URL ?? import.meta.env.VITE_API_URL ?? 'https://capadmis.onrender.com';
+const WS_URL = import.meta.env.VITE_WS_URL ?? import.meta.env.VITE_API_URL;
 
 export function useNotifications(token) {
   const [notifications, setNotifications] = useState([]);

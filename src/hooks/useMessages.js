@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 import { apiGetConversations, apiGetMessages, apiSendMessage, apiGetUnreadMessages } from '../api/auth';
 import { playMessageSound, registerAudioUnlock } from '../utils/sound';
 
-const WS_URL = import.meta.env.VITE_WS_URL ?? import.meta.env.VITE_API_URL ?? 'https://capadmis.onrender.com';
+const WS_URL = import.meta.env.VITE_WS_URL ?? import.meta.env.VITE_API_URL;
 
 export function useMessages(token) {
   const [conversations, setConversations]   = useState([]);

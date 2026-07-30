@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL ?? (import.meta.env.PROD ? 'https://capadmis.onrender.com' : '');
+const API_URL = import.meta.env.VITE_API_URL ?? (import.meta.env.PROD);
 const BASE = API_URL ? `${API_URL.replace(/\/$/, '')}/api` : '/api';
 // const BASE = 'http://localhost:3000/api';
 

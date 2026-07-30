@@ -6,5 +6,7 @@ Disallow: /dashboard/superadmin
 Disallow: /dashboard/conseiller-admission
 Disallow: /dashboard/conseiller-visa
 Disallow: /personnel
+Disallow: /connexion
+Disallow: /inscription
 
 Sitemap: https://capadmis.com/sitemap.xml

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Loader, AlertCircle, Mail, ArrowRight, Shield, Lock, Eye, EyeOff, CheckCircle, Users, Briefcase, Globe } from 'lucide-react';
 import { apiPersonnelLogin, savePersonnelSession } from '../api/auth';
 import logoAuth from '../assets/les images du site/logo-horizontal-white-bg - Copie.png';
@@ -70,6 +71,10 @@ export default function AuthPersonnel() {
 
   return (
     <div className="auth-page auth-page--personnel">
+      <Helmet>
+        <title>Espace équipe — CapAdmis</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       {/* ── Carrousel gauche ── */}
       <div className="auth-carousel">
         {personnelSlides.map((slide, i) => (
@@ -137,7 +142,7 @@ export default function AuthPersonnel() {
                       type="email" required className="form-input auth-input-field"
                       value={email} onChange={e => setEmail(e.target.value)}
                       placeholder="admin@capadmis.com"
-                      autoFocus
+                      autoComplete="email" name="email" autoFocus
                     />
                   </div>
                 </div>
@@ -151,6 +156,7 @@ export default function AuthPersonnel() {
                       className="form-input auth-input-field auth-input-field--pwd"
                       value={mdp} onChange={e => setMdp(e.target.value)}
                       placeholder="••••••••"
+                      autoComplete="current-password" name="password"
                     />
                     <button
                       type="button"
