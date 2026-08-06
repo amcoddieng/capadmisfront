@@ -2,9 +2,9 @@ import { useEffect, useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LogOut, LayoutDashboard, FolderOpen, Users, UserCheck,
-  History, MessageSquare, Bell, Menu, X, CreditCard, Plus, Pencil,
+  History, MessageSquare, Bell, Menu, X, CreditCard, Plus, Pencil, Clock,
   Trash2, Lock, Unlock, Loader, AlertCircle, CheckCircle, Send, Eye, Award, Globe,
-  AlertTriangle, Check, XCircle, School,
+  AlertTriangle, Check, XCircle, School, Mail,
 } from 'lucide-react';
 import logoHeader from '../assets/les images du site/logo-horizontal-2x.png';
 import DossierDetailConseiller from '../components/DossierDetailConseiller';
@@ -14,6 +14,7 @@ import {
   apiListEtudiants, apiCreateEtudiant, apiUpdateEtudiant, apiDeleteEtudiant, apiToggleBlockEtudiant,
   apiListDossiers, apiAssignConseiller, apiUpdateDossierStatus, apiListConseillers,
   apiGetDashboardAdmin, apiPatchPaiement,
+  apiListContacts, apiUpdateContact, apiDeleteContact, apiToggleContactAppele,
 } from '../api/auth';
 import { useNotifications } from '../hooks/useNotifications';
 import NotificationsPanel from '../components/NotificationsPanel';
@@ -33,6 +34,7 @@ const NAV_ITEMS = [
   { id: 'etudiants',     label: 'Gestion étudiants',   icon: Users },
   { id: 'conseillers',   label: 'Gestion conseillers', icon: UserCheck },
   { id: 'paiement',      label: 'Paiement',            icon: CreditCard },
+  { id: 'contacts',      label: 'Contacter-moi',       icon: Mail },
   { id: 'historique',    label: 'Historique',          icon: History },
   { id: 'messages',      label: 'Messages',            icon: MessageSquare },
   { id: 'notifications', label: 'Notifications',       icon: Bell },
@@ -1107,6 +1109,282 @@ function PageNotifications(props) {
   );
 }
 
+/* ── Page Contacts ── */
+function PageContacts({ token }) {
+  const [contacts, setContacts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [search, setSearch] = useState('');
+  const [filterAppele, setFilterAppele] = useState('');
+  const [viewModal, setViewModal] = useState(null);
+  const [editModal, setEditModal] = useState(null);
+  const [deleteModal, setDeleteModal] = useState(null);
+  const [processing, setProcessing] = useState(null);
+
+  const fetch = useCallback(async () => {
+    setLoading(true); setError('');
+    try { setContacts(await apiListContacts(token)); } catch (e) { setError(e.message); } finally { setLoading(false); }
+  }, [token]);
+
+  useEffect(() => { fetch(); }, [fetch]);
+
+  const handleToggleAppele = async (id) => {
+    setProcessing(`appele-${id}`); setError('');
+    try {
+      const updated = await apiToggleContactAppele(token, id);
+      setContacts(prev => prev.map(c => c.id === id ? updated : c));
+    } catch (e) { setError(e.message); } finally { setProcessing(null); }
+  };
+
+  const handleDelete = async (id) => {
+    setProcessing(`delete-${id}`); setError('');
+    try {
+      await apiDeleteContact(token, id);
+      setContacts(prev => prev.filter(c => c.id !== id));
+      setDeleteModal(null);
+    } catch (e) { setError(e.message); } finally { setProcessing(null); }
+  };
+
+  const handleUpdate = async (id, payload) => {
+    setProcessing(`edit-${id}`); setError('');
+    try {
+      const updated = await apiUpdateContact(token, id, payload);
+      setContacts(prev => prev.map(c => c.id === id ? updated : c));
+      setEditModal(null);
+    } catch (e) { setError(e.message); } finally { setProcessing(null); }
+  };
+
+  const filtered = contacts.filter(c => {
+    const q = search.trim().toLowerCase();
+    const matchSearch = !q ||
+      c.nom_complet?.toLowerCase().includes(q) ||
+      c.email?.toLowerCase().includes(q) ||
+      c.sujet?.toLowerCase().includes(q) ||
+      c.telephone?.toLowerCase().includes(q);
+    const matchAppele = !filterAppele ||
+      (filterAppele === 'appele' && c.appele) ||
+      (filterAppele === 'non_appele' && !c.appele);
+    return matchSearch && matchAppele;
+  });
+
+  const total = contacts.length;
+  const appeles = contacts.filter(c => c.appele).length;
+  const nonAppeles = total - appeles;
+
+  return (
+    <div className="cons-page">
+      <h2 className="cons-page__title">Messages de contact</h2>
+      <p className="cons-page__sub">Gestion des demandes reçues via le formulaire de contact.</p>
+
+      <div className="cons-stats" style={{ marginBottom: '1.25rem' }}>
+        <div className="cons-stat-card" style={{ borderTop: '3px solid #64748b' }}>
+          <span className="cons-stat-card__icon" style={{ background: '#f1f5f9', color: '#475569' }}><Mail size={18}/></span>
+          <span className="cons-stat-card__value">{total}</span>
+          <span className="cons-stat-card__label">Total messages</span>
+        </div>
+        <div className="cons-stat-card" style={{ borderTop: '3px solid #16a34a' }}>
+          <span className="cons-stat-card__icon" style={{ background: '#f0fdf4', color: '#16a34a' }}><CheckCircle size={18}/></span>
+          <span className="cons-stat-card__value" style={{ color: '#16a34a' }}>{appeles}</span>
+          <span className="cons-stat-card__label">Appelés</span>
+        </div>
+        <div className="cons-stat-card" style={{ borderTop: '3px solid #f59e0b' }}>
+          <span className="cons-stat-card__icon" style={{ background: '#fffbeb', color: '#f59e0b' }}><Clock size={18}/></span>
+          <span className="cons-stat-card__value" style={{ color: '#f59e0b' }}>{nonAppeles}</span>
+          <span className="cons-stat-card__label">À appeler</span>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', gap: '.75rem', flexWrap: 'wrap', alignItems: 'center', marginBottom: '1.25rem', background: '#fff', padding: '.75rem 1rem', borderRadius: '.5rem', border: '1px solid #e2e8f0' }}>
+        <input
+          type="text"
+          placeholder="Rechercher (nom, email, sujet...)"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ flex: 1, minWidth: 200, padding: '.4rem .6rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.85rem' }}
+        />
+        <select value={filterAppele} onChange={e => setFilterAppele(e.target.value)} style={{ padding: '.4rem .6rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.85rem' }}>
+          <option value="">Tous statuts</option>
+          <option value="non_appele">À appeler</option>
+          <option value="appele">Appelés</option>
+        </select>
+      </div>
+
+      {error && <div className="auth-error" style={{ margin: '0 0 1rem' }}><AlertCircle size={15}/> {error}</div>}
+
+      <TableWrap loading={loading} error={''}>
+        <div style={{ overflowX: 'auto' }}>
+          <table className="sa-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nom complet</th>
+                <th>Email</th>
+                <th>Téléphone</th>
+                <th>Sujet</th>
+                <th>Statut</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 && <tr><td colSpan={8} style={{ textAlign: 'center', color: '#94a3b8', padding: '2rem' }}>Aucun message trouvé.</td></tr>}
+              {filtered.map(c => (
+                <tr key={c.id}>
+                  <td style={{ fontWeight: 600 }}>{c.id}</td>
+                  <td>{c.nom_complet}</td>
+                  <td style={{ fontSize: '.8rem' }}>{c.email}</td>
+                  <td style={{ fontSize: '.8rem' }}>{c.telephone || '—'}</td>
+                  <td style={{ fontSize: '.8rem' }}>{c.sujet}</td>
+                  <td>
+                    {c.appele
+                      ? <span className="status-badge status-badge--green"><Check size={12} style={{ display: 'inline', marginRight: '.25rem' }}/>Appelé</span>
+                      : <span className="status-badge status-badge--orange"><XCircle size={12} style={{ display: 'inline', marginRight: '.25rem' }}/>À appeler</span>}
+                  </td>
+                  <td style={{ fontSize: '.8rem' }}>{new Date(c.createdAt).toLocaleString('fr-FR')}</td>
+                  <td>
+                    <div className="sa-actions">
+                      <button className="sa-btn sa-btn--blue" onClick={() => setViewModal(c)} title="Voir"><Eye size={14}/></button>
+                      <button className="sa-btn sa-btn--green" onClick={() => handleToggleAppele(c.id)} disabled={processing === `appele-${c.id}`} title={c.appele ? 'Marquer non appelé' : 'Marquer appelé'}>
+                        {processing === `appele-${c.id}` ? <Loader size={14} className="auth-spinner"/> : c.appele ? <XCircle size={14}/> : <CheckCircle size={14}/>}
+                      </button>
+                      <button className="sa-btn sa-btn--orange" onClick={() => setEditModal(c)} title="Modifier"><Pencil size={14}/></button>
+                      <button className="sa-btn sa-btn--red" onClick={() => setDeleteModal(c)} title="Supprimer"><Trash2 size={14}/></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </TableWrap>
+
+      {viewModal && (
+        <div className="modal-overlay" onClick={() => setViewModal(null)}>
+          <div className="modal" style={{ maxWidth: 560 }} onClick={e => e.stopPropagation()}>
+            <div className="modal__header">
+              <h3 className="modal__title">Message de {viewModal.nom_complet}</h3>
+              <button className="modal__close" onClick={() => setViewModal(null)}><X size={18}/></button>
+            </div>
+            <div className="modal__body" style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+              <div><strong>Email :</strong> <a href={`mailto:${viewModal.email}`}>{viewModal.email}</a></div>
+              <div><strong>Téléphone :</strong> {viewModal.telephone || '—'}</div>
+              <div><strong>Sujet :</strong> {viewModal.sujet}</div>
+              <div><strong>Statut :</strong> {viewModal.appele ? 'Appelé' : 'À appeler'}</div>
+              <div><strong>Date :</strong> {new Date(viewModal.createdAt).toLocaleString('fr-FR')}</div>
+              <div style={{ marginTop: '.5rem', padding: '1rem', background: '#f8fafc', borderRadius: '.5rem' }}>
+                <strong>Message :</strong>
+                <p style={{ margin: '.5rem 0 0', whiteSpace: 'pre-wrap' }}>{viewModal.message}</p>
+              </div>
+            </div>
+            <div className="modal__footer">
+              <button className="form-back" onClick={() => setViewModal(null)}>Fermer</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editModal && (
+        <ContactEditModal
+          token={token}
+          contact={editModal}
+          onClose={() => setEditModal(null)}
+          onSubmit={(payload) => handleUpdate(editModal.id, payload)}
+          processing={processing === `edit-${editModal.id}`}
+        />
+      )}
+
+      {deleteModal && (
+        <div className="modal-overlay" onClick={() => setDeleteModal(null)}>
+          <div className="modal modal--confirm" onClick={e => e.stopPropagation()}>
+            <div className="modal__header modal__header--danger">
+              <div className="modal__header-icon"><AlertTriangle size={20}/></div>
+              <h3 className="modal__title">Supprimer le message</h3>
+              <button className="modal__close" onClick={() => setDeleteModal(null)} disabled={processing === `delete-${deleteModal.id}`}><X size={18}/></button>
+            </div>
+            <div className="modal__body">
+              <p>Êtes-vous sûr de vouloir supprimer le message de <strong>{deleteModal.nom_complet}</strong> ? Cette action est irréversible.</p>
+            </div>
+            <div className="modal__footer">
+              <button className="form-back" onClick={() => setDeleteModal(null)} disabled={processing === `delete-${deleteModal.id}`}>Annuler</button>
+              <button className="btn btn--delete" onClick={() => handleDelete(deleteModal.id)} disabled={processing === `delete-${deleteModal.id}`}>
+                {processing === `delete-${deleteModal.id}` ? <><Loader size={16} className="auth-spinner"/> Suppression…</> : <><Trash2 size={16}/> Supprimer</>}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ContactEditModal({ contact, onClose, onSubmit, processing }) {
+  const [form, setForm] = useState({
+    nom_complet: contact.nom_complet || '',
+    email: contact.email || '',
+    telephone: contact.telephone || '',
+    sujet: contact.sujet || '',
+    message: contact.message || '',
+  });
+  const [error, setError] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!form.nom_complet.trim() || !form.email.trim() || !form.sujet.trim() || !form.message.trim()) {
+      setError('Les champs nom, email, sujet et message sont requis.');
+      return;
+    }
+    onSubmit({
+      nom_complet: form.nom_complet.trim(),
+      email: form.email.trim(),
+      telephone: form.telephone.trim() || undefined,
+      sujet: form.sujet.trim(),
+      message: form.message.trim(),
+    });
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" style={{ maxWidth: 520 }} onClick={e => e.stopPropagation()}>
+        <div className="modal__header">
+          <h3 className="modal__title">Modifier le message</h3>
+          <button className="modal__close" onClick={onClose} disabled={processing}><X size={18}/></button>
+        </div>
+        <div className="modal__body">
+          {error && <div className="auth-error" style={{ margin: '0 0 1rem' }}><AlertCircle size={15}/> {error}</div>}
+          <form id="edit-contact-form" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div className="form-group">
+              <label className="form-label">Nom complet *</label>
+              <input className="form-input" value={form.nom_complet} onChange={e => setForm(f => ({ ...f, nom_complet: e.target.value }))} required />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Email *</label>
+              <input type="email" className="form-input" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} required />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Téléphone</label>
+              <input className="form-input" value={form.telephone} onChange={e => setForm(f => ({ ...f, telephone: e.target.value }))} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Sujet *</label>
+              <input className="form-input" value={form.sujet} onChange={e => setForm(f => ({ ...f, sujet: e.target.value }))} required />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Message *</label>
+              <textarea rows={5} className="form-textarea" value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} required />
+            </div>
+          </form>
+        </div>
+        <div className="modal__footer">
+          <button className="form-back" onClick={onClose} disabled={processing}>Annuler</button>
+          <button type="submit" form="edit-contact-form" className="form-submit" disabled={processing}>
+            {processing ? <><Loader size={14} className="auth-spinner"/> Enregistrement…</> : <><CheckCircle size={14}/> Enregistrer</>}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── Composant principal ── */
 export default function DashboardSuperAdmin() {
   const location = useLocation();
@@ -1141,6 +1419,7 @@ export default function DashboardSuperAdmin() {
       case 'etudiants':     return <PageEtudiants token={token} personnel={personnel} />;
       case 'conseillers':   return <PageConseillers token={token} />;
       case 'paiement':      return <PagePaiement token={token} />;
+      case 'contacts':      return <PageContacts token={token} />;
       case 'historique':    return <PageHistorique />;
       case 'messages':      return <PageMessages conversations={msg.conversations} messages={msg.messages} activeChat={msg.activeChat} unreadCount={msg.unreadCount} userEmail={personnel.email} onSelectChat={msg.loadConversation} onSend={msg.send} />;
       case 'notifications': return <PageNotifications notifications={notifications} loading={notifLoading} unread={unread} markRead={markRead} markAllRead={markAllRead} />;

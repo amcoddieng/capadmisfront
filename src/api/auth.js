@@ -66,6 +66,51 @@ export async function apiContacterMoi(payload) {
   return data;
 }
 
+export async function apiListContacts(token) {
+  const res = await authFetch(`${BASE}/contacter-moi`, { headers: { Authorization: `Bearer ${token}` }, credentials: 'include' });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Erreur');
+  return data.data;
+}
+
+export async function apiGetContact(token, id) {
+  const res = await authFetch(`${BASE}/contacter-moi/${id}`, { headers: { Authorization: `Bearer ${token}` }, credentials: 'include' });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Erreur');
+  return data.data;
+}
+
+export async function apiUpdateContact(token, id, payload) {
+  const res = await authFetch(`${BASE}/contacter-moi/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Erreur');
+  return data.data;
+}
+
+export async function apiDeleteContact(token, id) {
+  const res = await authFetch(`${BASE}/contacter-moi/${id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` }, credentials: 'include',
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Erreur');
+  return data;
+}
+
+export async function apiToggleContactAppele(token, id) {
+  const res = await authFetch(`${BASE}/contacter-moi/${id}/appele`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` }, credentials: 'include',
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Erreur');
+  return data.data;
+}
+
 export async function apiGetDossier(token) {
   const res = await authFetch(`${BASE}/dossiers/moi`, {
     headers: { Authorization: `Bearer ${token}` }, credentials: 'include',
