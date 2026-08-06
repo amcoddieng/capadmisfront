@@ -3927,6 +3927,15 @@ a { text-decoration: none; color: inherit; }
 .contact-form-card__title { font-family: Georgia, 'Times New Roman', serif; font-size: 1.8rem; font-weight: 500; }
 .form-input, .form-select, .form-textarea { padding: .85rem 1rem; border-color: #ded6c5; }
 .form-submit { padding: 1rem 1.5rem; background: var(--primary); }
+.form-submit:disabled { opacity: .65; cursor: not-allowed; }
+.form-error {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .75rem 1rem;
+  border-radius: .5rem;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: .9rem;
+}
 
 @media (max-width: 767px) {
   .home-pricing { padding: 6rem 0; }

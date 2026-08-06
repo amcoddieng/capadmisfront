@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Mail, Phone, MapPin, Clock, Send, CheckCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, Send, CheckCircle, AlertCircle } from 'lucide-react';
 import useAdvancedScroll from '../hooks/useAdvancedScroll';
+import { apiContacterMoi } from '../api/auth';
 
 const contactInfo = [
   { icon: <MapPin className="w-5 h-5 text-blue-600" />, label: 'Adresse', value: 'Dakar, Sénégal' },
@@ -13,13 +14,30 @@ const contactInfo = [
 export default function Contact() {
   useAdvancedScroll();
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [form, setForm] = useState({ nom: '', email: '', telephone: '', sujet: '', message: '' });
 
   const set = (f, v) => setForm(prev => ({ ...prev, [f]: v }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSent(true);
+    setLoading(true);
+    setError('');
+    try {
+      await apiContacterMoi({
+        nom_complet: form.nom,
+        email: form.email,
+        telephone: form.telephone || undefined,
+        sujet: form.sujet,
+        message: form.message,
+      });
+      setSent(true);
+    } catch (err) {
+      setError(err.message || 'Erreur lors de l\'envoi du message');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -120,8 +138,13 @@ export default function Contact() {
                     <label className="form-label">Message *</label>
                     <textarea required rows={5} className="form-textarea" value={form.message} onChange={e => set('message', e.target.value)} placeholder="Décrivez votre situation et votre question..." />
                   </div>
-                  <button type="submit" className="form-submit">
-                    <Send size={16} /> Envoyer le message
+                  {error && (
+                    <div className="form-error" role="alert">
+                      <AlertCircle size={18} /> {error}
+                    </div>
+                  )}
+                  <button type="submit" className="form-submit" disabled={loading}>
+                    <Send size={16} /> {loading ? 'Envoi en cours...' : 'Envoyer le message'}
                   </button>
                 </form>
               )}

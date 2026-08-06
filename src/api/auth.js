@@ -55,6 +55,17 @@ export async function apiRegister(payload) {
   return data;
 }
 
+export async function apiContacterMoi(payload) {
+  const res = await authFetch(`${BASE}/contacter-moi`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Erreur lors de l\'envoi du message');
+  return data;
+}
+
 export async function apiGetDossier(token) {
   const res = await authFetch(`${BASE}/dossiers/moi`, {
     headers: { Authorization: `Bearer ${token}` }, credentials: 'include',
