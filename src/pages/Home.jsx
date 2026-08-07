@@ -88,7 +88,7 @@ const steps = [
 ];
 
 const features = [
-  { icon: <Zap size={20} />, title: 'Processus digital', desc: 'L'étudiant ne se déplace qu'en cas d'urgence ou lorsqu'il le souhaite personnellement.' },
+  { icon: <Zap size={20} />, title: 'Processus digital', desc: 'L\'étudiant ne se déplace qu\'en cas d\'urgence ou lorsqu\'il le souhaite personnellement.' },
   { icon: <BarChart3 size={20} />, title: 'Suivi temps réel', desc: 'Dashboard personnel de votre avancement' },
   { icon: <Shield size={20} />, title: 'Accompagnement total', desc: "De l'orientation au visa" },
   { icon: <TrendingUp size={20} />, title: 'Tarif accessible', desc: "Jusqu'à 3x moins cher qu'une agence" },
