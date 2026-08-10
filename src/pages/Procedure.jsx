@@ -106,8 +106,8 @@ const steps = [
     description: 'Une fois l\'admission obtenue, nous vous aidons à constituer votre dossier visa.',
     items: [
       'Constitution du dossier visa complet',
-      'Prise en charge et hébergement',
-      'Justificatifs financiers',
+      'Prise en charge et hébergement (accompagnement)',
+      'Justificatifs financiers (accompagnement)',
       'Préparation à l\'entretien visa',
       'Vérification finale du dossier',
     ],

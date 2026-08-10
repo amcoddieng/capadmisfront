@@ -30,8 +30,8 @@ const missionItems = [
 const missionStats = [
   { value: '500+', label: 'Étudiants' },
   { value: '95%',  label: 'Satisfaction' },
-  { value: '6',    label: 'Pays' },
-  { value: '18',   label: 'Étapes' },
+  { value: '75+',    label: 'Universités publiques' },
+  { value: '8',   label: 'Étapes' },
 ];
 
 export default function APropos() {
@@ -89,6 +89,12 @@ export default function APropos() {
             </div>
           </div>
         </div>
+        {/* ajoutons un lien pour telecharger le fichier PDF */}
+        <p>
+          <a href="/fiche.pdf" download>
+            Telecharger le fichier PDF pour plus d'informations
+          </a>
+        </p>
       </section>
 
       {/* Services */}

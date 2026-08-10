@@ -8,7 +8,7 @@ const differentiators = [
   {
     icon: <Zap className="w-7 h-7 text-blue-600" />,
     title: 'Processus 100% digital et rapide',
-    capadmis: 'Tout se fait en ligne : dépôt de documents, suivi, communication. Pas de déplacement en agence.',
+    capadmis: 'Tout se fait en ligne : dépôt de documents, suivi, communication. Pas de déplacement inutile en agence.',
     agence: 'Rendez-vous physiques, paperasse, délais importants.',
   },
   {
