@@ -99,17 +99,17 @@ export default function APropos() {
               alignItems: 'center',
               gap: '.6rem',
               padding: '.85rem 1.5rem',
-              background: 'linear-gradient(135deg, #0c1c3f 0%, #c5a150 100%)',
+              background: '#0c1c3f',
               color: '#fff',
               borderRadius: '999px',
               fontWeight: 600,
               fontSize: '.95rem',
               textDecoration: 'none',
               boxShadow: '0 4px 14px rgba(12, 28, 63, .35)',
-              transition: 'transform .2s, box-shadow .2s',
+              transition: 'transform .2s, box-shadow .2s, background .2s',
             }}
-            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(12, 28, 63, .45)'; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(12, 28, 63, .35)'; }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(12, 28, 63, .45)'; e.currentTarget.style.background = '#c5a150'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(12, 28, 63, .35)'; e.currentTarget.style.background = '#0c1c3f'; }}
           >
             <Download size={18} />
             Télécharger la fiche PDF
