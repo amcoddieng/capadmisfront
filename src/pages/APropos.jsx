@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { ArrowRight, Target, Cpu, BookOpen, Globe, Users, Shield, CheckCircle } from 'lucide-react';
+import { ArrowRight, Target, Cpu, BookOpen, Globe, Users, Shield, CheckCircle, Download } from 'lucide-react';
 import { getStartPath } from '../api/auth';
 import useAdvancedScroll from '../hooks/useAdvancedScroll';
 
@@ -89,12 +89,32 @@ export default function APropos() {
             </div>
           </div>
         </div>
-        {/* ajoutons un lien pour telecharger le fichier PDF */}
-        <p>
-          <a href="/fiche.pdf" download>
-            Telecharger le fichier PDF pour plus d'informations
+        {/* Lien de téléchargement du fichier PDF */}
+        <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+          <a
+            href="/fiche.pdf"
+            download
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '.6rem',
+              padding: '.85rem 1.5rem',
+              background: 'linear-gradient(135deg, #0c1c3f 0%, #c5a150 100%)',
+              color: '#fff',
+              borderRadius: '999px',
+              fontWeight: 600,
+              fontSize: '.95rem',
+              textDecoration: 'none',
+              boxShadow: '0 4px 14px rgba(12, 28, 63, .35)',
+              transition: 'transform .2s, box-shadow .2s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(12, 28, 63, .45)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(12, 28, 63, .35)'; }}
+          >
+            <Download size={18} />
+            Télécharger la fiche PDF
           </a>
-        </p>
+        </div>
       </section>
 
       {/* Services */}
