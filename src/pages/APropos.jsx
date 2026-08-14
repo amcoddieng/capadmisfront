@@ -28,8 +28,8 @@ const missionItems = [
 ];
 
 const missionStats = [
-  { value: '500+', label: 'Étudiants' },
-  { value: '95%',  label: 'Satisfaction' },
+//   { value: '500+', label: 'Étudiants' },
+  { value: '100%',  label: 'digital' },
   { value: '75+',    label: 'Universités publiques' },
   { value: '8',   label: 'Étapes' },
 ];

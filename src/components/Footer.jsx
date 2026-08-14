@@ -80,12 +80,12 @@ export default function Footer() {
             </li>
             <li>
               {/* mettre un sticker haha */}
-              le mode ne dort pas, nous non plus 🤩
+              Le monde ne dort pas, nous non plus 🤩
               <br />
               <span style={{fontSize:'0.8rem', color:'#666'}}>Disponible 24h/24 - 7j/7</span>
             </li>
           </ul>
-          <Link to={getStartPath()} className="footer__cta-btn">Commencer ma procédure</Link>
+          <Link to={getStartPath()} className="footer__cta-btn">Prendre rendez-vous</Link>
         </div>
       </div>
 

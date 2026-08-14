@@ -9,7 +9,7 @@ import logoNavbar from '../assets/les images du site/logo-navbar-dark - Copie.pn
 
 const navLinks = [
   { label: 'Accueil', path: '/', icon: Home },
-  { label: 'À propos', path: '/a-propos', icon: Info },
+  // { label: 'À propos', path: '/a-propos', icon: Info },
   { label: 'Procédure', path: '/procedure', icon: FileText },
   { label: 'Tarifs', path: '/tarifs', icon: CreditCard },
   { label: 'Pourquoi', path: '/pourquoi', icon: Star },

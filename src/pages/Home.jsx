@@ -107,13 +107,13 @@ const homePlans = [
     title: 'Visa étudiant',
     price: '49 900',
     description: 'Payable uniquement après votre admission universitaire.',
-    features: ['Constitution du dossier visa', 'Justificatifs et hébergement', 'Préparation à l’entretien', 'Suivi jusqu’au résultat'],
+    features: ['Constitution du dossier visa', 'Prise en charge et hébergement (accompagnement)', 'Préparation à l’entretien', 'Suivi jusqu’au résultat'],
   },
 ];
 
 const stats = [
-  { value: '500+', label: 'Étudiants accompagnés' },
-  { value: '95%',  label: 'Taux de satisfaction' },
+  // { value: '500+', label: 'Étudiants accompagnés' },
+  { value: '100%',  label: 'Digital' },
   { value: 'Pays couvert',    label: 'France' },
   { value: '39 900', label: 'FCFA pour démarrer' },
 ];
