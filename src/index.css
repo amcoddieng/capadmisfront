@@ -4510,3 +4510,22 @@ a { text-decoration: none; color: inherit; }
   [data-tilt] { transform: none !important; }
   [data-parallax] { transform: none !important; }
 }
+
+/* ===============================================
+   LEGAL PAGES (Confidentialité, CGU, Mentions légales)
+   =============================================== */
+.legal-content { display: flex; flex-direction: column; gap: 2.5rem; }
+.legal-section__title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #0c1c3f;
+  margin-bottom: .75rem;
+  padding-bottom: .5rem;
+  border-bottom: 2px solid #ead49f;
+}
+.legal-section__body { color: #475569; font-size: .98rem; line-height: 1.7; }
+.legal-section__body p { margin: 0 0 1rem; }
+.legal-section__body p:last-child { margin-bottom: 0; }
+.legal-section__body ul { margin: 0 0 1rem; padding-left: 1.25rem; display: flex; flex-direction: column; gap: .4rem; }
+.legal-section__body ul:last-child { margin-bottom: 0; }
+.legal-section__body a { color: #c5a150; font-weight: 600; text-decoration: underline; }

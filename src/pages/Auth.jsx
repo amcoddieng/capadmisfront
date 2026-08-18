@@ -356,8 +356,8 @@ export default function Auth() {
 
         <p className="auth-footer">
           En créant un compte, vous acceptez nos{' '}
-          <Link to="/contact">CGU</Link> et notre{' '}
-          <Link to="/contact">politique de confidentialité</Link>.
+          <Link to="/confidentialite">CGU</Link> et notre{' '}
+          <Link to="/confidentialite">politique de confidentialité</Link>.
         </p>
 
         <div className="auth-trust">

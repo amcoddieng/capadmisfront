@@ -10,6 +10,7 @@ import Pourquoi from './pages/Pourquoi';
 import Analyse from './pages/Analyse';
 import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
+import Confidentialite from './pages/Confidentialite';
 import Temoignages from './pages/Temoignages';
 import Auth from './pages/Auth';
 import { getSession, getPersonnelSession, initSession } from './api/auth';
@@ -92,6 +93,7 @@ function App() {
           <Route path="/faq" element={<Layout><FAQ /></Layout>} />
           <Route path="/temoignages" element={<Layout><Temoignages /></Layout>} />
           <Route path="/contact" element={<Layout><Contact /></Layout>} />
+          <Route path="/confidentialite" element={<Layout><Confidentialite /></Layout>} />
           <Route path="/connexion" element={<Auth />} />
           <Route path="/inscription" element={<Auth />} />
           <Route path="/dashboard" element={<PrivateRoute authReady={authReady}><DashboardStudent /></PrivateRoute>} />

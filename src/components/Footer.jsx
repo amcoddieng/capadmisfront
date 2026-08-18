@@ -93,8 +93,8 @@ export default function Footer() {
         <p>© {new Date().getFullYear()} capAdmis. Tous droits réservés.</p>
         <div className="footer__bottom-links">
           <a href="#" className="footer__bottom-link">Mentions légales</a>
-          <a href="#" className="footer__bottom-link">Confidentialité</a>
-          <a href="#" className="footer__bottom-link">CGU</a>
+          <Link to="/confidentialite" className="footer__bottom-link">Confidentialité</Link>
+          <a href="/confidentialite" className="footer__bottom-link">CGU</a>
         </div>
       </div>
     </footer>
