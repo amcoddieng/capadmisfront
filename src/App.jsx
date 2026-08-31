@@ -22,6 +22,8 @@ import DashboardSuperAdmin from './pages/DashboardSuperAdmin';
 import { MessageModalProvider } from './context/MessageModalContext';
 import ScrollToTop from './components/ScrollToTop';
 import NotFound from './pages/NotFound';
+import Blog from './pages/Blog';
+import BlogArticle from './pages/BlogArticle';
 
 /* ── Guards de route ── */
 function AuthLoading() {
@@ -94,6 +96,8 @@ function App() {
           <Route path="/temoignages" element={<Layout><Temoignages /></Layout>} />
           <Route path="/contact" element={<Layout><Contact /></Layout>} />
           <Route path="/confidentialite" element={<Layout><Confidentialite /></Layout>} />
+          <Route path="/blog" element={<Layout><Blog /></Layout>} />
+          <Route path="/blog/:slug" element={<Layout><BlogArticle /></Layout>} />
           <Route path="/connexion" element={<Auth />} />
           <Route path="/inscription" element={<Auth />} />
           <Route path="/dashboard" element={<PrivateRoute authReady={authReady}><DashboardStudent /></PrivateRoute>} />

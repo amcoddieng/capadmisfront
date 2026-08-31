@@ -9,6 +9,7 @@ const navLinks = [
   { label: 'Tarifs', path: '/tarifs' },
   { label: 'Pourquoi CapAdmis.', path: '/pourquoi' },
   { label: 'FAQ', path: '/faq' },
+  { label: 'Blog', path: '/blog' },
 ];
 
 const services = [
