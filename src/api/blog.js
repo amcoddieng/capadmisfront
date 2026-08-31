@@ -29,7 +29,7 @@ function toPost(block) {
 }
 
 export async function fetchPublished() {
-  const res = await fetch(`${BLOG_API}/blocks?status=published`);
+  const res = await fetch(`${BLOG_API}/blocks?status=published&project=capadmis`);
   if (!res.ok) throw new Error('Impossible de charger les articles');
   const blocks = await res.json();
   return blocks.map(toPost);
