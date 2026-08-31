@@ -27,7 +27,7 @@ const NAV_ITEMS = [
 ];
 
 const PAYS_LISTE       = ['Sénégal', 'Côte d\'Ivoire', 'Mali', 'Guinée', 'Cameroun', 'Maroc', 'Burkina Faso', 'Togo', 'Bénin', 'Niger', 'Autre'];
-const NIVEAUX_LISTE    = ['Bachelier avant ','Licence 1','Licence 1', 'Licence 2', 'Licence 3', 'Master 1', 'Master 2', 'Doctorat', 'BTS', 'DUT', 'Prépa', 'Autre'];
+const NIVEAUX_LISTE    = ['Bachelier ','Licence 1','Licence 1', 'Licence 2', 'Licence 3', 'Master 1', 'Master 2', 'Doctorat', 'BTS', 'DUT', 'Prépa', 'Autre'];
 const PAYS_CIBLE_LISTE = ['France','Allemagne','Autre'];
 
 const TYPES_PJ = {
