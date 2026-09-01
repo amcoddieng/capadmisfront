@@ -15,7 +15,7 @@ const navLinks = [
   { label: 'Pourquoi', path: '/pourquoi', icon: Star },
   // { label: 'Témoignages', path: '/temoignages', icon: Quote },
   // { label: 'FAQ', path: '/faq', icon: HelpCircle },
-  { label: 'Blog', path: '/blog', icon: BookOpen },
+  // { label: 'Blog', path: '/blog', icon: BookOpen },
   { label: 'Contact', path: '/contact', icon: Mail },
 ];
 
