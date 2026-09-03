@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle, AlertCircle } from 'lucide-react';
 import useAdvancedScroll from '../hooks/useAdvancedScroll';
@@ -12,7 +13,17 @@ const contactInfo = [
 ];
 
 export default function Contact() {
+  const location = useLocation();
   useAdvancedScroll();
+
+  useEffect(() => {
+    if (location.hash) {
+      const el = document.getElementById(location.hash.replace('#', ''));
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }, [location]);
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -90,7 +101,7 @@ export default function Contact() {
             </div>
 
             {/* Form */}
-            <div className="contact-form-card" data-reveal data-reveal-delay="200">
+            <div id="formulaire" className="contact-form-card" data-reveal data-reveal-delay="200">
               {sent ? (
                 <div className="contact-success">
                   <div className="contact-success__icon"><CheckCircle size={32} /></div>

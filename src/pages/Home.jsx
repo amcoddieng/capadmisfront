@@ -174,7 +174,7 @@ export default function Home() {
               <Link to={getStartPath()} className="btn btn--hero-primary">
                 Creer mon compte <ArrowRight size={18} />
               </Link>
-              <Link to="/contact" className="btn btn--hero-secondary">
+              <Link to="/contact#formulaire" className="btn btn--hero-secondary">
                 Poser une question
               </Link>
             </div>
