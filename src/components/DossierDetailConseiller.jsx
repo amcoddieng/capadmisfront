@@ -551,6 +551,14 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
                   </button>
                 </div>
               ))}
+              <div style={{background:'#f8fafc',borderRadius:'.5rem',padding:'.75rem',textAlign:'center'}}>
+                <div style={{fontSize:'.75rem',color:'#64748b',marginBottom:'.4rem',display:'flex',alignItems:'center',justifyContent:'center',gap:'.25rem'}}>
+                  <Calendar size={12} color="#64748b"/> Date de création
+                </div>
+                <div style={{fontSize:'.9rem',fontWeight:600,color:'#0f172a'}}>
+                  {dossier.createdAt ? new Date(dossier.createdAt).toLocaleDateString('fr-FR') : '—'}
+                </div>
+              </div>
             </div>
             <div style={{marginTop:'1rem',display:'flex',gap:'.5rem',flexWrap:'wrap'}}>
               {dossier.etudiant?.email && (
