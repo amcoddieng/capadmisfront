@@ -172,10 +172,10 @@ export default function Home() {
             <div className="hero__location"><MapPin size={16} /> {heroSlides[activeSlide].location}</div>
             <div className="hero__actions">
               <Link to={getStartPath()} className="btn btn--hero-primary">
-                Commencer mon projet <ArrowRight size={18} />
+                creer mon compte <ArrowRight size={18} />
               </Link>
-              <Link to="/analyse" className="btn btn--hero-secondary">
-                Analyser mes chances
+              <Link to="/contact" className="btn btn--hero-secondary">
+                poser une question
               </Link>
             </div>
             <div className="hero__reassurance">
@@ -370,6 +370,47 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── WhatsApp flottant ── */}
+      <a
+        href="https://wa.me/221767675858?text=Bonjour%20CapAdmis%2C%20j'aimerais%20avoir%20des%20informations."
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Envoyer un message WhatsApp"
+        style={{
+          position: 'fixed',
+          bottom: '1.5rem',
+          right: '1.5rem',
+          zIndex: 9999,
+          width: '3.5rem',
+          height: '3.5rem',
+          borderRadius: '50%',
+          backgroundColor: '#25D366',
+          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 4px 12px rgba(37, 211, 102, 0.35)',
+          transition: 'transform .2s ease, box-shadow .2s ease',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'scale(1.08)';
+          e.currentTarget.style.boxShadow = '0 6px 18px rgba(37, 211, 102, 0.45)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1)';
+          e.currentTarget.style.boxShadow = '0 4px 12px rgba(37, 211, 102, 0.35)';
+        }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.009-.57-.009-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 9.403h-.004c-1.535-.057-3.05-.45-4.382-1.147l-.315-.157-3.27.858 1.253-3.19-.198-.315a9.724 9.724 0 0 1-1.46-5.2c.083-2.613 1.166-5.084 3.045-6.952A9.688 9.688 0 0 1 12.001 2c2.614 0 5.07 1.016 6.92 2.86a9.686 9.686 0 0 1 2.854 6.946c-.084 2.613-1.167 5.084-3.046 6.953-1.879 1.868-4.335 2.884-6.949 2.884l-.408-.008h-.001zm.058-21.572C9.017 2.224 6.58 3.35 4.517 5.4A11.874 11.874 0 0 0 1.27 14.19c.062 2.068.612 4.074 1.588 5.827L0 24l4.885-1.282a11.875 11.875 0 0 0 5.698 1.456c3.234.054 6.27-1.19 8.54-3.456a11.868 11.868 0 0 0 3.45-8.443c-.06-3.18-1.274-6.173-3.416-8.34A11.892 11.892 0 0 0 12.048.213z" />
+        </svg>
+      </a>
     </main>
   );
 }
