@@ -172,10 +172,10 @@ export default function Home() {
             <div className="hero__location"><MapPin size={16} /> {heroSlides[activeSlide].location}</div>
             <div className="hero__actions">
               <Link to={getStartPath()} className="btn btn--hero-primary">
-                creer mon compte <ArrowRight size={18} />
+                Creer mon compte <ArrowRight size={18} />
               </Link>
               <Link to="/contact" className="btn btn--hero-secondary">
-                poser une question
+                Poser une question
               </Link>
             </div>
             <div className="hero__reassurance">
