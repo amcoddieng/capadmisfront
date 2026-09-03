@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { X, Loader, AlertCircle, Send, Pencil, Eye, User, FolderOpen, CheckCircle, Upload, MessageSquare, Mail, MapPin, Globe, BookOpen, FileText, Calendar, Shield, Award, School, Trash2, Plus, Download } from 'lucide-react';
+import { X, Loader, AlertCircle, Send, Pencil, Eye, User, FolderOpen, CheckCircle, Upload, MessageSquare, Mail, MapPin, Phone, Globe, BookOpen, FileText, Calendar, Shield, Award, School, Trash2, Plus, Download } from 'lucide-react';
 import { apiGetInfosDossier, apiListPiecesJointes, apiGetPieceJointeUrl, apiUpdateDossierStatus, apiAddPieceJointe, apiUpdatePieceJointeStatus, apiPutInfosDossier, apiListDossiersUniversite, apiListDossiersUniversiteByDossier, apiCreateDossierUniversite, apiUpdateDossierUniversite, apiDeleteDossierUniversite } from '../api/auth';
 import { useMessageModal } from '../context/MessageModalContext';
 
@@ -524,6 +524,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
                 <span style={{display:'flex',alignItems:'center',gap:'.25rem'}}><Mail size={12}/> {dossier.etudiant?.email}</span>
                 <span style={{display:'flex',alignItems:'center',gap:'.25rem'}}><MapPin size={12}/> {dossier.etudiant?.ville || '—'} — {dossier.etudiant?.payes || '—'}</span>
                 <span style={{display:'flex',alignItems:'center',gap:'.25rem'}}><User size={12}/> Lieu de naissance: {dossier.etudiant?.lieu_de_naissance || '—'}</span>
+                <span style={{display:'flex',alignItems:'center',gap:'.25rem'}}><Phone size={12}/> Tuteur: {dossier.etudiant?.numero_tuteur || '—'}</span>
                 {/* bien formater la date de naissance */}
                 <span style={{display:'flex',alignItems:'center',gap:'.25rem'}}><Calendar size={12}/> Date de naissance: {dossier.etudiant?.date_de_naissance ? new Date(dossier.etudiant.date_de_naissance).toLocaleDateString('fr-FR') : '—'}</span>
               </div>

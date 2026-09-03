@@ -166,6 +166,10 @@ function PageInfos({ token, onVoirDossier }) {
             <span className="info-field__value">{profil.telephone || '—'}</span>
           </div>
           <div className="info-field">
+            <span className="info-field__label">Numéro du tuteur</span>
+            <span className="info-field__value">{profil.numero_tuteur || '—'}</span>
+          </div>
+          <div className="info-field">
             <span className="info-field__label">Date de naissance</span>
             <span className="info-field__value">{formatDate(profil.date_de_naissance)}</span>
           </div>
@@ -215,6 +219,7 @@ function ModalInfos({ token, profil, onClose, onSuccess }) {
     prenom:            profil.prenom || '',
     nom:               profil.nom || '',
     telephone:         profil.telephone || '',
+    numero_tuteur:     profil.numero_tuteur || '',
     sexe:              profil.sexe || '',
     payes:             profil.payes || '',
     ville:             profil.ville || '',
@@ -279,6 +284,15 @@ function ModalInfos({ token, profil, onClose, onSuccess }) {
                   type="tel" className="form-input"
                   value={form.telephone} onChange={e => set('telephone', e.target.value)}
                   placeholder="Ex: +221 77 123 45 67"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Numéro du tuteur</label>
+                <input
+                  type="tel" className="form-input"
+                  value={form.numero_tuteur} onChange={e => set('numero_tuteur', e.target.value)}
+                  placeholder="Ex: +221 77 000 00 00"
                 />
               </div>
 

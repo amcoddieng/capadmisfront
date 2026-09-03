@@ -47,7 +47,7 @@ export default function Auth() {
   }, []);
 
   const [form, setForm] = useState({
-    prenom: '', nom: '', email: '', mdp: '', telephone: '',
+    prenom: '', nom: '', email: '', mdp: '', telephone: '', numero_tuteur: '',
     sexe: '', payes: '', ville: '',
     date_de_naissance: '', lieu_de_naissance: '',
   });
@@ -82,6 +82,7 @@ export default function Auth() {
         email:             form.email,
         mdp:               form.mdp,
         telephone:         form.telephone,
+        numero_tuteur:     form.numero_tuteur,
         sexe:              form.sexe,
         ville:             form.ville,
         payes:             form.payes,
@@ -264,6 +265,15 @@ export default function Auth() {
                         required type="tel" className="form-input"
                         value={form.telephone} onChange={e => set('telephone', e.target.value)}
                         placeholder="Ex: +221 77 123 45 67"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">Numéro du tuteur</label>
+                      <input
+                        type="tel" className="form-input"
+                        value={form.numero_tuteur} onChange={e => set('numero_tuteur', e.target.value)}
+                        placeholder="Ex: +221 77 000 00 00"
                       />
                     </div>
 
