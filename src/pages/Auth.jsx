@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import WhatsAppFloat from '../components/WhatsAppFloat';
 import { Helmet } from 'react-helmet-async';
 import { Eye, EyeOff, ArrowRight, CheckCircle, AlertCircle, Loader, GraduationCap, MapPin, Shield } from 'lucide-react';
 import { apiLogin, apiRegister, apiGetDossier, saveSession } from '../api/auth';
@@ -29,6 +30,7 @@ const authSlides = [
 const paysOrigine = ['Sénégal', 'Côte d\'Ivoire', 'Mali', 'Guinée', 'Cameroun', 'Maroc', 'Burkina Faso', 'Togo', 'Bénin', 'Niger', 'Autre'];
 
 export default function Auth() {
+  const location = useLocation();
   const navigate = useNavigate();
   const [mode, setMode]       = useState('login');
   const [showPwd, setShowPwd] = useState(false);
@@ -366,6 +368,7 @@ export default function Auth() {
         </div>
         </div>
       </div>
+      {location.pathname === '/inscription' && <WhatsAppFloat />}
     </div>
   );
 }

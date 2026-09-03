@@ -21,6 +21,7 @@ import DashboardConseiller from './pages/DashboardConseiller';
 import DashboardSuperAdmin from './pages/DashboardSuperAdmin';
 import { MessageModalProvider } from './context/MessageModalContext';
 import ScrollToTop from './components/ScrollToTop';
+import WhatsAppFloat from './components/WhatsAppFloat';
 import NotFound from './pages/NotFound';
 import Blog from './pages/Blog';
 import BlogArticle from './pages/BlogArticle';
@@ -70,6 +71,7 @@ function Layout({ children }) {
         {children}
       </div>
       {!isAuthPage && <Footer />}
+      {!isAuthPage && <WhatsAppFloat />}
     </div>
   );
 }
