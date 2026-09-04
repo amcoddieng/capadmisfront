@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
 import {
   LogOut, LayoutDashboard, FolderOpen, Users, UserCheck,
   History, MessageSquare, Bell, Menu, X, CreditCard, Plus, Pencil, Clock,
   Trash2, Lock, Unlock, Loader, AlertCircle, CheckCircle, Send, Eye, Award, Globe,
-  AlertTriangle, Check, XCircle, School, Mail,
+  AlertTriangle, Check, XCircle, School, Mail, Download,
 } from 'lucide-react';
 import logoHeader from '../assets/les images du site/logo-horizontal-2x.png';
 import DossierDetailConseiller from '../components/DossierDetailConseiller';
@@ -379,6 +380,7 @@ function ModalEtudiant({ token, etudiant, onClose, onSuccess }) {
 function PageEtudiants({ token, personnel }) {
   const { openMessageModal } = useMessageModal();
   const [etudiants, setEtudiants] = useState([]);
+  const [dossiers, setDossiers]   = useState([]);
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState('');
   const [actionErr, setActionErr] = useState('');
@@ -389,9 +391,18 @@ function PageEtudiants({ token, personnel }) {
   const [filterStatut, setFilterStatut] = useState('');
   const [detailDossier, setDetailDossier] = useState(null);
   const [loadingDossier, setLoadingDossier] = useState(false);
+  const [selected, setSelected]   = useState(new Set());
   const fetch = useCallback(async () => {
     setLoading(true); setError('');
-    try { setEtudiants(await apiListEtudiants(token)); } catch (e) { setError(e.message); } finally { setLoading(false); }
+    try {
+      const [etudiantsData, dossiersData] = await Promise.all([
+        apiListEtudiants(token),
+        apiListDossiers(token),
+      ]);
+      setEtudiants(etudiantsData);
+      setDossiers(dossiersData);
+    } catch (e) { setError(e.message); }
+    finally { setLoading(false); }
   }, [token]);
   useEffect(() => { fetch(); }, [fetch]);
 
@@ -427,11 +438,77 @@ function PageEtudiants({ token, personnel }) {
     setDeleting(id); setActionErr('');
     try { await apiDeleteEtudiant(token, id); await fetch(); } catch (e) { setActionErr(e.message); } finally { setDeleting(null); }
   };
+
+  const allFilteredSelected = filtered.length > 0 && filtered.every(e => selected.has(e.id));
+  const someFilteredSelected = filtered.some(e => selected.has(e.id)) && !allFilteredSelected;
+  const toggleSelectAll = () => {
+    const next = new Set(selected);
+    if (allFilteredSelected) filtered.forEach(e => next.delete(e.id));
+    else filtered.forEach(e => next.add(e.id));
+    setSelected(next);
+  };
+  const toggleSelect = (id) => {
+    const next = new Set(selected);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setSelected(next);
+  };
+  const handleExportExcel = () => {
+    if (selected.size === 0) {
+      alert('Veuillez sélectionner au moins un étudiant.');
+      return;
+    }
+    const selectedEtudiants = etudiants.filter(e => selected.has(e.id));
+    const rows = selectedEtudiants.map(e => {
+      const d = dossiers.find(ds => ds.etudiant?.id === e.id || ds.etudiant?.email === e.email);
+      const infos = d?.infos_dossier;
+      return {
+        'ID': e.id,
+        'Prénom': e.prenom,
+        'Nom': e.nom,
+        'Email': e.email,
+        'Téléphone': e.telephone || '',
+        'Numéro tuteur': e.numero_tuteur || '',
+        'Sexe': e.sexe || '',
+        'Ville': e.ville || '',
+        'Pays': e.payes || '',
+        'Lieu de naissance': e.lieu_de_naissance || '',
+        'Date de naissance': e.date_de_naissance ? new Date(e.date_de_naissance).toLocaleDateString('fr-FR') : '',
+        'Statut compte': e.bloque ? 'Bloqué' : 'Actif',
+        'Date création compte': e.createdAt ? new Date(e.createdAt).toLocaleDateString('fr-FR') : '',
+        'Code dossier': d?.code_dossier || '',
+        'Statut dossier': d?.status || '',
+        'Statut admission': d?.status_admission || '',
+        'Statut visa': d?.status_visa || '',
+        'Paiement': infos?.paiement ? 'Payé' : 'Non payé',
+        'Conseiller admission': d?.conseiller_admission ? `${d.conseiller_admission.prenom} ${d.conseiller_admission.nom}` : '',
+        'Conseiller visa': d?.conseiller_visa ? `${d.conseiller_visa.prenom} ${d.conseiller_visa.nom}` : '',
+        'Date création dossier': d?.createdAt ? new Date(d.createdAt).toLocaleDateString('fr-FR') : '',
+        'Date mise à jour dossier': d?.updatedAt ? new Date(d.updatedAt).toLocaleDateString('fr-FR') : '',
+      };
+    });
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Étudiants');
+    XLSX.writeFile(wb, `etudiants_${new Date().toISOString().slice(0, 10)}_${selected.size}.xlsx`);
+  };
+
   return (
     <div className="cons-page">
       <div className="sa-page-header">
         <h2 className="cons-page__title" style={{margin:0}}>Gestion étudiants</h2>
-        <button className="form-submit" style={{padding:'.4rem .875rem'}} onClick={() => setModal(null)}><Plus size={14}/> Ajouter</button>
+        <div style={{ display: 'flex', gap: '.5rem' }}>
+          <button
+            className="form-submit"
+            style={{ padding: '.4rem .875rem', background: '#15803d' }}
+            onClick={handleExportExcel}
+            disabled={selected.size === 0}
+            title={selected.size === 0 ? 'Sélectionnez au moins un étudiant' : `Exporter ${selected.size} étudiant(s)`}
+          >
+            <Download size={14}/> Exporter Excel ({selected.size})
+          </button>
+          <button className="form-submit" style={{padding:'.4rem .875rem'}} onClick={() => setModal(null)}><Plus size={14}/> Ajouter</button>
+        </div>
       </div>
       <p className="cons-page__sub">{filtered.length} étudiant(s) sur {etudiants.length} enregistré(s).</p>
 
@@ -455,11 +532,12 @@ function PageEtudiants({ token, personnel }) {
       <TableWrap loading={loading} error={error}>
         <div className="sa-table-wrap">
           <table className="sa-table">
-            <thead><tr><th>Prénom</th><th>Nom</th><th>Email</th><th>Téléphone</th><th>Tuteur</th><th>Ville</th><th>Pays</th><th>Statut</th><th>Actions</th></tr></thead>
+            <thead><tr><th><input type="checkbox" checked={allFilteredSelected} ref={el => el && (el.indeterminate = someFilteredSelected)} onChange={toggleSelectAll} aria-label="Tout sélectionner" /></th><th>Prénom</th><th>Nom</th><th>Email</th><th>Téléphone</th><th>Tuteur</th><th>Ville</th><th>Pays</th><th>Statut</th><th>Actions</th></tr></thead>
             <tbody>
-              {filtered.length === 0 && <tr><td colSpan={9} className="sa-empty">Aucun étudiant trouvé</td></tr>}
+              {filtered.length === 0 && <tr><td colSpan={10} className="sa-empty">Aucun étudiant trouvé</td></tr>}
               {filtered.map(e => (
                 <tr key={e.id}>
+                  <td><input type="checkbox" checked={selected.has(e.id)} onChange={() => toggleSelect(e.id)} aria-label={`Sélectionner ${e.prenom} ${e.nom}`} /></td>
                   <td>{e.prenom}</td><td>{e.nom}</td>
                   <td style={{fontSize:'.8rem'}}>{e.email}</td>
                   <td style={{fontSize:'.8rem'}}>{e.telephone || '—'}</td>
