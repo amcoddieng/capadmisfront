@@ -834,6 +834,9 @@ function ModalUploadPJ({ token, codeDossier, piece, onClose, onSuccess }) {
     e.preventDefault();
     if (!file) { setError('Veuillez sélectionner un fichier.'); return; }
     if (file.size > 10 * 1024 * 1024) { setError('Le fichier ne doit pas dépasser 10 Mo.'); return; }
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    const allowed = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp'];
+    if (!ext || !allowed.includes(ext)) { setError('Le fichier doit être un PDF ou une image (jpg, png, gif, webp).'); return; }
     setSaving(true);
     setError('');
     try {
@@ -906,7 +909,7 @@ function ModalUploadPJ({ token, codeDossier, piece, onClose, onSuccess }) {
                   <input
                     type="file"
                     className="pj-upload__input"
-                    accept=".pdf,.jpg,.jpeg,.png,.gif,.webp"
+                    accept="application/pdf,image/*"
                     onChange={e => { setFile(e.target.files[0] || null); setError(''); }}
                   />
                 </label>
