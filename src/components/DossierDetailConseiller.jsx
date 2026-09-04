@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Loader, AlertCircle, Send, Pencil, Eye, User, FolderOpen, CheckCircle, Upload, MessageSquare, Mail, MapPin, Phone, Globe, BookOpen, FileText, Calendar, Shield, Award, School, Trash2, Plus, Download } from 'lucide-react';
-import { apiGetInfosDossier, apiListPiecesJointes, apiGetPieceJointeUrl, apiUpdateDossierStatus, apiAddPieceJointe, apiUpdatePieceJointeStatus, apiPutInfosDossier, apiListDossiersUniversite, apiListDossiersUniversiteByDossier, apiCreateDossierUniversite, apiUpdateDossierUniversite, apiDeleteDossierUniversite } from '../api/auth';
+import { apiGetInfosDossier, apiListPiecesJointes, apiGetPieceJointeUrl, apiUpdateDossierStatus, apiAddPieceJointe, apiUpdatePieceJointeStatus, apiDeletePieceJointe, apiPutInfosDossier, apiListDossiersUniversite, apiListDossiersUniversiteByDossier, apiCreateDossierUniversite, apiUpdateDossierUniversite, apiDeleteDossierUniversite } from '../api/auth';
 import { useMessageModal } from '../context/MessageModalContext';
 
 const DOSSIER_STATUS_OPTIONS = ['EN_COURS_D_ETUDE','VALIDE','CHANGEMENT_A_APPORTER'];
@@ -392,6 +392,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
   const [preview, setPreview] = useState(null);
   const [previewLoading, setPreviewLoading] = useState(null);
   const [infosModal, setInfosModal] = useState(false);
+  const [deletingPj, setDeletingPj] = useState(null);
   const fileInputRef = useRef(null);
 
   const fetchDetails = useCallback(async () => {
@@ -459,6 +460,17 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
       setPieces(prev => prev.map(p => p.id === id ? { ...p, status: oldStatus } : p));
       alert(err.message);
     } finally { setUpdatingPj(null); }
+  };
+
+  const handleDeletePieceJointe = async (piece) => {
+    if (!window.confirm(`Supprimer définitivement la pièce jointe "${piece.type || piece.nom}" ?\n\nCette action est irréversible.`)) return;
+    setDeletingPj(piece.id);
+    try {
+      await apiDeletePieceJointe(token, piece.id);
+      setPieces(prev => prev.filter(p => p.id !== piece.id));
+    } catch (err) {
+      alert(err.message || 'Erreur lors de la suppression');
+    } finally { setDeletingPj(null); }
   };
 
   const handleUpdateInfosStatus = async (newStatus) => {
@@ -664,6 +676,16 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
                     <button style={{...btnPrimary,padding:'.35rem .6rem'}} onClick={() => handlePreview(p)} disabled={previewLoading === p.id} title="Voir">
                       {previewLoading === p.id ? <Loader size={14} className="auth-spinner"/> : <Eye size={14}/>}
                     </button>
+                    {isAdmin && (
+                      <button
+                        style={{...btnGhost,padding:'.35rem .6rem',color:'#dc2626',borderColor:'#fecaca'}}
+                        onClick={() => handleDeletePieceJointe(p)}
+                        disabled={deletingPj === p.id}
+                        title="Supprimer"
+                      >
+                        {deletingPj === p.id ? <Loader size={14} className="auth-spinner"/> : <Trash2 size={14}/>}
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
