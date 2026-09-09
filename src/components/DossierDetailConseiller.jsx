@@ -536,6 +536,8 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
                 <span style={{display:'flex',alignItems:'center',gap:'.25rem'}}><Mail size={12}/> {dossier.etudiant?.email}</span>
                 <span style={{display:'flex',alignItems:'center',gap:'.25rem'}}><MapPin size={12}/> {dossier.etudiant?.ville || '—'} — {dossier.etudiant?.payes || '—'}</span>
                 <span style={{display:'flex',alignItems:'center',gap:'.25rem'}}><User size={12}/> Lieu de naissance: {dossier.etudiant?.lieu_de_naissance || '—'}</span>
+                {/* afficher son numero aussi */}
+                <span style={{display:'flex',alignItems:'center',gap:'.25rem'}}><Phone size={12}/> Numéro: {dossier.etudiant?.telephone || '—'}</span>
                 <span style={{display:'flex',alignItems:'center',gap:'.25rem'}}><Phone size={12}/> Tuteur: {dossier.etudiant?.numero_tuteur || '—'}</span>
                 {/* bien formater la date de naissance */}
                 <span style={{display:'flex',alignItems:'center',gap:'.25rem'}}><Calendar size={12}/> Date de naissance: {dossier.etudiant?.date_de_naissance ? new Date(dossier.etudiant.date_de_naissance).toLocaleDateString('fr-FR') : '—'}</span>
