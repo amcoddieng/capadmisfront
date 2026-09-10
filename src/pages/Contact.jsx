@@ -7,7 +7,7 @@ import { apiContacterMoi } from '../api/auth';
 
 const contactInfo = [
   { icon: <MapPin className="w-5 h-5 text-blue-600" />, label: 'Adresse', value: 'Dakar, Sénégal' },
-  { icon: <Phone className="w-5 h-5 text-blue-600" />, label: 'Téléphone / WhatsApp', value: '+221 76 948 60 60' },
+  { icon: <Phone className="w-5 h-5 text-blue-600" />, label: 'Téléphone / WhatsApp', value: '+221 76 317 17 86' },
   { icon: <Mail className="w-5 h-5 text-blue-600" />, label: 'Email', value: 'contact@capadmis.com' },
   { icon: <Clock className="w-5 h-5 text-blue-600" />, label: 'Disponibilité', value: 'Lun–Sam, 8h–20h' },
 ];
