@@ -1,10 +1,13 @@
-const API_URL = import.meta.env.VITE_API_URL ?? (import.meta.env.PROD);
+const API_URL = import.meta.env.VITE_API_URL;
 const BASE = API_URL ? `${API_URL.replace(/\/$/, '')}/api` : '/api';
 // const BASE = 'http://localhost:3000/api';
 
-/* ── In-memory token store (never in localStorage) ── */
+/* ── In-memory token & user store (never in localStorage) ── */
 let _studentToken = null;
+let _studentData = null;
+let _studentDossierCode = null;
 let _personnelToken = null;
+let _personnelData = null;
 
 export function setStudentToken(t) { _studentToken = t; }
 export function getStudentToken() { return _studentToken; }
@@ -278,21 +281,18 @@ export async function apiModifierMdpCode(email, code, nouveau_mdp) {
 
 export function saveSession(token, etudiant, codeDossier) {
   _studentToken = token;
-  localStorage.setItem('cap_etudiant', JSON.stringify(etudiant));
-  localStorage.setItem('cap_code_dossier', codeDossier || '');
+  _studentData = etudiant || null;
+  _studentDossierCode = codeDossier || null;
 }
 
 export function clearSession() {
   _studentToken = null;
-  localStorage.removeItem('cap_token');
-  localStorage.removeItem('cap_etudiant');
-  localStorage.removeItem('cap_code_dossier');
+  _studentData = null;
+  _studentDossierCode = null;
 }
 
 export function getSession() {
-  const etudiant = JSON.parse(localStorage.getItem('cap_etudiant') || 'null');
-  const codeDossier = localStorage.getItem('cap_code_dossier') || '';
-  return { token: _studentToken, etudiant, codeDossier };
+  return { token: _studentToken, etudiant: _studentData, codeDossier: _studentDossierCode };
 }
 
 export function getStartPath() {
@@ -313,18 +313,16 @@ export async function apiPersonnelLogin(email, mdp) {
 
 export function savePersonnelSession(token, personnel) {
   _personnelToken = token;
-  localStorage.setItem('cap_personnel', JSON.stringify(personnel));
+  _personnelData = personnel || null;
 }
 
 export function clearPersonnelSession() {
   _personnelToken = null;
-  localStorage.removeItem('cap_personnel_token');
-  localStorage.removeItem('cap_personnel');
+  _personnelData = null;
 }
 
 export function getPersonnelSession() {
-  const personnel = JSON.parse(localStorage.getItem('cap_personnel') || 'null');
-  return { token: _personnelToken, personnel };
+  return { token: _personnelToken, personnel: _personnelData };
 }
 
 /* ── Gestion Personnel ── */
@@ -597,17 +595,25 @@ export async function apiRefresh() {
   if (!res.ok) throw new Error(data.message || 'Session expirée');
   if (data.userType === 'personnel') {
     _personnelToken = data.accessToken;
+    _personnelData = data.personnel || null;
   } else {
     _studentToken = data.accessToken;
+    _studentData = data.etudiant || null;
   }
   return data;
 }
 
 export async function initSession() {
-  localStorage.removeItem('cap_token');
-  localStorage.removeItem('cap_personnel_token');
   try {
     await apiRefresh();
+    if (_studentToken && !_studentDossierCode) {
+      try {
+        const dossier = await apiGetDossier(_studentToken);
+        _studentDossierCode = dossier?.code_dossier || null;
+      } catch (_) {
+        /* pas de dossier, ce n'est pas bloquant */
+      }
+    }
   } catch (_) {
     /* pas de session active, c'est normal */
   }

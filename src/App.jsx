@@ -22,6 +22,7 @@ import DashboardSuperAdmin from './pages/DashboardSuperAdmin';
 import { MessageModalProvider } from './context/MessageModalContext';
 import ScrollToTop from './components/ScrollToTop';
 import WhatsAppFloat from './components/WhatsAppFloat';
+import CookieBanner from './components/CookieBanner';
 import NotFound from './pages/NotFound';
 import Blog from './pages/Blog';
 import BlogArticle from './pages/BlogArticle';
@@ -111,6 +112,7 @@ function App() {
           <Route path="/dashboard/conseiller-visa" element={<PrivatePersonnelRoute authReady={authReady} roles={['visa']}><DashboardConseiller /></PrivatePersonnelRoute>} />
           <Route path="*" element={<Layout><NotFound /></Layout>} />
         </Routes>
+        <CookieBanner />
       </MessageModalProvider>
     </BrowserRouter>
   );
