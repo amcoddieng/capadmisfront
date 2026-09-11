@@ -3,13 +3,14 @@ import { X, Loader, AlertCircle, Send, Pencil, Eye, User, FolderOpen, CheckCircl
 import { apiGetInfosDossier, apiListPiecesJointes, apiGetPieceJointeUrl, apiUpdateDossierStatus, apiAddPieceJointe, apiUpdatePieceJointeStatus, apiDeletePieceJointe, apiPutInfosDossier, apiListDossiersUniversite, apiListDossiersUniversiteByDossier, apiCreateDossierUniversite, apiUpdateDossierUniversite, apiDeleteDossierUniversite } from '../api/auth';
 import { useMessageModal } from '../context/MessageModalContext';
 
-const DOSSIER_STATUS_OPTIONS = ['non_demarre','EN_COURS_D_ETUDE','VALIDE','CHANGEMENT_A_APPORTER'];
+const DOSSIER_STATUS_OPTIONS = ['non_demarre','EN_COURS_D_ETUDE','VALIDE','CHANGEMENT_A_APPORTER','DOCUMENT_MANQUANT'];
 const STATUS_ADM_OPTIONS  = ['ADMISSION_EN_COURS','ADMISSION_VALIDE','ADMISSION_INVALIDE'];
 const STATUS_VISA_OPTIONS = ['DEMANDE_VISA_EN_COURS','DEMANDE_VISA_VALIDE','DEMANDE_VISA_INVALIDE'];
 
 const STATUS_LABELS = {
   non_demarre:'Non démarré', EN_COURS_D_ETUDE:'En cours d\'étude', VALIDE:'Validé',
   INVALIDE:'Invalide', EN_ATTENTE:'En attente', CHANGEMENT_A_APPORTER:'Changement requis',
+  DOCUMENT_MANQUANT:'Document manquant',
   ADMISSION_EN_COURS:'Admission en cours', ADMISSION_VALIDE:'Admission validée', ADMISSION_INVALIDE:'Admission invalidée',
   DEMANDE_VISA_EN_COURS:'Visa en cours', DEMANDE_VISA_VALIDE:'Visa validé', DEMANDE_VISA_INVALIDE:'Visa invalidé',
 };
@@ -18,7 +19,7 @@ function StatusBadge({ value, size = 'sm' }) {
   if (!value) return <span style={{ color:'#94a3b8' }}>—</span>;
   const green=['VALIDE','ADMISSION_VALIDE','DEMANDE_VISA_VALIDE'];
   const red=['INVALIDE','ADMISSION_INVALIDE','DEMANDE_VISA_INVALIDE'];
-  const orange=['EN_ATTENTE','CHANGEMENT_A_APPORTER'];
+  const orange=['EN_ATTENTE','CHANGEMENT_A_APPORTER','DOCUMENT_MANQUANT'];
   const grey=['non_demarre'];
   const c = green.includes(value)?'green':red.includes(value)?'red':orange.includes(value)?'orange':grey.includes(value)?'grey':'blue';
   const colors = {
@@ -26,6 +27,7 @@ function StatusBadge({ value, size = 'sm' }) {
     red:   { bg: '#fee2e2', text: '#991b1b', border: '#fecaca' },
     orange:{ bg: '#ffedd5', text: '#9a3412', border: '#fed7aa' },
     blue:  { bg: '#f5f0e4', text: '#0c1c3f', border: '#efe3cb' },
+    grey:  { bg: '#f1f5f9', text: '#475569', border: '#e2e8f0' },
   };
   const style = colors[c];
   const padding = size === 'lg' ? '.5rem 1rem' : '.2rem .55rem';

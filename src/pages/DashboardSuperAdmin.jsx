@@ -48,12 +48,13 @@ const ROLES_PERSONNEL = [
 ];
 const ROLE_LABELS_PERS = { admin: 'Admin', conseiller_admission: 'Cons. Admission', conseiller_visa: 'Cons. Visa' };
 
-const STATUS_OPTIONS      = ['non_demarre','EN_COURS_D_ETUDE','VALIDE','CHANGEMENT_A_APPORTER'];
+const STATUS_OPTIONS      = ['non_demarre','EN_COURS_D_ETUDE','VALIDE','CHANGEMENT_A_APPORTER','DOCUMENT_MANQUANT'];
 const STATUS_ADM_OPTIONS  = ['ADMISSION_EN_COURS','ADMISSION_VALIDE','ADMISSION_INVALIDE'];
 const STATUS_VISA_OPTIONS = ['DEMANDE_VISA_EN_COURS','DEMANDE_VISA_VALIDE','DEMANDE_VISA_INVALIDE'];
 const STATUS_LABELS = {
   non_demarre:'Non démarré', EN_COURS_D_ETUDE:'En cours d’étude', VALIDE:'Validé',
-  CHANGEMENT_A_APPORTER:'Changement requis', INVALIDE:'Invalide', EN_ATTENTE:'En attente',
+  CHANGEMENT_A_APPORTER:'Changement requis', DOCUMENT_MANQUANT:'Document manquant',
+  INVALIDE:'Invalide', EN_ATTENTE:'En attente',
   ADMISSION_EN_COURS:'Admission en cours', ADMISSION_VALIDE:'Admission validée', ADMISSION_INVALIDE:'Admission invalidée',
   DEMANDE_VISA_EN_COURS:'Visa en cours', DEMANDE_VISA_VALIDE:'Visa validé', DEMANDE_VISA_INVALIDE:'Visa invalidé',
 };
@@ -61,7 +62,7 @@ function StatusBadge({ value }) {
   if (!value) return <span style={{ color:'#94a3b8' }}>—</span>;
   const green=['VALIDE','ADMISSION_VALIDE','DEMANDE_VISA_VALIDE'];
   const red=['INVALIDE','ADMISSION_INVALIDE','DEMANDE_VISA_INVALIDE'];
-  const orange=['EN_ATTENTE','CHANGEMENT_A_APPORTER'];
+  const orange=['EN_ATTENTE','CHANGEMENT_A_APPORTER','DOCUMENT_MANQUANT'];
   const grey=['non_demarre'];
   const c = green.includes(value)?'green':red.includes(value)?'red':orange.includes(value)?'orange':grey.includes(value)?'grey':'blue';
   return <span className={`status-badge status-badge--${c}`}>{STATUS_LABELS[value]||value}</span>;
