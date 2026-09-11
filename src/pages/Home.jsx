@@ -142,12 +142,12 @@ export default function Home() {
   return (
     <main className="home-page">
       <Helmet>
-        <title>CapAdmis | Études en France, Campus France et études à l'étranger</title>
-        <meta name="description" content="CapAdmis accompagne les étudiants dans leurs études en France et à l'étranger : orientation, admission universitaire, procédure Campus France, visa étudiant et suivi personnalisé. Commencez votre projet d'études en France dès aujourd'hui." />
-        <meta name="keywords" content="études en France, etude en france, études à l'étranger, etude a l'etranger, Campus France, visa étudiant, admission université France, accompagnement étudiant, étudier en France, procédure Campus France" />
+        <title>CapAdmis | Accompagnement Études en France depuis le Sénégal & Afrique</title>
+        <meta name="description" content="CapAdmis accompagne les étudiants africains pour étudier en France : procédure Campus France Sénégal, admission universitaire, visa étudiant France, logement et suivi personnalisé." />
+        <meta name="keywords" content="études en France, étudier en France depuis le Sénégal, accompagnement études France Afrique, procédure Campus France Sénégal, visa étudiant France Sénégal, admission université France, Campus France Dakar, étudier en France Côte d'Ivoire, Mali, Guinée, Cameroun" />
         <link rel="canonical" href="https://capadmis.com/" />
         <link rel="preload" as="image" href={heroSlides[0].image} fetchpriority="high" />
-        <meta property="og:title" content="CapAdmis | Études en France et à l'étranger — Accompagnement complet" />
+        <meta property="og:title" content="CapAdmis | Accompagnement Études en France depuis le Sénégal & Afrique" />
         <meta property="og:description" content="Orientation, admission universitaire, procédure Campus France et visa étudiant. Capadmis vous accompagne pour étudier en France et à l'étranger." />
       </Helmet>
 
@@ -263,7 +263,7 @@ export default function Home() {
             <span className="section-label">Votre destination, notre expertise</span>
             <h2 className="section-title">La France, bien plus qu’une destination d’études</h2>
             <p className="france-section__intro">
-              Construisez un projet académique solide dans un pays reconnu pour la qualité de ses formations, sa recherche et son ouverture internationale.
+              Construisez un projet académique solide dans un pays reconnu pour la qualité de ses formations, sa recherche et son ouverture internationale. Capadmis accompagne chaque année des étudiants du Sénégal, de Côte d'Ivoire, du Mali, de Guinée et du Cameroun dans leurs études en France.
             </p>
             <div className="france-section__highlights">
               {franceHighlights.map(({ icon: Icon, value, label }) => (
@@ -286,7 +286,7 @@ export default function Home() {
           <div className="features-section__header">
             <span className="section-label">L’expertise CapAdmis</span>
             <h2 className="section-title">Tout ce qu’il faut pour réussir votre projet France</h2>
-            <p className="section-subtitle">Une méthode rigoureuse, des outils simples et un conseiller qui connaît réellement votre dossier.</p>
+            <p className="section-subtitle">Une méthode rigoureuse, des outils simples et un conseiller qui connaît réellement votre dossier. L'accompagnement idéal pour étudier en France depuis le Sénégal ou l'Afrique.</p>
           </div>
           <div className="features-section__grid">
             {features.map((f, i) => (
@@ -306,7 +306,7 @@ export default function Home() {
           <div className="steps-section__header">
             <span className="section-label">Un chemin clair vers la France</span>
             <h2 className="section-title">Votre parcours, maîtrisé en 6 étapes</h2>
-            <p className="section-subtitle">De la première analyse à l’embarquement, chaque décision est préparée avec vous.</p>
+            <p className="section-subtitle">De la première analyse à l’embarquement, chaque décision est préparée avec vous : orientation, admission, procédure Campus France Sénégal et visa étudiant.</p>
           </div>
           <div className="steps-section__wrapper">
             <div className="steps-section__line" />
