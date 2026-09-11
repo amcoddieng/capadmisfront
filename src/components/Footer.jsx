@@ -35,9 +35,9 @@ export default function Footer() {
             Choisissez la bonne filière, la bonne université, et suivez votre procédure jusqu'au visa.
           </p>
           <div className="footer__social">
-            <a href="#" className="footer__social-link"><span style={{fontSize:'.875rem',fontWeight:600}}>f</span></a>
-            <a href="#" className="footer__social-link"><Share2 size={15} /></a>
-            <a href="#" className="footer__social-link"><Globe size={15} /></a>
+            <a href="#" className="footer__social-link" aria-label="Facebook Capadmis"><span style={{fontSize:'.875rem',fontWeight:600}}>f</span></a>
+            <a href="#" className="footer__social-link" aria-label="Partager Capadmis"><Share2 size={15} /></a>
+            <a href="#" className="footer__social-link" aria-label="Site web Capadmis"><Globe size={15} /></a>
           </div>
         </div>
 

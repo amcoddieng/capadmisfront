@@ -1,0 +1,37 @@
+# Capadmis — Plateforme d'accompagnement pour étudier en France et à l'étranger
+
+Capadmis est une plateforme en ligne qui accompagne les étudiants africains dans leurs démarches d'études en France et à l'étranger : orientation, admission universitaire, procédure Campus France et visa étudiant.
+
+## Pages publiques principales
+
+- [Accueil](https://capadmis.com/)
+- [À propos](https://capadmis.com/a-propos)
+- [Procédure Campus France](https://capadmis.com/procedure)
+- [Tarifs](https://capadmis.com/tarifs)
+- [Pourquoi Capadmis](https://capadmis.com/pourquoi)
+- [Analyse du profil](https://capadmis.com/analyse)
+- [Témoignages](https://capadmis.com/temoignages)
+- [FAQ](https://capadmis.com/faq)
+- [Blog](https://capadmis.com/blog)
+- [Contact](https://capadmis.com/contact)
+- [Inscription / Connexion](https://capadmis.com/inscription)
+- [Politique de confidentialité](https://capadmis.com/confidentialite)
+
+## Espace étudiant
+
+- [Connexion étudiant](https://capadmis.com/connexion)
+- [Dashboard étudiant](https://capadmis.com/dashboard)
+
+## Espace personnel
+
+- [Connexion personnel](https://capadmis.com/personnel)
+
+## Ressources techniques
+
+- [Plan du site](https://capadmis.com/sitemap.xml)
+- [Robots.txt](https://capadmis.com/robots.txt)
+
+## Contact
+
+- Email : contact@capadmis.com
+- Site : https://capadmis.com
