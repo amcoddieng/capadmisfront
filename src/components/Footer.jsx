@@ -28,7 +28,7 @@ export default function Footer() {
         {/* Brand */}
         <div>
           <Link to="/" className="footer__logo" style={{ display: 'flex', alignItems: 'center' }}>
-            <img src={logoFooter} alt="Capadmis" style={{ height: 32, width: 'auto', display: 'block' }} />
+            <img src={logoFooter} alt="Capadmis" width={181} height={32} style={{ height: 32, width: 'auto', display: 'block' }} />
           </Link>
           <p className="footer__desc">
             La plateforme digitale d'accompagnement pour vos études à l'étranger.

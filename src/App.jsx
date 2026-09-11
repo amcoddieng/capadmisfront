@@ -82,7 +82,13 @@ function App() {
   const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
-    initSession().finally(() => setAuthReady(true));
+    const run = () => initSession().finally(() => setAuthReady(true));
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(run, { timeout: 2000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const t = window.setTimeout(run, 100);
+    return () => window.clearTimeout(t);
   }, []);
 
   return (

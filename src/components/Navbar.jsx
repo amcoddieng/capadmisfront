@@ -27,7 +27,7 @@ export default function Navbar() {
     <header className="navbar">
       <div className="navbar__inner">
         <Link to="/" className="navbar__logo">
-          <img src={logoNavbar} alt="Capadmis" style={{ height: 36, width: 'auto', display: 'block' }} />
+          <img src={logoNavbar} alt="Capadmis" width={204} height={36} style={{ height: 36, width: 'auto', display: 'block' }} />
         </Link>
 
         <nav>

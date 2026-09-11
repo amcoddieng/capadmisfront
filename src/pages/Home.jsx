@@ -146,6 +146,7 @@ export default function Home() {
         <meta name="description" content="CapAdmis accompagne les étudiants dans leurs études en France et à l'étranger : orientation, admission universitaire, procédure Campus France, visa étudiant et suivi personnalisé. Commencez votre projet d'études en France dès aujourd'hui." />
         <meta name="keywords" content="études en France, etude en france, études à l'étranger, etude a l'etranger, Campus France, visa étudiant, admission université France, accompagnement étudiant, étudier en France, procédure Campus France" />
         <link rel="canonical" href="https://capadmis.com/" />
+        <link rel="preload" as="image" href={heroSlides[0].image} fetchpriority="high" />
         <meta property="og:title" content="CapAdmis | Études en France et à l'étranger — Accompagnement complet" />
         <meta property="og:description" content="Orientation, admission universitaire, procédure Campus France et visa étudiant. Capadmis vous accompagne pour étudier en France et à l'étranger." />
       </Helmet>
@@ -166,7 +167,7 @@ export default function Home() {
                 width={1200}
                 height={800}
                 fetchpriority={index === activeSlide ? 'high' : undefined}
-                loading={index === activeSlide ? 'eager' : 'lazy'}
+                loading={index !== activeSlide ? 'lazy' : undefined}
               />
             </div>
           ))}
