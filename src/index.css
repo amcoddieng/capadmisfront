@@ -511,16 +511,28 @@ a { text-decoration: none; color: inherit; }
 
 .hero__dots { display: flex; align-items: center; gap: .45rem; }
 .hero__dot {
-  width: 8px;
-  height: 8px;
+  position: relative;
+  width: 24px;
+  height: 24px;
   padding: 0;
-  background: rgba(255,255,255,.45);
+  background: transparent;
   border: 0;
   border-radius: 999px;
   cursor: pointer;
+}
+.hero__dot::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  transform: translate(-50%, -50%);
+  background: rgba(255,255,255,.75);
+  border-radius: 999px;
   transition: width .3s, background .3s;
 }
-.hero__dot--active { width: 32px; background: var(--accent); }
+.hero__dot--active::before { width: 24px; background: var(--accent); }
 
 @media (max-width: 768px) {
   .hero { min-height: calc(100svh - 64px); }
@@ -998,7 +1010,7 @@ a { text-decoration: none; color: inherit; }
   color: var(--white);
 }
 .footer__logo-dot { color: var(--blue-400); }
-.footer__desc { font-size: .875rem; color: var(--slate-400); line-height: 1.75; margin-bottom: 1.5rem; }
+.footer__desc { font-size: .875rem; color: var(--slate-200); line-height: 1.75; margin-bottom: 1.5rem; }
 .footer__social { display: flex; gap: .75rem; }
 .footer__social-link {
   width: 32px; height: 32px;
@@ -1023,14 +1035,15 @@ a { text-decoration: none; color: inherit; }
 .footer__contact-list { list-style: none; display: flex; flex-direction: column; gap: .75rem; }
 .footer__contact-item { display: flex; align-items: flex-start; gap: .75rem; font-size: .875rem; }
 .footer__contact-icon { color: var(--blue-400); flex-shrink: 0; margin-top: 2px; }
-.footer__contact-text { color: var(--slate-400); }
-.footer__contact-link { color: var(--slate-400); transition: color .2s; }
-.footer__contact-link:hover { color: var(--blue-400); }
+.footer__contact-text { color: var(--slate-200); }
+.footer__contact-link { color: var(--slate-200); transition: color .2s; }
+.footer__contact-link:hover { color: var(--blue-300); }
+.footer__availability { font-size: 0.8rem; color: var(--slate-200); }
 
 .footer__cta-btn {
   display: inline-block;
   margin-top: 1.25rem;
-  background: var(--blue-600);
+  background: var(--blue-500);
   color: var(--white);
   font-size: .875rem;
   font-weight: 600;
@@ -1057,8 +1070,8 @@ a { text-decoration: none; color: inherit; }
   .footer__bottom { flex-direction: row; justify-content: space-between; text-align: left; }
 }
 .footer__bottom-links { display: flex; gap: 1.25rem; }
-.footer__bottom-link { color: var(--slate-500); transition: color .2s; }
-.footer__bottom-link:hover { color: var(--slate-300); }
+.footer__bottom-link { color: var(--slate-300); transition: color .2s; }
+.footer__bottom-link:hover { color: var(--white); }
 
 /* ===============================================
    COMMON PAGE PATTERNS

@@ -43,7 +43,7 @@ export default function Footer() {
 
         {/* Navigation */}
         <div>
-          <h4 className="footer__col-title">Navigation</h4>
+          <h3 className="footer__col-title">Navigation</h3>
           <ul className="footer__links">
             {navLinks.map((link) => (
               <li key={link.path}>
@@ -55,7 +55,7 @@ export default function Footer() {
 
         {/* Services */}
         <div>
-          <h4 className="footer__col-title">Nos services</h4>
+          <h3 className="footer__col-title">Nos services</h3>
           <ul className="footer__links">
             {services.map((s) => (
               <li key={s} className="footer__link" style={{cursor:'default'}}>{s}</li>
@@ -65,7 +65,7 @@ export default function Footer() {
 
         {/* Contact */}
         <div>
-          <h4 className="footer__col-title">Contact</h4>
+          <h3 className="footer__col-title">Contact</h3>
           <ul className="footer__contact-list">
             <li className="footer__contact-item">
               <MapPin size={15} className="footer__contact-icon" />
@@ -83,7 +83,7 @@ export default function Footer() {
               {/* mettre un sticker haha */}
               Le monde ne dort pas, nous non plus 🤩
               <br />
-              <span style={{fontSize:'0.8rem', color:'#666'}}>Disponible 24h/24 - 7j/7</span>
+              <span className="footer__availability">Disponible 24h/24 - 7j/7</span>
             </li>
           </ul>
           <Link to={getStartPath()} className="footer__cta-btn">Prendre rendez-vous</Link>
