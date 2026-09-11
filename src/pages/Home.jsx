@@ -7,7 +7,7 @@ import useAdvancedScroll from '../hooks/useAdvancedScroll';
 
 const heroSlides = [
   {
-    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=2200&q=85',
+    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=80',
     eyebrow: 'Cap sur la France',
     title: 'Votre projet d’études en France commence ici',
     description: 'Orientation, candidatures, Campus France et visa : un expert vous accompagne jusqu’à votre arrivée.',
@@ -15,7 +15,7 @@ const heroSlides = [
     credit: 'Photo libre — Unsplash',
   },
   {
-    image: 'https://unsplash.com/photos/nsHO6mtOsc4/download?force=true&w=2200',
+    image: 'https://unsplash.com/photos/nsHO6mtOsc4/download?force=true&w=1200&q=80',
     eyebrow: 'L’excellence académique française',
     title: 'Intégrez la formation qui révèle votre potentiel',
     description: 'Nous construisons une stratégie de candidature cohérente avec votre parcours, vos ambitions et votre budget.',
@@ -23,7 +23,7 @@ const heroSlides = [
     credit: 'La Sorbonne — Robin Benzrihem / Unsplash',
   },
   {
-    image: 'https://unsplash.com/photos/-JonPZiIhII/download?force=true&w=2200',
+    image: 'https://unsplash.com/photos/-JonPZiIhII/download?force=true&w=1200&q=80',
     eyebrow: 'De Dakar à votre campus',
     title: 'Chaque étape maîtrisée, jusqu’à votre départ',
     description: 'Votre dossier avance dans un espace digital clair, avec des conseils personnalisés et un suivi humain.',
@@ -31,7 +31,7 @@ const heroSlides = [
     credit: 'Paris-Sorbonne — Chepe Nicoli / Unsplash',
   },
   {
-    image: 'https://images.unsplash.com/photo-1562774053-70193937158a?auto=format&fit=crop&w=2200&q=85',
+    image: 'https://images.unsplash.com/photo-1562774053-70193937158a?auto=format&fit=crop&w=1200&q=80',
     eyebrow: 'Vie étudiante en France',
     title: 'Intégrez une communauté internationale dynamique',
     description: 'Plus de 370 000 étudiants étrangers choisissent la France chaque année. Devenez l’un d’entre eux.',
@@ -39,7 +39,7 @@ const heroSlides = [
     credit: 'Campus universitaire — Unsplash',
   },
   {
-    image: 'https://images.unsplash.com/photo-1523240795612-9770540121d8?auto=format&fit=crop&w=2200&q=85',
+    image: 'https://images.unsplash.com/photo-1523240795612-9770540121d8?auto=format&fit=crop&w=1200&q=80',
     eyebrow: 'Excellence académique',
     title: 'Des campus d’exception pour votre formation',
     description: 'Universités historiques, laboratoires de pointe, bibliothèques riches : la France investit dans votre réussite.',
@@ -47,7 +47,7 @@ const heroSlides = [
     credit: 'Campus français — Unsplash',
   },
   {
-    image: 'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?auto=format&fit=crop&w=2200&q=85',
+    image: 'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?auto=format&fit=crop&w=1200&q=80',
     eyebrow: 'Étudiants du monde entier',
     title: 'La France, 1ère destination d’études non anglophone',
     description: 'Rejoignez une communauté d’étudiants venus du monde entier dans un pays reconnu pour sa qualité de vie et ses diplômes.',
@@ -55,7 +55,7 @@ const heroSlides = [
     credit: 'Étudiants internationaux — Unsplash',
   },
   {
-    image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=2200&q=85',
+    image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80',
     eyebrow: 'Bibliothèques & recherche',
     title: 'Un environnement d’apprentissage d’exception',
     description: 'Accédez à des bibliothèques universitaires centenaires, des centres de recherche et un accompagnement pédagogique reconnu.',
@@ -63,7 +63,7 @@ const heroSlides = [
     credit: 'Bibliothèque universitaire — Unsplash',
   },
   {
-    image: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=2200&q=85',
+    image: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=1200&q=80',
     eyebrow: 'Diplômes reconnus',
     title: 'Un diplôme français, un passeport pour le monde',
     description: 'Les diplômes français sont reconnus dans toute l’Europe et au-delà. Votre investissement ouvre des portes internationales.',
@@ -159,7 +159,15 @@ export default function Home() {
               className={`hero__slide${index === activeSlide ? ' hero__slide--active' : ''}`}
               aria-hidden={index !== activeSlide}
             >
-              <img src={slide.image} alt="" className="hero__image" />
+              <img
+                src={slide.image}
+                alt=""
+                className="hero__image"
+                width={1200}
+                height={800}
+                fetchpriority={index === activeSlide ? 'high' : undefined}
+                loading={index === activeSlide ? 'eager' : 'lazy'}
+              />
             </div>
           ))}
         </div>
@@ -234,14 +242,18 @@ export default function Home() {
           <div className="france-section__visual" data-reveal data-reveal-delay="100" data-parallax="0.15">
             <img
               className="france-section__main-image"
-              src="https://unsplash.com/photos/nsHO6mtOsc4/download?force=true&w=1400"
+              src="https://unsplash.com/photos/nsHO6mtOsc4/download?force=true&w=800&q=80"
               alt="Façade de la Sorbonne à Paris"
+              width={600}
+              height={800}
               loading="lazy"
             />
             <img
               className="france-section__detail-image"
-              src="https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=800&q=85"
+              src="https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=400&q=80"
               alt="Rue parisienne près de la Tour Eiffel"
+              width={400}
+              height={300}
               loading="lazy"
             />
             <span className="france-section__badge"><MapPin size={16} /> Étudier en France</span>

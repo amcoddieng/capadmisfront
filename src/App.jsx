@@ -1,31 +1,32 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense, lazy } from 'react';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
-import APropos from './pages/APropos';
-import Procedure from './pages/Procedure';
-import Tarifs from './pages/Tarifs';
-import Pourquoi from './pages/Pourquoi';
-import Analyse from './pages/Analyse';
-import FAQ from './pages/FAQ';
-import Contact from './pages/Contact';
-import Confidentialite from './pages/Confidentialite';
-import Temoignages from './pages/Temoignages';
-import Auth from './pages/Auth';
 import { getSession, getPersonnelSession, initSession } from './api/auth';
-import DashboardStudent from './pages/DashboardStudent';
-import AuthPersonnel from './pages/AuthPersonnel';
-import DashboardPersonnel from './pages/DashboardPersonnel';
-import DashboardConseiller from './pages/DashboardConseiller';
-import DashboardSuperAdmin from './pages/DashboardSuperAdmin';
 import { MessageModalProvider } from './context/MessageModalContext';
 import ScrollToTop from './components/ScrollToTop';
 import WhatsAppFloat from './components/WhatsAppFloat';
 import CookieBanner from './components/CookieBanner';
-import NotFound from './pages/NotFound';
-import Blog from './pages/Blog';
-import BlogArticle from './pages/BlogArticle';
+
+const APropos = lazy(() => import('./pages/APropos'));
+const Procedure = lazy(() => import('./pages/Procedure'));
+const Tarifs = lazy(() => import('./pages/Tarifs'));
+const Pourquoi = lazy(() => import('./pages/Pourquoi'));
+const Analyse = lazy(() => import('./pages/Analyse'));
+const FAQ = lazy(() => import('./pages/FAQ'));
+const Contact = lazy(() => import('./pages/Contact'));
+const Confidentialite = lazy(() => import('./pages/Confidentialite'));
+const Temoignages = lazy(() => import('./pages/Temoignages'));
+const Auth = lazy(() => import('./pages/Auth'));
+const AuthPersonnel = lazy(() => import('./pages/AuthPersonnel'));
+const DashboardStudent = lazy(() => import('./pages/DashboardStudent'));
+const DashboardPersonnel = lazy(() => import('./pages/DashboardPersonnel'));
+const DashboardConseiller = lazy(() => import('./pages/DashboardConseiller'));
+const DashboardSuperAdmin = lazy(() => import('./pages/DashboardSuperAdmin'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+const Blog = lazy(() => import('./pages/Blog'));
+const BlogArticle = lazy(() => import('./pages/BlogArticle'));
 
 /* ── Guards de route ── */
 function AuthLoading() {
@@ -88,6 +89,7 @@ function App() {
     <BrowserRouter>
       <ScrollToTop />
       <MessageModalProvider>
+        <Suspense fallback={<AuthLoading />}>
         <Routes>
           <Route path="/" element={<Layout><Home /></Layout>} />
           <Route path="/a-propos" element={<Layout><APropos /></Layout>} />
@@ -112,6 +114,7 @@ function App() {
           <Route path="/dashboard/conseiller-visa" element={<PrivatePersonnelRoute authReady={authReady} roles={['visa']}><DashboardConseiller /></PrivatePersonnelRoute>} />
           <Route path="*" element={<Layout><NotFound /></Layout>} />
         </Routes>
+        </Suspense>
         <CookieBanner />
       </MessageModalProvider>
     </BrowserRouter>
