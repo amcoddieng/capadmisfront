@@ -3,13 +3,13 @@ import { X, Loader, AlertCircle, Send, Pencil, Eye, User, FolderOpen, CheckCircl
 import { apiGetInfosDossier, apiListPiecesJointes, apiGetPieceJointeUrl, apiUpdateDossierStatus, apiAddPieceJointe, apiUpdatePieceJointeStatus, apiDeletePieceJointe, apiPutInfosDossier, apiListDossiersUniversite, apiListDossiersUniversiteByDossier, apiCreateDossierUniversite, apiUpdateDossierUniversite, apiDeleteDossierUniversite } from '../api/auth';
 import { useMessageModal } from '../context/MessageModalContext';
 
-const DOSSIER_STATUS_OPTIONS = ['EN_COURS_D_ETUDE','VALIDE','CHANGEMENT_A_APPORTER'];
+const DOSSIER_STATUS_OPTIONS = ['non_demarre','EN_COURS_D_ETUDE','VALIDE','CHANGEMENT_A_APPORTER'];
 const STATUS_ADM_OPTIONS  = ['ADMISSION_EN_COURS','ADMISSION_VALIDE','ADMISSION_INVALIDE'];
 const STATUS_VISA_OPTIONS = ['DEMANDE_VISA_EN_COURS','DEMANDE_VISA_VALIDE','DEMANDE_VISA_INVALIDE'];
 
 const STATUS_LABELS = {
-  EN_COURS_D_ETUDE:'En cours d\'étude', VALIDE:'Validé', INVALIDE:'Invalide',
-  EN_ATTENTE:'En attente', CHANGEMENT_A_APPORTER:'Changement requis',
+  non_demarre:'Non démarré', EN_COURS_D_ETUDE:'En cours d\'étude', VALIDE:'Validé',
+  INVALIDE:'Invalide', EN_ATTENTE:'En attente', CHANGEMENT_A_APPORTER:'Changement requis',
   ADMISSION_EN_COURS:'Admission en cours', ADMISSION_VALIDE:'Admission validée', ADMISSION_INVALIDE:'Admission invalidée',
   DEMANDE_VISA_EN_COURS:'Visa en cours', DEMANDE_VISA_VALIDE:'Visa validé', DEMANDE_VISA_INVALIDE:'Visa invalidé',
 };
@@ -19,7 +19,8 @@ function StatusBadge({ value, size = 'sm' }) {
   const green=['VALIDE','ADMISSION_VALIDE','DEMANDE_VISA_VALIDE'];
   const red=['INVALIDE','ADMISSION_INVALIDE','DEMANDE_VISA_INVALIDE'];
   const orange=['EN_ATTENTE','CHANGEMENT_A_APPORTER'];
-  const c = green.includes(value)?'green':red.includes(value)?'red':orange.includes(value)?'orange':'blue';
+  const grey=['non_demarre'];
+  const c = green.includes(value)?'green':red.includes(value)?'red':orange.includes(value)?'orange':grey.includes(value)?'grey':'blue';
   const colors = {
     green: { bg: '#dcfce7', text: '#166534', border: '#bbf7d0' },
     red:   { bg: '#fee2e2', text: '#991b1b', border: '#fecaca' },
@@ -42,7 +43,7 @@ function StatusBadge({ value, size = 'sm' }) {
 
 /* ── Modal changer statut ── */
 function ModalChangerStatut({ token, dossier, isAdmin, isAdmission, isVisa, mode, onClose, onSuccess }) {
-  const [status, setStatus] = useState(dossier.status || DOSSIER_STATUS_OPTIONS[0]);
+  const [status, setStatus] = useState(DOSSIER_STATUS_OPTIONS.includes(dossier.status) ? dossier.status : DOSSIER_STATUS_OPTIONS[0]);
   const [statusAdmission, setStatusAdmission] = useState(dossier.status_admission || STATUS_ADM_OPTIONS[0]);
   const [statusVisa, setStatusVisa] = useState(dossier.status_visa || STATUS_VISA_OPTIONS[0]);
   const [saving, setSaving] = useState(false);
