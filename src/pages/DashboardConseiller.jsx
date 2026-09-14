@@ -371,7 +371,7 @@ export default function DashboardConseiller() {
     switch (activePage) {
       case 'dashboard':     return <PageDashboard token={token} personnel={personnel} onOpenChat={handleOpenChat} />;
       case 'dossiers':      return <PageDossiers token={token} personnel={personnel} onOpenChat={handleOpenChat} />;
-      case 'messages':      return <PageMessages conversations={msg.conversations} messages={msg.messages} activeChat={msg.activeChat} unreadCount={msg.unreadCount} userEmail={personnel.email} onSelectChat={msg.loadConversation} onSend={msg.send} />;
+      case 'messages':      return <PageMessages conversations={msg.conversations} messages={msg.messages} activeChat={msg.activeChat} unreadCount={msg.unreadCount} userEmail={personnel.email} loading={msg.loading} onSelectChat={msg.loadConversation} onSend={msg.send} />;
       case 'notifications': return <PageNotifications notifications={notifications} loading={notifLoading} unread={unread} markRead={markRead} markAllRead={markAllRead} />;
       default:              return null;
     }

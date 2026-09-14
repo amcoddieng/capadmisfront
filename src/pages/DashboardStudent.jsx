@@ -1359,6 +1359,7 @@ export default function DashboardStudent() {
               activeChat={msg.activeChat}
               unreadCount={msg.unreadCount}
               userEmail={etudiant.email}
+              loading={msg.loading}
               onSelectChat={msg.loadConversation}
               onSend={msg.send}
             />

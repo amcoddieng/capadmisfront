@@ -32,12 +32,16 @@ export function useMessages(token) {
 
   const loadConversation = useCallback(async (interlocuteur) => {
     if (!token || !interlocuteur) return;
+    setLoading(true);
     setActiveChat(interlocuteur);
     try {
       const msgs = await apiGetMessages(token, interlocuteur);
       setMessages(msgs);
-    } catch (_) {}
-  }, [token]);
+      await refreshUnread();
+    } catch (_) {} finally {
+      setLoading(false);
+    }
+  }, [token, refreshUnread]);
 
   useEffect(() => {
     activeChatRef.current = activeChat;
