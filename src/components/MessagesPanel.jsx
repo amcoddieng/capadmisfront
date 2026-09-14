@@ -113,13 +113,13 @@ export default function MessagesPanel({ conversations, messages, activeChat, unr
   return (
     <div className="msg-layout">
       {/* Sidebar conversations */}
-      <aside className="msg-sidebar">
+      <aside className="msg-sidebar" style={{ minHeight: 0, overflow: 'hidden' }}>
         <div className="msg-sidebar__header">
           <MessageSquare size={18} />
           <span>Conversations</span>
           {unreadCount > 0 && <span className="msg-sidebar__badge">{unreadCount}</span>}
         </div>
-        <div className="msg-sidebar__list">
+        <div className="msg-sidebar__list" style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto' }}>
           {conversations.length === 0 && (
             <div className="msg-sidebar__empty">Aucune conversation</div>
           )}
