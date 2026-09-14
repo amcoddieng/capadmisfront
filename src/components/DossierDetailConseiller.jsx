@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Loader, AlertCircle, Send, Pencil, Eye, User, FolderOpen, CheckCircle, Upload, MessageSquare, Mail, MapPin, Phone, Globe, BookOpen, FileText, Calendar, Shield, Award, School, Trash2, Plus, Download } from 'lucide-react';
-import { apiGetInfosDossier, apiListPiecesJointes, apiGetPieceJointeUrl, apiUpdateDossierStatus, apiAddPieceJointe, apiUpdatePieceJointeStatus, apiDeletePieceJointe, apiPutInfosDossier, apiListDossiersUniversite, apiListDossiersUniversiteByDossier, apiCreateDossierUniversite, apiUpdateDossierUniversite, apiDeleteDossierUniversite } from '../api/auth';
+import { apiGetInfosDossier, apiListPiecesJointes, apiGetPieceJointeUrl, apiTelechargerPiecesJointesZip, apiUpdateDossierStatus, apiAddPieceJointe, apiUpdatePieceJointeStatus, apiDeletePieceJointe, apiPutInfosDossier, apiListDossiersUniversite, apiListDossiersUniversiteByDossier, apiCreateDossierUniversite, apiUpdateDossierUniversite, apiDeleteDossierUniversite } from '../api/auth';
 import { useMessageModal } from '../context/MessageModalContext';
 
 const DOSSIER_STATUS_OPTIONS = ['non_demarre','EN_COURS_D_ETUDE','VALIDE','CHANGEMENT_A_APPORTER','DOCUMENT_MANQUANT'];
@@ -396,6 +396,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
   const [previewLoading, setPreviewLoading] = useState(null);
   const [infosModal, setInfosModal] = useState(false);
   const [deletingPj, setDeletingPj] = useState(null);
+  const [downloadingAll, setDownloadingAll] = useState(false);
   const fileInputRef = useRef(null);
 
   const fetchDetails = useCallback(async () => {
@@ -474,6 +475,24 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
     } catch (err) {
       alert(err.message || 'Erreur lors de la suppression');
     } finally { setDeletingPj(null); }
+  };
+
+  const handleDownloadAllPieces = async () => {
+    if (pieces.length === 0) return;
+    setDownloadingAll(true);
+    try {
+      const blob = await apiTelechargerPiecesJointesZip(token, dossier.code_dossier);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${dossier.code_dossier}_pieces.zip`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert(err.message || 'Erreur lors du téléchargement des pièces jointes');
+    } finally { setDownloadingAll(false); }
   };
 
   const handleUpdateInfosStatus = async (newStatus) => {
@@ -632,6 +651,17 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
           {/* ── Pièces jointes ── */}
           <SectionCard icon={FileText} title={`Pièces jointes (${pieces.length})`} action={
             <div style={{display:'flex',alignItems:'center',gap:'.5rem',flexWrap:'wrap'}}>
+              {isConseiller && pieces.length > 0 && (
+                <button
+                  style={{...btnGhost,fontSize:'.75rem',padding:'.2rem .5rem'}}
+                  onClick={handleDownloadAllPieces}
+                  disabled={downloadingAll}
+                  title="Télécharger toutes les pièces jointes (organisées par type)"
+                >
+                  {downloadingAll ? <Loader size={12} className="auth-spinner"/> : <Download size={12}/>}
+                  {downloadingAll ? 'Préparation…' : 'Tout télécharger'}
+                </button>
+              )}
               <select
                 className="form-select"
                 style={{fontSize:'.75rem',padding:'.25rem .5rem',borderRadius:'.4rem',minWidth:160}}

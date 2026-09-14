@@ -161,6 +161,17 @@ export async function apiGetPieceJointeUrl(token, id) {
   return data;
 }
 
+export async function apiTelechargerPiecesJointesZip(token, codeDossier) {
+  const res = await authFetch(`${BASE}/pieces-jointes/dossier/${codeDossier}/telecharger`, {
+    headers: { Authorization: `Bearer ${token}` }, credentials: 'include',
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.message || 'Impossible de télécharger les pièces jointes');
+  }
+  return res.blob();
+}
+
 export async function apiAddPieceJointe(token, formData) {
   const res = await authFetch(`${BASE}/pieces-jointes/`, {
     method: 'POST',
