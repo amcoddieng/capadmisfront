@@ -835,7 +835,26 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
           </h3>
           <button className="modal__close" onClick={onClose}><X size={18}/></button>
         </div>
-        <div className="modal__body" style={{padding:'1.25rem',background:'#f8fafc'}}>{content}</div>
+        <div className="modal__body" style={{padding:'1.25rem',background:'#f8fafc',position:'relative'}}>
+          {content}
+          {downloadingAll && (
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'rgba(248, 250, 252, 0.9)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '.75rem',
+              zIndex: 10,
+              borderRadius: '0 0 .75rem .75rem',
+            }}>
+              <Loader size={32} className="auth-spinner" />
+              <span style={{ color: '#0c1c3f', fontWeight: 600, fontSize: '.9rem' }}>Préparation du téléchargement…</span>
+            </div>
+          )}
+        </div>
         {statusModal && (
           <ModalChangerStatut token={token} dossier={dossier} isAdmin={isAdmin} isAdmission={isAdmission} isVisa={isVisa} mode={statusMode}
             onClose={() => setStatusModal(false)} onSuccess={() => { setStatusModal(false); onRefresh(); }}/>
