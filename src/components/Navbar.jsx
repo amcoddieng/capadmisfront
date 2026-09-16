@@ -4,7 +4,6 @@ import {
   Menu, X, Home, Info, FileText, CreditCard, Star,
   Mail, BarChart3, ArrowRight, Quote, HelpCircle, BookOpen,
 } from 'lucide-react';
-import { getStartPath } from '../api/auth';
 import logoNavbar from '../assets/les images du site/logo-navbar-dark - Copie.png';
 
 const navLinks = [
@@ -54,8 +53,8 @@ export default function Navbar() {
             <BarChart3 size={14} />
             <span>Analyse</span>
           </Link>
-          <Link to={getStartPath()} className="btn btn--primary-sm navbar__cta-compact">
-            <span>Commencer</span>
+          <Link to="/connexion" className="btn btn--primary-sm navbar__cta-compact">
+            <span>Se connecter</span>
             <ArrowRight size={14} />
           </Link>
         </div>
@@ -85,8 +84,8 @@ export default function Navbar() {
             <Link to="/analyse" onClick={() => setOpen(false)} className="navbar__mobile-cta navbar__mobile-cta--outline">
               <BarChart3 size={14} /> Analyser mes chances
             </Link>
-            <Link to="/inscription" onClick={() => setOpen(false)} className="navbar__mobile-cta navbar__mobile-cta--filled">
-              Commencer ma procédure <ArrowRight size={14} />
+            <Link to="/connexion" onClick={() => setOpen(false)} className="navbar__mobile-cta navbar__mobile-cta--filled">
+              Se connecter <ArrowRight size={14} />
             </Link>
           </div>
         </div>
