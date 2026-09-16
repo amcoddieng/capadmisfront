@@ -2028,6 +2028,37 @@ a { text-decoration: none; color: inherit; }
 @media (min-width: 900px) { .auth-panel { width: 520px; flex-shrink: 0; padding: 3rem 2.5rem; } }
 
 .auth-wrapper { width: 100%; max-width: 448px; }
+.auth-page--register { position: relative; justify-content: center; }
+.auth-page--register .auth-carousel {
+  position: fixed;
+  inset: 0;
+  display: block;
+  width: 100%;
+  z-index: 0;
+}
+.auth-page--register .auth-panel {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  min-height: 100vh;
+  overflow-y: auto;
+}
+.auth-page--register .auth-wrapper { max-width: 760px; margin: auto; }
+.auth-page--register .auth-card { width: 100%; }
+.auth-form--register { align-items: stretch; }
+.auth-form--register > .auth-form-header,
+.auth-form--register > .auth-error,
+.auth-form--register > .form-row,
+.auth-form--register > .form-actions,
+.auth-form--register > .form-submit,
+.auth-form--register > .form-link-text,
+.auth-form--register > .auth-register__full { grid-column: 1 / -1; }
+@media (min-width: 640px) {
+  .auth-form--register { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.1rem 1.25rem; }
+}
+@media (min-width: 900px) {
+  .auth-page--register .auth-panel { width: 100%; padding: 2rem; }
+}
 .auth-logo {
   text-align: center;
   margin-bottom: 2rem;

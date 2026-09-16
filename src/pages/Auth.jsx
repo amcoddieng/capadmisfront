@@ -98,7 +98,7 @@ export default function Auth({ page = 'login' }) {
   };
 
   return (
-    <div className="auth-page">
+    <div className={`auth-page${isRegister ? ' auth-page--register' : ''}`}>
       <Helmet>
         <title>{isRegister ? 'Inscription étudiant' : 'Connexion étudiant'} — CapAdmis</title>
         <meta name="description" content={isRegister ? "Créez votre compte étudiant CapAdmis pour démarrer votre procédure d'études à l'étranger." : 'Connectez-vous à votre espace étudiant CapAdmis.'} />
@@ -218,7 +218,7 @@ export default function Auth({ page = 'login' }) {
 
             {/* ── REGISTER ──────────────────────────────── */}
             {isRegister && (
-              <form onSubmit={handleRegister} className="auth-form">
+              <form onSubmit={handleRegister} className="auth-form auth-form--register">
                 <div className="auth-form-header">
                   <h2 className="auth-form-title">Créer mon compte</h2>
                   <p className="auth-form-sub">Étape {step} sur 2</p>
@@ -317,7 +317,7 @@ export default function Auth({ page = 'login' }) {
                       />
                     </div>
 
-                    <div className="form-group">
+                    <div className="form-group auth-register__full">
                       <label className="form-label">Mot de passe *</label>
                       <div className="auth-pwd-field">
                         <input
