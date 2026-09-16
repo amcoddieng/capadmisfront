@@ -109,8 +109,8 @@ function App() {
           <Route path="/confidentialite" element={<Layout><Confidentialite /></Layout>} />
           <Route path="/blog" element={<Layout><Blog /></Layout>} />
           <Route path="/blog/:slug" element={<Layout><BlogArticle /></Layout>} />
-          <Route path="/connexion" element={<Auth />} />
-          <Route path="/inscription" element={<Auth />} />
+          <Route path="/connexion" element={<Auth page="login" />} />
+          <Route path="/inscription" element={<Auth page="register" />} />
           <Route path="/dashboard" element={<PrivateRoute authReady={authReady}><DashboardStudent /></PrivateRoute>} />
           <Route path="/personnel" element={<AuthPersonnel />} />
           <Route path="/dashboard/admin" element={<PrivatePersonnelRoute authReady={authReady} roles={['admin']}><DashboardPersonnel /></PrivatePersonnelRoute>} />

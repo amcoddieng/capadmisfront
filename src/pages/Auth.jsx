@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import WhatsAppFloat from '../components/WhatsAppFloat';
 import { Helmet } from 'react-helmet-async';
 import { Eye, EyeOff, ArrowRight, CheckCircle, AlertCircle, Loader, GraduationCap, MapPin, Shield } from 'lucide-react';
@@ -29,10 +29,9 @@ const authSlides = [
 
 const paysOrigine = ['Sénégal', 'Côte d\'Ivoire', 'Mali', 'Guinée', 'Cameroun', 'Maroc', 'Burkina Faso', 'Togo', 'Bénin', 'Niger', 'Autre'];
 
-export default function Auth() {
-  const location = useLocation();
+export default function Auth({ page = 'login' }) {
   const navigate = useNavigate();
-  const [mode, setMode]       = useState('login');
+  const isRegister = page === 'register';
   const [showPwd, setShowPwd] = useState(false);
   const [step, setStep]       = useState(1);
   const [loading, setLoading] = useState(false);
@@ -98,13 +97,11 @@ export default function Auth() {
     }
   };
 
-  const switchMode = (m) => { setMode(m); setStep(1); setError(''); };
-
   return (
     <div className="auth-page">
       <Helmet>
-        <title>Connexion / Inscription — CapAdmis</title>
-        <meta name="description" content="Connectez-vous ou créez votre compte CapAdmis pour démarrer votre procédure d'études à l'étranger." />
+        <title>{isRegister ? 'Inscription étudiant' : 'Connexion étudiant'} — CapAdmis</title>
+        <meta name="description" content={isRegister ? "Créez votre compte étudiant CapAdmis pour démarrer votre procédure d'études à l'étranger." : 'Connectez-vous à votre espace étudiant CapAdmis.'} />
         <meta name="robots" content="noindex, follow" />
       </Helmet>
 
@@ -160,15 +157,6 @@ export default function Auth() {
 
           {/* Card */}
           <div className="auth-card">
-          <div className="auth-tabs">
-            <button className={`auth-tab auth-tab--${mode === 'login' ? 'active' : 'inactive'}`} onClick={() => switchMode('login')}>
-              Connexion
-            </button>
-            <button className={`auth-tab auth-tab--${mode === 'register' ? 'active' : 'inactive'}`} onClick={() => switchMode('register')}>
-              Inscription
-            </button>
-          </div>
-
           <div className="auth-body">
             {/* Message d'erreur global */}
             {error && (
@@ -179,7 +167,7 @@ export default function Auth() {
             )}
 
             {/* ── LOGIN ─────────────────────────────────── */}
-            {mode === 'login' && (
+            {!isRegister && (
               <form onSubmit={handleLogin} className="auth-form">
                 <div className="auth-form-header">
                   <h2 className="auth-form-title">Bienvenue !</h2>
@@ -221,15 +209,15 @@ export default function Auth() {
 
                 <p className="form-link-text">
                   Pas encore de compte ?{' '}
-                  <button type="button" className="form-link" onClick={() => switchMode('register')}>
+                  <Link className="form-link" to="/inscription">
                     S'inscrire gratuitement
-                  </button>
+                  </Link>
                 </p>
               </form>
             )}
 
             {/* ── REGISTER ──────────────────────────────── */}
-            {mode === 'register' && (
+            {isRegister && (
               <form onSubmit={handleRegister} className="auth-form">
                 <div className="auth-form-header">
                   <h2 className="auth-form-title">Créer mon compte</h2>
@@ -357,9 +345,9 @@ export default function Auth() {
 
                 <p className="form-link-text">
                   Déjà un compte ?{' '}
-                  <button type="button" className="form-link" onClick={() => switchMode('login')}>
+                  <Link className="form-link" to="/connexion">
                     Se connecter
-                  </button>
+                  </Link>
                 </p>
               </form>
             )}
@@ -378,7 +366,7 @@ export default function Auth() {
         </div>
         </div>
       </div>
-      {location.pathname === '/inscription' && <WhatsAppFloat />}
+      {isRegister && <WhatsAppFloat />}
     </div>
   );
 }
