@@ -15,7 +15,7 @@ import {
   apiListEtudiants, apiCreateEtudiant, apiUpdateEtudiant, apiDeleteEtudiant, apiToggleBlockEtudiant,
   apiListDossiers, apiAssignConseiller, apiUpdateDossierStatus, apiListConseillers,
   apiGetDashboardAdmin, apiPatchPaiement,
-  apiListContacts, apiUpdateContact, apiDeleteContact, apiToggleContactAppele,
+  apiListContacts, apiUpdateContact, apiDeleteContact, apiUpdateContactCallStatus,
 } from '../api/auth';
 import { useNotifications } from '../hooks/useNotifications';
 import NotificationsPanel from '../components/NotificationsPanel';
@@ -1196,6 +1196,13 @@ function PageNotifications(props) {
 }
 
 /* ── Page Contacts ── */
+const CONTACT_CALL_STATUSES = {
+  A_APPELER: { label: 'À appeler', badge: 'status-badge--orange' },
+  APPELE: { label: 'Appelé', badge: 'status-badge--blue' },
+  JOINT: { label: 'Joint', badge: 'status-badge--green' },
+  NON_JOINT: { label: 'Non joint', badge: 'status-badge--red' },
+};
+
 function PageContacts({ token }) {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -1214,10 +1221,10 @@ function PageContacts({ token }) {
 
   useEffect(() => { fetch(); }, [fetch]);
 
-  const handleToggleAppele = async (id) => {
-    setProcessing(`appele-${id}`); setError('');
+  const handleCallStatus = async (id, statut) => {
+    setProcessing(`status-${id}`); setError('');
     try {
-      const updated = await apiToggleContactAppele(token, id);
+      const updated = await apiUpdateContactCallStatus(token, id, statut);
       setContacts(prev => prev.map(c => c.id === id ? updated : c));
     } catch (e) { setError(e.message); } finally { setProcessing(null); }
   };
@@ -1240,6 +1247,8 @@ function PageContacts({ token }) {
     } catch (e) { setError(e.message); } finally { setProcessing(null); }
   };
 
+  const getCallStatus = contact => contact.statutAppel || (contact.appele ? 'APPELE' : 'A_APPELER');
+
   const filtered = contacts.filter(c => {
     const q = search.trim().toLowerCase();
     const matchSearch = !q ||
@@ -1247,15 +1256,14 @@ function PageContacts({ token }) {
       c.email?.toLowerCase().includes(q) ||
       c.sujet?.toLowerCase().includes(q) ||
       c.telephone?.toLowerCase().includes(q);
-    const matchAppele = !filterAppele ||
-      (filterAppele === 'appele' && c.appele) ||
-      (filterAppele === 'non_appele' && !c.appele);
+    const matchAppele = !filterAppele || getCallStatus(c) === filterAppele;
     return matchSearch && matchAppele;
   });
 
   const total = contacts.length;
-  const appeles = contacts.filter(c => c.appele).length;
-  const nonAppeles = total - appeles;
+  const joints = contacts.filter(c => getCallStatus(c) === 'JOINT').length;
+  const nonJoints = contacts.filter(c => getCallStatus(c) === 'NON_JOINT').length;
+  const aAppeler = contacts.filter(c => getCallStatus(c) === 'A_APPELER').length;
 
   return (
     <div className="cons-page">
@@ -1270,12 +1278,17 @@ function PageContacts({ token }) {
         </div>
         <div className="cons-stat-card" style={{ borderTop: '3px solid #16a34a' }}>
           <span className="cons-stat-card__icon" style={{ background: '#f0fdf4', color: '#16a34a' }}><CheckCircle size={18}/></span>
-          <span className="cons-stat-card__value" style={{ color: '#16a34a' }}>{appeles}</span>
-          <span className="cons-stat-card__label">Appelés</span>
+          <span className="cons-stat-card__value" style={{ color: '#16a34a' }}>{joints}</span>
+          <span className="cons-stat-card__label">Joints</span>
+        </div>
+        <div className="cons-stat-card" style={{ borderTop: '3px solid #dc2626' }}>
+          <span className="cons-stat-card__icon" style={{ background: '#fef2f2', color: '#dc2626' }}><XCircle size={18}/></span>
+          <span className="cons-stat-card__value" style={{ color: '#dc2626' }}>{nonJoints}</span>
+          <span className="cons-stat-card__label">Non joints</span>
         </div>
         <div className="cons-stat-card" style={{ borderTop: '3px solid #f59e0b' }}>
           <span className="cons-stat-card__icon" style={{ background: '#fffbeb', color: '#f59e0b' }}><Clock size={18}/></span>
-          <span className="cons-stat-card__value" style={{ color: '#f59e0b' }}>{nonAppeles}</span>
+          <span className="cons-stat-card__value" style={{ color: '#f59e0b' }}>{aAppeler}</span>
           <span className="cons-stat-card__label">À appeler</span>
         </div>
       </div>
@@ -1290,8 +1303,7 @@ function PageContacts({ token }) {
         />
         <select value={filterAppele} onChange={e => setFilterAppele(e.target.value)} style={{ padding: '.4rem .6rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.85rem' }}>
           <option value="">Tous statuts</option>
-          <option value="non_appele">À appeler</option>
-          <option value="appele">Appelés</option>
+          {Object.entries(CONTACT_CALL_STATUSES).map(([value, config]) => <option key={value} value={value}>{config.label}</option>)}
         </select>
       </div>
 
@@ -1322,17 +1334,23 @@ function PageContacts({ token }) {
                   <td style={{ fontSize: '.8rem' }}>{c.telephone || '—'}</td>
                   <td style={{ fontSize: '.8rem' }}>{c.sujet}</td>
                   <td>
-                    {c.appele
-                      ? <span className="status-badge status-badge--green"><Check size={12} style={{ display: 'inline', marginRight: '.25rem' }}/>Appelé</span>
-                      : <span className="status-badge status-badge--orange"><XCircle size={12} style={{ display: 'inline', marginRight: '.25rem' }}/>À appeler</span>}
+                    <span className={`status-badge ${CONTACT_CALL_STATUSES[getCallStatus(c)].badge}`}>
+                      {CONTACT_CALL_STATUSES[getCallStatus(c)].label}
+                    </span>
                   </td>
                   <td style={{ fontSize: '.8rem' }}>{new Date(c.createdAt).toLocaleString('fr-FR')}</td>
                   <td>
                     <div className="sa-actions">
                       <button className="sa-btn sa-btn--blue" onClick={() => setViewModal(c)} title="Voir"><Eye size={14}/></button>
-                      <button className="sa-btn sa-btn--green" onClick={() => handleToggleAppele(c.id)} disabled={processing === `appele-${c.id}`} title={c.appele ? 'Marquer non appelé' : 'Marquer appelé'}>
-                        {processing === `appele-${c.id}` ? <Loader size={14} className="auth-spinner"/> : c.appele ? <XCircle size={14}/> : <CheckCircle size={14}/>}
-                      </button>
+                      <select
+                        value={getCallStatus(c)}
+                        onChange={e => handleCallStatus(c.id, e.target.value)}
+                        disabled={processing === `status-${c.id}`}
+                        title="Modifier le statut d’appel"
+                        style={{ padding: '.3rem', border: '1px solid #cbd5e1', borderRadius: '.35rem', fontSize: '.75rem' }}
+                      >
+                        {Object.entries(CONTACT_CALL_STATUSES).map(([value, config]) => <option key={value} value={value}>{config.label}</option>)}
+                      </select>
                       <button className="sa-btn sa-btn--orange" onClick={() => setEditModal(c)} title="Modifier"><Pencil size={14}/></button>
                       <button className="sa-btn sa-btn--red" onClick={() => setDeleteModal(c)} title="Supprimer"><Trash2 size={14}/></button>
                     </div>
@@ -1355,7 +1373,7 @@ function PageContacts({ token }) {
               <div><strong>Email :</strong> <a href={`mailto:${viewModal.email}`}>{viewModal.email}</a></div>
               <div><strong>Téléphone :</strong> {viewModal.telephone || '—'}</div>
               <div><strong>Sujet :</strong> {viewModal.sujet}</div>
-              <div><strong>Statut :</strong> {viewModal.appele ? 'Appelé' : 'À appeler'}</div>
+              <div><strong>Statut :</strong> {CONTACT_CALL_STATUSES[getCallStatus(viewModal)].label}</div>
               <div><strong>Date :</strong> {new Date(viewModal.createdAt).toLocaleString('fr-FR')}</div>
               <div style={{ marginTop: '.5rem', padding: '1rem', background: '#f8fafc', borderRadius: '.5rem' }}>
                 <strong>Message :</strong>

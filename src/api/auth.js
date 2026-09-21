@@ -104,10 +104,11 @@ export async function apiDeleteContact(token, id) {
   return data;
 }
 
-export async function apiToggleContactAppele(token, id) {
+export async function apiUpdateContactCallStatus(token, id, statut) {
   const res = await authFetch(`${BASE}/contacter-moi/${id}/appele`, {
     method: 'PATCH',
-    headers: { Authorization: `Bearer ${token}` }, credentials: 'include',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, credentials: 'include',
+    body: JSON.stringify({ statut }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || 'Erreur');
