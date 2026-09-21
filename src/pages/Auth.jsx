@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import WhatsAppFloat from '../components/WhatsAppFloat';
 import { Helmet } from 'react-helmet-async';
-import { Eye, EyeOff, ArrowRight, CheckCircle, AlertCircle, Loader, GraduationCap, MapPin, Shield } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, CheckCircle, AlertCircle, Loader, GraduationCap, MapPin, Shield, FileText, Calendar, Compass, Route, Lock } from 'lucide-react';
 import { apiLogin, apiRegister, apiGetDossier, saveSession } from '../api/auth';
 import logoAuth from '../assets/les images du site/logo-horizontal-white-bg - Copie.png';
 
@@ -97,8 +97,128 @@ export default function Auth({ page = 'login' }) {
     }
   };
 
+  if (isRegister) {
+    const benefits = [
+      { icon: Compass, title: 'Comprendre votre situation', text: 'Situez votre niveau d’éligibilité à partir des informations déclarées.' },
+      { icon: FileText, title: 'Anticiper les documents', text: 'Identifiez les pièces importantes à préparer pour votre projet.' },
+      { icon: Calendar, title: 'Choisir le bon moment', text: 'Comprenez le calendrier et les prochaines échéances utiles.' },
+      { icon: GraduationCap, title: 'Explorer des formations', text: 'Obtenez des premières pistes cohérentes avec votre parcours.' },
+    ];
+    const nextSteps = ['Création de votre compte et ouverture du dossier', 'Collecte progressive des informations utiles', 'Analyse de votre situation par CapAdmis', 'Orientation et suivi depuis votre espace'];
+
+    return (
+      <div className="register-page">
+        <Helmet>
+          <title>Commencer mon analyse gratuite — CapAdmis</title>
+          <meta name="description" content="Créez votre dossier étudiant et commencez gratuitement l’analyse de votre projet d’études en France." />
+          <meta name="robots" content="noindex, follow" />
+        </Helmet>
+
+        <header className="register-header">
+          <Link to="/" className="register-header__logo">
+            <img src={logoAuth} alt="CapAdmis" />
+          </Link>
+          <div className="register-header__actions">
+            <span>Vous avez déjà un compte ?</span>
+            <Link to="/connexion">Se connecter</Link>
+          </div>
+        </header>
+
+        <main>
+          <section className="register-hero">
+            <div className="register-hero__content">
+              <span className="register-eyebrow"><GraduationCap size={17} /> Votre projet commence ici</span>
+              <h1>Comprenez votre projet d’études en France, étape par étape</h1>
+              <p>Créez gratuitement votre dossier pour obtenir une première lecture de votre situation et savoir comment avancer.</p>
+              <a href="#creer-dossier" className="register-hero__cta">Commencer mon analyse gratuite <ArrowRight size={18} /></a>
+              <span className="register-hero__note"><CheckCircle size={15} /> Vous pouvez commencer même si vous n’avez pas encore toutes les réponses.</span>
+            </div>
+          </section>
+
+          <section className="register-benefits">
+            <div className="register-section-heading">
+              <span>Une première étape utile</span>
+              <h2>Ce que votre analyse vous aide à clarifier</h2>
+              <p>Une orientation initiale pour mieux comprendre votre situation, sans promesse d’admission ou de visa.</p>
+            </div>
+            <div className="register-benefits__grid">
+              {benefits.map(({ icon: Icon, title, text }) => (
+                <article key={title} className="register-benefit">
+                  <div className="register-benefit__icon"><Icon size={21} /></div>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="register-form-section" id="creer-dossier">
+            <div className="register-form-intro">
+              <span className="register-eyebrow"><Route size={17} /> Ouverture du dossier</span>
+              <h2>Commençons par faire connaissance</h2>
+              <p>Ces informations nous permettent d’ouvrir votre espace et de préparer l’analyse. Le parcours se complète progressivement.</p>
+              <div className="register-progress-copy">
+                <strong>Étape {step} sur 2</strong>
+                <span>{step === 1 ? 'Vos coordonnées' : 'Finalisation du compte'}</span>
+              </div>
+              <div className="register-progress"><span style={{ width: `${step * 50}%` }} /></div>
+            </div>
+
+            <div className="register-form-card">
+              {error && <div className="auth-error"><AlertCircle size={15} />{error}</div>}
+              <form onSubmit={handleRegister} className="register-form">
+                {step === 1 ? (
+                  <>
+                    <div className="form-group"><label className="form-label">Prénom *</label><input required className="form-input" value={form.prenom} onChange={e => set('prenom', e.target.value)} placeholder="Aminata" autoComplete="given-name" /></div>
+                    <div className="form-group"><label className="form-label">Nom *</label><input required className="form-input" value={form.nom} onChange={e => set('nom', e.target.value)} placeholder="Diallo" autoComplete="family-name" /></div>
+                    <div className="form-group register-form__full"><label className="form-label">Adresse email *</label><input required type="email" className="form-input" value={form.email} onChange={e => set('email', e.target.value)} placeholder="votre@email.com" autoComplete="email" /></div>
+                    <div className="form-group"><label className="form-label">Téléphone *</label><input required type="tel" className="form-input" value={form.telephone} onChange={e => set('telephone', e.target.value)} placeholder="+221 77 123 45 67" autoComplete="tel" /></div>
+                    <div className="form-group"><label className="form-label">Téléphone du tuteur</label><input type="tel" className="form-input" value={form.numero_tuteur} onChange={e => set('numero_tuteur', e.target.value)} placeholder="+221 77 000 00 00" /></div>
+                    <div className="form-group"><label className="form-label">Sexe *</label><select required className="form-select" value={form.sexe} onChange={e => set('sexe', e.target.value)}><option value="">Sélectionner</option><option value="M">Masculin</option><option value="F">Féminin</option></select></div>
+                    <div className="form-group"><label className="form-label">Pays d’origine *</label><select required className="form-select" value={form.payes} onChange={e => set('payes', e.target.value)}><option value="">Sélectionner</option>{paysOrigine.map(p => <option key={p} value={p}>{p}</option>)}</select></div>
+                    <div className="form-group register-form__full"><label className="form-label">Ville *</label><input required className="form-input" value={form.ville} onChange={e => set('ville', e.target.value)} placeholder="Dakar" autoComplete="address-level2" /></div>
+                    <button type="submit" className="register-submit register-form__full">Continuer <ArrowRight size={17} /></button>
+                  </>
+                ) : (
+                  <>
+                    <div className="form-group"><label className="form-label">Date de naissance *</label><input required type="date" className="form-input" value={form.date_de_naissance} onChange={e => set('date_de_naissance', e.target.value)} max={new Date().toISOString().split('T')[0]} /></div>
+                    <div className="form-group"><label className="form-label">Lieu de naissance *</label><input required className="form-input" value={form.lieu_de_naissance} onChange={e => set('lieu_de_naissance', e.target.value)} placeholder="Dakar" /></div>
+                    <div className="form-group register-form__full"><label className="form-label">Choisissez un mot de passe *</label><div className="auth-pwd-field"><input required type={showPwd ? 'text' : 'password'} className="form-input" value={form.mdp} onChange={e => set('mdp', e.target.value)} placeholder="Minimum 8 caractères" minLength={8} autoComplete="new-password" /><button type="button" className="auth-pwd-toggle" onClick={() => setShowPwd(!showPwd)} aria-label={showPwd ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}>{showPwd ? <EyeOff size={16} /> : <Eye size={16} />}</button></div></div>
+                    <div className="register-form__actions register-form__full"><button type="button" className="form-back" onClick={() => setStep(1)}>Retour</button><button type="submit" className="register-submit" disabled={loading}>{loading ? <Loader size={16} className="auth-spinner" /> : <CheckCircle size={16} />}{loading ? 'Création du dossier…' : 'Créer mon dossier'}</button></div>
+                  </>
+                )}
+              </form>
+              <p className="register-form__privacy"><Lock size={13} /> Vos informations sont utilisées uniquement pour comprendre et suivre votre situation.</p>
+            </div>
+          </section>
+
+          <section className="register-next">
+            <div className="register-section-heading">
+              <span>Après votre inscription</span>
+              <h2>Vous avancez avec une progression claire</h2>
+            </div>
+            <div className="register-next__steps">
+              {nextSteps.map((label, index) => <div key={label} className="register-next__step"><b>{index + 1}</b><span>{label}</span></div>)}
+            </div>
+          </section>
+
+          <section className="register-reassurance">
+            <Shield size={28} />
+            <div><h2>Une première analyse gratuite, sans promesse excessive</h2><p>L’inscription ouvre votre dossier et permet une première orientation. Elle ne garantit ni admission, ni visa. Chaque étape vous sera expliquée progressivement.</p></div>
+          </section>
+        </main>
+
+        <footer className="register-footer">
+          <span>© CapAdmis — Votre projet, étape par étape</span>
+          <div><Link to="/confidentialite">Confidentialité</Link><Link to="/contact">Besoin d’aide ?</Link></div>
+        </footer>
+        <WhatsAppFloat />
+      </div>
+    );
+  }
+
   return (
-    <div className={`auth-page${isRegister ? ' auth-page--register' : ''}`}>
+    <div className="auth-page">
       <Helmet>
         <title>{isRegister ? 'Inscription étudiant' : 'Connexion étudiant'} — CapAdmis</title>
         <meta name="description" content={isRegister ? "Créez votre compte étudiant CapAdmis pour démarrer votre procédure d'études à l'étranger." : 'Connectez-vous à votre espace étudiant CapAdmis.'} />
@@ -355,7 +475,7 @@ export default function Auth({ page = 'login' }) {
         </div>
 
         <p className="auth-footer">
-          En créant un compte, vous acceptez nos{' '}
+          En vous connectant, vous acceptez nos{' '}
           <Link to="/confidentialite">CGU</Link> et notre{' '}
           <Link to="/confidentialite">politique de confidentialité</Link>.
         </p>
