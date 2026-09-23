@@ -1,11 +1,44 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Loader, AlertCircle, Send, Pencil, Eye, User, FolderOpen, CheckCircle, Upload, MessageSquare, Mail, MapPin, Phone, Globe, BookOpen, FileText, Calendar, Shield, Award, School, Trash2, Plus, Download } from 'lucide-react';
-import { apiGetInfosDossier, apiListPiecesJointes, apiGetPieceJointeUrl, apiTelechargerPiecesJointesZip, apiUpdateDossierStatus, apiAddPieceJointe, apiUpdatePieceJointeStatus, apiDeletePieceJointe, apiPutInfosDossier, apiListDossiersUniversite, apiListDossiersUniversiteByDossier, apiCreateDossierUniversite, apiUpdateDossierUniversite, apiDeleteDossierUniversite } from '../api/auth';
+import { apiGetInfosDossier, apiListPiecesJointes, apiGetPieceJointeUrl, apiTelechargerPiecesJointesZip, apiUpdateDossierStatus, apiAddPieceJointe, apiUpdatePieceJointeStatus, apiDeletePieceJointe, apiPutInfosDossier, apiListDossiersUniversite, apiListDossiersUniversiteByDossier, apiCreateDossierUniversite, apiUpdateDossierUniversite, apiDeleteDossierUniversite, apiGetDossierChecklist, apiUpdateDossierChecklist } from '../api/auth';
 import { useMessageModal } from '../context/MessageModalContext';
 
 const DOSSIER_STATUS_OPTIONS = ['non_demarre','EN_COURS_D_ETUDE','VALIDE','CHANGEMENT_A_APPORTER','DOCUMENT_MANQUANT'];
 const STATUS_ADM_OPTIONS  = ['ADMISSION_EN_COURS','ADMISSION_VALIDE','ADMISSION_INVALIDE'];
 const STATUS_VISA_OPTIONS = ['DEMANDE_VISA_EN_COURS','DEMANDE_VISA_VALIDE','DEMANDE_VISA_INVALIDE'];
+
+const CHECKLIST_PHASES = [
+  {
+    title: 'Étape 1 — Constitution et dépôt du dossier',
+    items: [
+      ['verifier_documents', 'Vérifier les documents insérés sur CapAdmis'],
+      ['creer_adresse_mail', "créer l'adresse mail pour l'étudiant"],
+      ['creer_dossier_etudes_en_france', 'Créer le dossier sur la plateforme « Études en France ».'],
+      ['remplir_informations_personnelles', 'Remplir les informations personnelles.'],
+      ['faire_choix_formations', 'Faire les choix de formations sur la plateforme Études en France.'],
+      ['rediger_motivations', 'Rédiger les motivations.'],
+      ['verifier_entierement_dossier', 'Vérifier entièrement le dossier'],
+      ['soumettre_dossier', 'Soumettre le dossier.'],
+      ['paiement_frais', 'Paiement des frais par l’étudiant (après autorisation).'],
+      ['choisir_date_entretien', "Choisir une date d'entretien."],
+      ['coaching_preparation_entretien', 'Coaching de préparation pour l’entretion'],
+    ],
+  },
+  {
+    title: "Étape 2 — Après l'admission",
+    items: [
+      ['valider_choix_definitif', 'Valider le choix définitif sur la plateforme Études en France.'],
+      ['telecharger_accord_inscription', "Télécharger l'accord préalable d'inscription, puis le transmettre à l'élève."],
+      ['remplir_formulaire_visa', 'Remplir le formulaire de demande de visa sur www.francevisas.gouv.fr.'],
+      ['rassembler_documents', 'Rassembler les documents (AVI + Hébergement).'],
+      ['prendre_rendez_depot', 'Prendre un Rendez depot'],
+      ['recevoir_mail_fin_procedure', 'Recevoir le mail de fin de procédure.'],
+      ['deposer_dossier_visa', 'Déposer le dossier de visa.'],
+    ],
+  },
+];
+
+const CHECKLIST_ITEMS = CHECKLIST_PHASES.flatMap(phase => phase.items);
 
 const STATUS_LABELS = {
   non_demarre:'Non démarré', EN_COURS_D_ETUDE:'En cours d\'étude', VALIDE:'Validé',
@@ -397,6 +430,8 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
   const [infosModal, setInfosModal] = useState(false);
   const [deletingPj, setDeletingPj] = useState(null);
   const [downloadingAll, setDownloadingAll] = useState(false);
+  const [checklist, setChecklist] = useState(null);
+  const [updatingChecklist, setUpdatingChecklist] = useState(null);
   const fileInputRef = useRef(null);
 
   const fetchDetails = useCallback(async () => {
@@ -418,6 +453,9 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
         setDossiersUniv(all.filter(u => u.code_dossier === dossier.code_dossier));
       } catch { setDossiersUniv([]); }
     }
+    try {
+      setChecklist(await apiGetDossierChecklist(token, dossier.id));
+    } catch { setChecklist(null); }
     setLoading(false);
   }, [token, dossier.code_dossier]);
 
@@ -516,6 +554,23 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
     } finally { setUpdatingInfos(false); }
   };
 
+  const handleChecklistChange = async (champ, valeur) => {
+    const previous = checklist;
+    setChecklist(current => ({ ...current, [champ]: valeur }));
+    setUpdatingChecklist(champ);
+    try {
+      setChecklist(await apiUpdateDossierChecklist(token, dossier.id, champ, valeur));
+    } catch (err) {
+      setChecklist(previous);
+      alert(err.message || 'Impossible de mettre à jour la checklist');
+    } finally {
+      setUpdatingChecklist(null);
+    }
+  };
+
+  const completedChecklist = checklist ? CHECKLIST_ITEMS.filter(([field]) => checklist[field]).length : 0;
+  const checklistProgress = Math.round((completedChecklist / CHECKLIST_ITEMS.length) * 100);
+
   const cardStyle = { background:'#fff', borderRadius:'.875rem', boxShadow:'0 1px 2px rgba(15,23,42,.05), 0 8px 20px rgba(15,23,42,.04)', border:'1px solid #eef2f7', overflow:'hidden' };
   const cardHeader = { padding:'.9rem 1.25rem', borderBottom:'1px solid #eef2f7', background:'#fbfaf7', display:'flex', alignItems:'center', gap:'.6rem', fontWeight:700, fontSize:'.9rem', color:'#1e293b' };
   const cardHeaderIcon = { width:28, height:28, borderRadius:'.5rem', background:'#f5f0e4', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 };
@@ -611,6 +666,51 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
                 </>
               )}
             </div>
+          </SectionCard>
+
+          <SectionCard icon={CheckCircle} title="Checklist du dossier « Études en France »">
+            {checklist ? (
+              <div className="dossier-checklist">
+                <div className="dossier-checklist__summary">
+                  <div>
+                    <strong>{completedChecklist} sur {CHECKLIST_ITEMS.length} tâches terminées</strong>
+                    <span>{checklistProgress}% de progression</span>
+                  </div>
+                  <strong>{checklistProgress}%</strong>
+                </div>
+                <div className="dossier-checklist__progress" role="progressbar" aria-valuenow={checklistProgress} aria-valuemin="0" aria-valuemax="100">
+                  <span style={{ width: `${checklistProgress}%` }} />
+                </div>
+                {CHECKLIST_PHASES.map(phase => {
+                  const phaseCompleted = phase.items.filter(([field]) => checklist[field]).length;
+                  return (
+                    <div key={phase.title} className="dossier-checklist__phase">
+                      <div className="dossier-checklist__phase-header">
+                        <strong>{phase.title}</strong>
+                        <span>{phaseCompleted}/{phase.items.length}</span>
+                      </div>
+                      <div className="dossier-checklist__items">
+                        {phase.items.map(([field, label], itemIndex) => (
+                          <label key={field} className={`dossier-checklist__item${checklist[field] ? ' dossier-checklist__item--done' : ''}`}>
+                            <input
+                              type="checkbox"
+                              checked={Boolean(checklist[field])}
+                              onChange={e => handleChecklistChange(field, e.target.checked)}
+                              disabled={updatingChecklist !== null}
+                            />
+                            <span className="dossier-checklist__number">{itemIndex + 1}</span>
+                            <span>{label}</span>
+                            {updatingChecklist === field && <Loader size={14} className="auth-spinner" />}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div style={{ color:'#94a3b8', fontSize:'.85rem' }}>Checklist indisponible.</div>
+            )}
           </SectionCard>
 
           {/* ── Infos académiques ── */}

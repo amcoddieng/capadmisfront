@@ -482,6 +482,26 @@ export async function apiUpdateDossierStatus(token, id, payload) {
   return data.dossier;
 }
 
+export async function apiGetDossierChecklist(token, id) {
+  const res = await authFetch(`${BASE}/dossiers/${id}/checklist`, {
+    headers: { Authorization: `Bearer ${token}` }, credentials: 'include',
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Erreur');
+  return data.checklist;
+}
+
+export async function apiUpdateDossierChecklist(token, id, champ, valeur) {
+  const res = await authFetch(`${BASE}/dossiers/${id}/checklist`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, credentials: 'include',
+    body: JSON.stringify({ champ, valeur }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Erreur');
+  return data.checklist;
+}
+
 /* ── Notifications ── */
 export async function apiGetNotifications(token) {
   const res = await authFetch(`${BASE}/notifications`, { headers: { Authorization: `Bearer ${token}` }, credentials: 'include' });

@@ -2966,6 +2966,34 @@ a { text-decoration: none; color: inherit; }
   display: block;
 }
 
+.dossier-checklist__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.dossier-checklist__summary > div { display: flex; flex-direction: column; gap: .2rem; }
+.dossier-checklist__summary strong { color: #0f172a; font-size: .9rem; }
+.dossier-checklist__summary > strong { color: #0c1c3f; font-size: 1.15rem; }
+.dossier-checklist__summary span { color: #64748b; font-size: .75rem; }
+.dossier-checklist__progress { height: 10px; margin: .75rem 0 1.25rem; overflow: hidden; border-radius: 999px; background: #e2e8f0; }
+.dossier-checklist__progress span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #c5a150, #0c1c3f); transition: width .25s ease; }
+.dossier-checklist__phase + .dossier-checklist__phase { margin-top: 1.25rem; }
+.dossier-checklist__phase-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .65rem .8rem; border-radius: .5rem; background: #f5f0e4; color: #0c1c3f; font-size: .82rem; }
+.dossier-checklist__phase-header span { flex-shrink: 0; padding: .15rem .45rem; border-radius: 999px; background: #fff; font-size: .72rem; }
+.dossier-checklist__items { display: grid; gap: .45rem; margin-top: .6rem; }
+.dossier-checklist__item { min-height: 42px; padding: .55rem .7rem; display: grid; grid-template-columns: auto 24px 1fr auto; align-items: center; gap: .55rem; border: 1px solid #e2e8f0; border-radius: .5rem; background: #fff; color: #334155; font-size: .82rem; cursor: pointer; transition: background .2s, border-color .2s; }
+.dossier-checklist__item:hover { border-color: #d8bd7d; background: #fffdf8; }
+.dossier-checklist__item input { width: 17px; height: 17px; accent-color: #0c1c3f; cursor: pointer; }
+.dossier-checklist__item--done { border-color: #bbf7d0; background: #f0fdf4; color: #166534; }
+.dossier-checklist__item--done > span:nth-of-type(2) { text-decoration: line-through; opacity: .8; }
+.dossier-checklist__number { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; background: #f1f5f9; color: #64748b; font-size: .68rem; font-weight: 700; }
+@media (max-width: 600px) {
+  .dossier-checklist__item { grid-template-columns: auto 1fr auto; }
+  .dossier-checklist__number { display: none; }
+  .dossier-checklist__phase-header { align-items: flex-start; }
+}
+
 /* Zone upload fichier */
 .pj-upload__input { display: none; }
 .pj-upload__label {
