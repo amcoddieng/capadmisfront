@@ -330,7 +330,7 @@ export default function Auth({ page = 'login' }) {
 
                 <p className="form-link-text">
                   Pas encore de compte ?{' '}
-                  <Link className="form-link" to="/inscription">
+                  <Link className="form-link" to="/inscription-classique">
                     S'inscrire gratuitement
                   </Link>
                 </p>

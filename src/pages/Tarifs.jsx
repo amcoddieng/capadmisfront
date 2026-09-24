@@ -25,7 +25,7 @@ const plans = [
       { included: false, text: 'Préparation entretien visa' },
     ],
     cta: 'Lancer ma procédure',
-    ctaPath: '/inscription',
+    ctaPath: '/inscription-classique',
     note: null,
   },
   {
@@ -48,7 +48,7 @@ const plans = [
       // { included: true, text: 'Accompagnement en cas de refus' },
     ],
     cta: 'Commencer la procédure',
-    ctaPath: '/inscription',
+    ctaPath: '/inscription-classique',
     note: 'Payable uniquement après obtention de votre admission.',
   },
 ];
@@ -125,7 +125,7 @@ export default function Tarifs() {
                 </ul>
                 {plan.note && <p className="plan-card__note">{plan.note}</p>}
                 <Link
-                  to={plan.ctaPath === '/inscription' ? getStartPath() : plan.ctaPath}
+                  to={plan.ctaPath === '/inscription-classique' ? getStartPath() : plan.ctaPath}
                   className={`plan-card__cta${plan.id === 'visa' ? ' plan-card__cta--featured' : ' plan-card__cta--default'}`}
                 >
                   {plan.cta} <ArrowRight size={16} />
@@ -196,7 +196,7 @@ export default function Tarifs() {
           <h2 className="page-cta__title">Votre avenir commence à 39 900 FCFA</h2>
           <p className="page-cta__desc">Un prix accessible, un suivi complet et une équipe engagée à vos côtés.</p>
           <div className="page-cta__actions">
-            <Link to="/inscription" className="btn btn--cta-primary">
+            <Link to="/inscription-classique" className="btn btn--cta-primary">
               Lancer ma procédure <ArrowRight size={18} />
             </Link>
           </div>

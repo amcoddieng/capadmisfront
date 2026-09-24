@@ -372,7 +372,7 @@ export default function Home() {
               Recevez une première analyse de votre projet et avancez avec une stratégie adaptée à votre profil.
             </p>
             <div className="cta-section__actions">
-              <Link to="/inscription" className="btn btn--cta-primary">
+              <Link to="/inscription-classique" className="btn btn--cta-primary">
                 Commencer ma procédure <ArrowRight size={20} />
               </Link>
               <Link to="/analyse" className="btn btn--cta-secondary">

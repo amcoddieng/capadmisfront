@@ -163,7 +163,7 @@ export default function Procedure() {
               De l’orientation jusqu’au visa, chaque démarche est expliquée, préparée et suivie avec un expert dédié.
             </p>
             <div className="page-hero__actions">
-              <Link to="/inscription" className="btn btn--hero-primary">
+              <Link to="/inscription-classique" className="btn btn--hero-primary">
                 Commencer ma procédure <ArrowRight size={18} />
               </Link>
               <Link to="/analyse" className="btn btn--hero-secondary">
