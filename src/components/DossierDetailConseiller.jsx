@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Loader, AlertCircle, Send, Pencil, Eye, User, FolderOpen, CheckCircle, Upload, MessageSquare, Mail, MapPin, Phone, Globe, BookOpen, FileText, Calendar, Shield, Award, School, Trash2, Plus, Download, ArrowLeft } from 'lucide-react';
 import { apiGetInfosDossier, apiListPiecesJointes, apiGetPieceJointeUrl, apiTelechargerPiecesJointesZip, apiUpdateDossierStatus, apiAddPieceJointe, apiUpdatePieceJointeStatus, apiDeletePieceJointe, apiPutInfosDossier, apiListDossiersUniversite, apiListDossiersUniversiteByDossier, apiCreateDossierUniversite, apiUpdateDossierUniversite, apiDeleteDossierUniversite, apiGetDossierChecklist, apiUpdateDossierChecklist } from '../api/auth';
 import { useMessageModal } from '../context/MessageModalContext';
@@ -39,6 +39,24 @@ const CHECKLIST_PHASES = [
 ];
 
 const CHECKLIST_ITEMS = CHECKLIST_PHASES.flatMap(phase => phase.items);
+
+const SECTION_CARD_STYLE = { background:'#fff', borderRadius:'.875rem', boxShadow:'0 1px 2px rgba(15,23,42,.05), 0 8px 20px rgba(15,23,42,.04)', border:'1px solid #eef2f7', overflow:'hidden' };
+const SECTION_CARD_HEADER = { padding:'.9rem 1.25rem', borderBottom:'1px solid #eef2f7', background:'#fbfaf7', display:'flex', alignItems:'center', gap:'.6rem', fontWeight:700, fontSize:'.9rem', color:'#1e293b' };
+const SECTION_CARD_ICON = { width:28, height:28, borderRadius:'.5rem', background:'#f5f0e4', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 };
+const SECTION_CARD_BODY = { padding:'1.25rem' };
+
+function SectionCard({ icon: Icon, title, children, action }) {
+  return (
+    <section style={SECTION_CARD_STYLE}>
+      <div style={SECTION_CARD_HEADER}>
+        {Icon && <span style={SECTION_CARD_ICON}><Icon size={14} color="#0c1c3f"/></span>}
+        <span style={{flex:1}}>{title}</span>
+        {action}
+      </div>
+      <div style={SECTION_CARD_BODY}>{children}</div>
+    </section>
+  );
+}
 
 const STATUS_LABELS = {
   non_demarre:'Non démarré', EN_COURS_D_ETUDE:'En cours d\'étude', VALIDE:'Validé',
@@ -433,20 +451,6 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
   const [checklist, setChecklist] = useState(null);
   const [updatingChecklist, setUpdatingChecklist] = useState(null);
   const fileInputRef = useRef(null);
-  const scrollPositionRef = useRef(0);
-
-  useEffect(() => {
-    if (!asPage) return undefined;
-    const rememberScrollPosition = () => { scrollPositionRef.current = window.scrollY; };
-    window.addEventListener('scroll', rememberScrollPosition, { passive: true });
-    return () => window.removeEventListener('scroll', rememberScrollPosition);
-  }, [asPage]);
-
-  useLayoutEffect(() => {
-    if (asPage && Math.abs(window.scrollY - scrollPositionRef.current) > 1) {
-      window.scrollTo(0, scrollPositionRef.current);
-    }
-  });
 
   const fetchDetails = useCallback(async () => {
     setLoading(true); setError('');
@@ -591,25 +595,10 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
     return index > 0 && !checklist[CHECKLIST_ITEMS[index - 1][0]];
   };
 
-  const cardStyle = { background:'#fff', borderRadius:'.875rem', boxShadow:'0 1px 2px rgba(15,23,42,.05), 0 8px 20px rgba(15,23,42,.04)', border:'1px solid #eef2f7', overflow:'hidden' };
-  const cardHeader = { padding:'.9rem 1.25rem', borderBottom:'1px solid #eef2f7', background:'#fbfaf7', display:'flex', alignItems:'center', gap:'.6rem', fontWeight:700, fontSize:'.9rem', color:'#1e293b' };
-  const cardHeaderIcon = { width:28, height:28, borderRadius:'.5rem', background:'#f5f0e4', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 };
-  const cardBody = { padding:'1.25rem' };
   const infoRow = { display:'flex', alignItems:'center', gap:'.6rem', padding:'.4rem 0', fontSize:'.875rem', color:'#334155' };
   const labelStyle = { color:'#64748b', minWidth:110, fontSize:'.8rem', fontWeight:500 };
   const btnPrimary = { background:'#c5a150', color:'#fff', border:'none', borderRadius:'.5rem', padding:'.4rem .85rem', fontSize:'.8rem', fontWeight:500, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:'.35rem' };
   const btnGhost = { background:'#f1f5f9', color:'#475569', border:'1px solid #e2e8f0', borderRadius:'.5rem', padding:'.4rem .85rem', fontSize:'.8rem', fontWeight:500, cursor:'pointer', display:'inline-flex', alignItems:'center', gap:'.35rem' };
-
-  const SectionCard = ({ icon: Icon, title, children, action }) => (
-    <section style={cardStyle}>
-      <div style={cardHeader}>
-        {Icon && <span style={cardHeaderIcon}><Icon size={14} color="#0c1c3f"/></span>}
-        <span style={{flex:1}}>{title}</span>
-        {action}
-      </div>
-      <div style={cardBody}>{children}</div>
-    </section>
-  );
 
   const content = (
     <>
