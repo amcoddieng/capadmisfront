@@ -8,7 +8,6 @@ import {
   AlertTriangle, Check, XCircle, School, Mail, Download,
 } from 'lucide-react';
 import logoHeader from '../assets/les images du site/logo-horizontal-2x.png';
-import DossierDetailConseiller from '../components/DossierDetailConseiller';
 import {
   getPersonnelSession, clearPersonnelSession, apiLogout,
   apiListPersonnel, apiCreatePersonnel, apiUpdatePersonnel, apiDeletePersonnel, apiToggleBlockPersonnel,
@@ -187,7 +186,8 @@ function ModalSingleStatus({ token, dossier, field, onClose, onSuccess }) {
 }
 
 /* ── Page Dossiers ── */
-function PageDossiers({ token, personnel }) {
+function PageDossiers({ token }) {
+  const navigate = useNavigate();
   const { openMessageModal } = useMessageModal();
   const [dossiers, setDossiers] = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -195,7 +195,6 @@ function PageDossiers({ token, personnel }) {
   const [assignModal, setAssignModal] = useState(null);
   const [statusModal, setStatusModal] = useState(null);
   const [statusField, setStatusField] = useState('status');
-  const [detailDossier, setDetailDossier] = useState(null);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [filterAdmission, setFilterAdmission] = useState('');
@@ -284,7 +283,7 @@ function PageDossiers({ token, personnel }) {
                     )}
                   </td>
                   <td><div className="sa-actions">
-                    <button className="sa-btn sa-btn--blue" onClick={() => setDetailDossier(d)} title="Voir le dossier"><Eye size={14}/></button>
+                    <button className="sa-btn sa-btn--blue" onClick={() => navigate(`/dashboard/dossier/${encodeURIComponent(d.code_dossier)}`)} title="Voir le dossier"><Eye size={14}/></button>
                     <button className="sa-btn sa-btn--orange" onClick={() => { setStatusField('status'); setStatusModal(d); }} title="Changer statut global"><Pencil size={14}/></button>
                     <button className="sa-btn sa-btn--orange" onClick={() => { setStatusField('status_admission'); setStatusModal(d); }} title="Changer statut admission"><Award size={14}/></button>
                     <button className="sa-btn sa-btn--orange" onClick={() => { setStatusField('status_visa'); setStatusModal(d); }} title="Changer statut visa"><Globe size={14}/></button>
@@ -298,15 +297,6 @@ function PageDossiers({ token, personnel }) {
       </TableWrap>
       {assignModal && <ModalAssignConseiller token={token} dossier={assignModal.dossier} defaultType={assignModal.type} onClose={() => setAssignModal(null)} onSuccess={fetch}/>}
       {statusModal && <ModalSingleStatus token={token} dossier={statusModal} field={statusField} onClose={() => setStatusModal(null)} onSuccess={fetch}/>}
-      {detailDossier && (
-        <DossierDetailConseiller
-          token={token}
-          personnel={personnel}
-          dossier={detailDossier}
-          onClose={() => setDetailDossier(null)}
-          onRefresh={fetch}
-        />
-      )}
     </div>
   );
 }
@@ -379,7 +369,8 @@ function ModalEtudiant({ token, etudiant, onClose, onSuccess }) {
 }
 
 /* ── Page Étudiants ── */
-function PageEtudiants({ token, personnel }) {
+function PageEtudiants({ token }) {
+  const navigate = useNavigate();
   const { openMessageModal } = useMessageModal();
   const [etudiants, setEtudiants] = useState([]);
   const [dossiers, setDossiers]   = useState([]);
@@ -391,8 +382,6 @@ function PageEtudiants({ token, personnel }) {
   const [deleting, setDeleting]   = useState(null);
   const [search, setSearch] = useState('');
   const [filterStatut, setFilterStatut] = useState('');
-  const [detailDossier, setDetailDossier] = useState(null);
-  const [loadingDossier, setLoadingDossier] = useState(false);
   const [selected, setSelected]   = useState(new Set());
   const fetch = useCallback(async () => {
     setLoading(true); setError('');
@@ -408,14 +397,10 @@ function PageEtudiants({ token, personnel }) {
   }, [token]);
   useEffect(() => { fetch(); }, [fetch]);
 
-  const handleVoir = async (etudiant) => {
-    setLoadingDossier(true);
-    try {
-      const dossiers = await apiListDossiers(token);
-      const d = dossiers.find(ds => ds.etudiant?.id === etudiant.id || ds.etudiant?.email === etudiant.email);
-      if (d) { setDetailDossier(d); }
-      else { alert('Cet étudiant n\'a pas encore de dossier.'); }
-    } catch (e) { alert(e.message); } finally { setLoadingDossier(false); }
+  const handleVoir = (etudiant) => {
+    const dossier = dossiers.find(item => item.etudiant?.id === etudiant.id || item.etudiant?.email === etudiant.email);
+    if (dossier) navigate(`/dashboard/dossier/${encodeURIComponent(dossier.code_dossier)}`);
+    else alert('Cet étudiant n\'a pas encore de dossier.');
   };
 
   const filtered = etudiants.filter(e => {
@@ -547,7 +532,7 @@ function PageEtudiants({ token, personnel }) {
                   <td>{e.ville||'—'}</td><td>{e.payes||'—'}</td>
                   <td><span className={`status-badge status-badge--${e.bloque?'red':'green'}`}>{e.bloque?'Bloqué':'Actif'}</span></td>
                   <td><div className="sa-actions">
-                    <button className="sa-btn sa-btn--blue" onClick={() => handleVoir(e)} disabled={loadingDossier} title="Voir le dossier"><Eye size={14}/></button>
+                    <button className="sa-btn sa-btn--blue" onClick={() => handleVoir(e)} title="Voir le dossier"><Eye size={14}/></button>
                     <button className="sa-btn sa-btn--blue" onClick={() => setModal(e)} title="Modifier"><Pencil size={14}/></button>
                     <button className={`sa-btn ${e.bloque?'sa-btn--green':'sa-btn--orange'}`} onClick={() => handleBlock(e.id)} disabled={toggling===e.id} title={e.bloque?'Débloquer':'Bloquer'}>
                       {toggling===e.id ? <Loader size={14} className="auth-spinner"/> : e.bloque ? <Unlock size={14}/> : <Lock size={14}/>}
@@ -564,15 +549,6 @@ function PageEtudiants({ token, personnel }) {
         </div>
       </TableWrap>
       {modal !== undefined && <ModalEtudiant token={token} etudiant={modal} onClose={() => setModal(undefined)} onSuccess={fetch}/>}
-      {detailDossier && (
-        <DossierDetailConseiller
-          token={token}
-          personnel={personnel}
-          dossier={detailDossier}
-          onClose={() => setDetailDossier(null)}
-          onRefresh={fetch}
-        />
-      )}
     </div>
   );
 }
@@ -1519,8 +1495,8 @@ export default function DashboardSuperAdmin() {
   const renderPage = () => {
     switch (activePage) {
       case 'dashboard':     return <PageDashboard token={token} />;
-      case 'dossiers':      return <PageDossiers token={token} personnel={personnel} />;
-      case 'etudiants':     return <PageEtudiants token={token} personnel={personnel} />;
+      case 'dossiers':      return <PageDossiers token={token} />;
+      case 'etudiants':     return <PageEtudiants token={token} />;
       case 'conseillers':   return <PageConseillers token={token} />;
       case 'paiement':      return <PagePaiement token={token} />;
       case 'contacts':      return <PageContacts token={token} />;

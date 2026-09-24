@@ -24,6 +24,7 @@ const DashboardStudent = lazy(() => import('./pages/DashboardStudent'));
 const DashboardPersonnel = lazy(() => import('./pages/DashboardPersonnel'));
 const DashboardConseiller = lazy(() => import('./pages/DashboardConseiller'));
 const DashboardSuperAdmin = lazy(() => import('./pages/DashboardSuperAdmin'));
+const DossierPersonnel = lazy(() => import('./pages/DossierPersonnel'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const Blog = lazy(() => import('./pages/Blog'));
 const BlogArticle = lazy(() => import('./pages/BlogArticle'));
@@ -113,6 +114,7 @@ function App() {
           <Route path="/inscription" element={<Auth page="register" />} />
           <Route path="/inscription-classique" element={<Auth page="legacy-register" />} />
           <Route path="/dashboard" element={<PrivateRoute authReady={authReady}><DashboardStudent /></PrivateRoute>} />
+          <Route path="/dashboard/dossier/:code_dossier" element={<PrivatePersonnelRoute authReady={authReady} roles={['admin', 'superadmin', 'admission', 'visa']}><DossierPersonnel /></PrivatePersonnelRoute>} />
           <Route path="/personnel" element={<AuthPersonnel />} />
           <Route path="/dashboard/admin" element={<PrivatePersonnelRoute authReady={authReady} roles={['admin']}><DashboardPersonnel /></PrivatePersonnelRoute>} />
           <Route path="/dashboard/superadmin" element={<PrivatePersonnelRoute authReady={authReady} roles={['superadmin']}><DashboardSuperAdmin /></PrivatePersonnelRoute>} />

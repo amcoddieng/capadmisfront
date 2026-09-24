@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Loader, AlertCircle } from 'lucide-react';
-import { getPersonnelSession, clearPersonnelSession, apiLogout, apiGetDashboardAdmin } from '../api/auth';
+import { LogOut, Loader, AlertCircle, Eye } from 'lucide-react';
+import { getPersonnelSession, clearPersonnelSession, apiLogout, apiGetDashboardAdmin, apiListDossiers } from '../api/auth';
 import logoHeader from '../assets/les images du site/logo-horizontal-2x.png';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -29,6 +29,7 @@ export default function DashboardPersonnel() {
   const navigate = useNavigate();
   const [session, setSession] = useState(null);
   const [stats, setStats] = useState(null);
+  const [dossiers, setDossiers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -41,8 +42,11 @@ export default function DashboardPersonnel() {
     setSession(s);
 
     let mounted = true;
-    apiGetDashboardAdmin(s.token).then(data => {
-      if (mounted) setStats(data);
+    Promise.all([apiGetDashboardAdmin(s.token), apiListDossiers(s.token)]).then(([data, dossierList]) => {
+      if (mounted) {
+        setStats(data);
+        setDossiers(dossierList);
+      }
     }).catch(e => {
       if (mounted) setError(e.message);
     }).finally(() => {
@@ -155,6 +159,25 @@ export default function DashboardPersonnel() {
                 {statCard('Dossiers univ.', stats?.totalDossiersUniversite ?? 0, 'violet')}
                 {statCard('Messages non lus', stats?.totalMessagesNonLus ?? 0, 'green')}
                 {statCard('Notifications', stats?.totalNotificationsNonLues ?? 0, 'orange')}
+              </div>
+
+              <div className="sa-table-wrap" style={{ marginTop: '1.5rem' }}>
+                <table className="sa-table">
+                  <thead><tr><th>Code</th><th>Étudiant</th><th>Statut</th><th>Admission</th><th>Visa</th><th>Action</th></tr></thead>
+                  <tbody>
+                    {dossiers.length === 0 && <tr><td colSpan={6} className="sa-empty">Aucun dossier trouvé</td></tr>}
+                    {dossiers.map(dossier => (
+                      <tr key={dossier.id}>
+                        <td><code className="sa-code">{dossier.code_dossier}</code></td>
+                        <td>{dossier.etudiant ? `${dossier.etudiant.prenom} ${dossier.etudiant.nom}` : '—'}</td>
+                        <td>{dossier.status || '—'}</td>
+                        <td>{dossier.status_admission || '—'}</td>
+                        <td>{dossier.status_visa || '—'}</td>
+                        <td><button className="sa-btn sa-btn--blue" onClick={() => navigate(`/dashboard/dossier/${encodeURIComponent(dossier.code_dossier)}`)} title="Voir le dossier"><Eye size={14} /></button></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem', marginTop: '1.5rem' }}>

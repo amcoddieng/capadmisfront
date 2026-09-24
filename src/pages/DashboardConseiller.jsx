@@ -11,7 +11,6 @@ import { useNotifications } from '../hooks/useNotifications';
 import NotificationsPanel from '../components/NotificationsPanel';
 import { useMessages } from '../hooks/useMessages';
 import MessagesPanel from '../components/MessagesPanel';
-import DossierDetailConseiller from '../components/DossierDetailConseiller';
 import { useMessageModal } from '../context/MessageModalContext';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -233,7 +232,8 @@ function StatusBadge({ value }) {
   return <span className={`status-badge status-badge--${c}`}>{STATUS_LABELS[value]||value}</span>;
 }
 
-function PageDossiers({ token, personnel, onOpenChat }) {
+function PageDossiers({ token }) {
+  const navigate = useNavigate();
   const { openMessageModal } = useMessageModal();
   const [dossiers, setDossiers] = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -283,10 +283,7 @@ function PageDossiers({ token, personnel, onOpenChat }) {
                   <td><StatusBadge value={d.status_visa}/></td>
                   <td>
                     <div className="sa-actions">
-                      <button className="sa-btn sa-btn--blue" onClick={() => {
-                        const rolePath = personnel.role?.includes('admission') ? 'conseiller-admission' : 'conseiller-visa';
-                        window.open(`/dashboard/${rolePath}?dossier=${encodeURIComponent(d.code_dossier)}`, '_blank');
-                      }} title="Voir détails"><Eye size={14}/></button>
+                      <button className="sa-btn sa-btn--blue" onClick={() => navigate(`/dashboard/dossier/${encodeURIComponent(d.code_dossier)}`)} title="Voir détails"><Eye size={14}/></button>
                       {d.etudiant?.email && (
                         <button className="sa-btn sa-btn--green" onClick={() => openMessageModal(token, d.etudiant.email, `${d.etudiant.prenom} ${d.etudiant.nom}`)} title="Envoyer message"><Send size={14}/></button>
                       )}
@@ -325,21 +322,11 @@ export default function DashboardConseiller() {
   const [session, setSession]       = useState(null);
   const [activePage, setActivePage] = useState('dashboard');
   const [mobileNav, setMobileNav]   = useState(false);
-  const [viewDossier, setViewDossier] = useState(null);
 
   useEffect(() => {
     const s = getPersonnelSession();
     if (!s.token || !s.personnel) { navigate('/personnel'); return; }
     setSession(s);
-
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get('dossier');
-    if (code) {
-      apiGetMesDossiers(s.token).then(list => {
-        const d = list.find(x => x.code_dossier === code);
-        if (d) setViewDossier(d);
-      }).catch(() => {});
-    }
   }, [navigate]);
 
   const handleLogout = async () => {
@@ -364,13 +351,9 @@ export default function DashboardConseiller() {
   };
 
   const renderPage = () => {
-    if (viewDossier) {
-      return <DossierDetailConseiller token={token} personnel={personnel} dossier={viewDossier} asPage={true}
-        onRefresh={updated => updated && setViewDossier(prev => ({ ...prev, ...updated }))} onOpenChat={handleOpenChat} />;
-    }
     switch (activePage) {
       case 'dashboard':     return <PageDashboard token={token} personnel={personnel} onOpenChat={handleOpenChat} />;
-      case 'dossiers':      return <PageDossiers token={token} personnel={personnel} onOpenChat={handleOpenChat} />;
+      case 'dossiers':      return <PageDossiers token={token} />;
       case 'messages':      return <PageMessages conversations={msg.conversations} messages={msg.messages} activeChat={msg.activeChat} unreadCount={msg.unreadCount} userEmail={personnel.email} loading={msg.loading} onSelectChat={msg.loadConversation} onSend={msg.send} />;
       case 'notifications': return <PageNotifications notifications={notifications} loading={notifLoading} unread={unread} markRead={markRead} markAllRead={markAllRead} />;
       default:              return null;

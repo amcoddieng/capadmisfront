@@ -2966,6 +2966,18 @@ a { text-decoration: none; color: inherit; }
   display: block;
 }
 
+.dossier-page-state {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .65rem;
+  background: #f8fafc;
+  color: #64748b;
+}
+.dossier-page-state--error { flex-direction: column; color: #b91c1c; }
+.dossier-page-state .form-back { margin-top: .5rem; display: inline-flex; align-items: center; gap: .4rem; }
+
 .dossier-checklist__summary {
   display: flex;
   align-items: center;

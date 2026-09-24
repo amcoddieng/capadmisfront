@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { X, Loader, AlertCircle, Send, Pencil, Eye, User, FolderOpen, CheckCircle, Upload, MessageSquare, Mail, MapPin, Phone, Globe, BookOpen, FileText, Calendar, Shield, Award, School, Trash2, Plus, Download } from 'lucide-react';
+import { X, Loader, AlertCircle, Send, Pencil, Eye, User, FolderOpen, CheckCircle, Upload, MessageSquare, Mail, MapPin, Phone, Globe, BookOpen, FileText, Calendar, Shield, Award, School, Trash2, Plus, Download, ArrowLeft } from 'lucide-react';
 import { apiGetInfosDossier, apiListPiecesJointes, apiGetPieceJointeUrl, apiTelechargerPiecesJointesZip, apiUpdateDossierStatus, apiAddPieceJointe, apiUpdatePieceJointeStatus, apiDeletePieceJointe, apiPutInfosDossier, apiListDossiersUniversite, apiListDossiersUniversiteByDossier, apiCreateDossierUniversite, apiUpdateDossierUniversite, apiDeleteDossierUniversite, apiGetDossierChecklist, apiUpdateDossierChecklist } from '../api/auth';
 import { useMessageModal } from '../context/MessageModalContext';
 
@@ -894,13 +894,13 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
 
   if (asPage) {
     return (
-      <div className="cons-page" style={{padding:'1.5rem',maxWidth:960,margin:'0 auto',background:'#f8fafc',minHeight:'100vh'}}>
+      <div className="cons-page" style={{padding:'1.5rem',maxWidth:1200,margin:'0 auto',background:'#f8fafc',minHeight:'100vh'}}>
         <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'1.5rem'}}>
           <div>
             <div style={{fontSize:'.75rem',color:'#64748b',textTransform:'uppercase',letterSpacing:'.05em',marginBottom:'.25rem'}}>Dossier étudiant</div>
             <h1 style={{margin:0,fontSize:'1.5rem',color:'#1e293b',fontWeight:800}}>{dossier.code_dossier}</h1>
           </div>
-          <button className="form-back" onClick={() => window.close()}>Fermer l'onglet</button>
+          <button className="form-back" onClick={onClose}><ArrowLeft size={15} /> Retour aux dossiers</button>
         </div>
         {content}
         {statusModal && (
