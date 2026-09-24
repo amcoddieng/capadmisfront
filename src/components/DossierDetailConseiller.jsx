@@ -584,6 +584,12 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
 
   const completedChecklist = checklist ? CHECKLIST_ITEMS.filter(([field]) => checklist[field]).length : 0;
   const checklistProgress = Math.round((completedChecklist / CHECKLIST_ITEMS.length) * 100);
+  const isChecklistItemLocked = field => {
+    if (!checklist || updatingChecklist !== null) return true;
+    const index = CHECKLIST_ITEMS.findIndex(([itemField]) => itemField === field);
+    if (checklist[field]) return CHECKLIST_ITEMS.slice(index + 1).some(([itemField]) => checklist[itemField]);
+    return index > 0 && !checklist[CHECKLIST_ITEMS[index - 1][0]];
+  };
 
   const cardStyle = { background:'#fff', borderRadius:'.875rem', boxShadow:'0 1px 2px rgba(15,23,42,.05), 0 8px 20px rgba(15,23,42,.04)', border:'1px solid #eef2f7', overflow:'hidden' };
   const cardHeader = { padding:'.9rem 1.25rem', borderBottom:'1px solid #eef2f7', background:'#fbfaf7', display:'flex', alignItems:'center', gap:'.6rem', fontWeight:700, fontSize:'.9rem', color:'#1e293b' };
@@ -704,19 +710,26 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
                         <span>{phaseCompleted}/{phase.items.length}</span>
                       </div>
                       <div className="dossier-checklist__items">
-                        {phase.items.map(([field, label], itemIndex) => (
-                          <label key={field} className={`dossier-checklist__item${checklist[field] ? ' dossier-checklist__item--done' : ''}`}>
-                            <input
-                              type="checkbox"
-                              checked={Boolean(checklist[field])}
-                              onChange={e => handleChecklistChange(field, e.target.checked)}
-                              disabled={updatingChecklist !== null}
-                            />
-                            <span className="dossier-checklist__number">{itemIndex + 1}</span>
-                            <span>{label}</span>
-                            {updatingChecklist === field && <Loader size={14} className="auth-spinner" />}
-                          </label>
-                        ))}
+                        {phase.items.map(([field, label], itemIndex) => {
+                          const locked = isChecklistItemLocked(field);
+                          return (
+                            <label
+                              key={field}
+                              className={`dossier-checklist__item${checklist[field] ? ' dossier-checklist__item--done' : ''}${locked ? ' dossier-checklist__item--locked' : ''}`}
+                              title={locked && updatingChecklist === null ? (checklist[field] ? 'Décochez d’abord les étapes suivantes' : 'Terminez d’abord l’étape précédente') : ''}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={Boolean(checklist[field])}
+                                onChange={e => handleChecklistChange(field, e.target.checked)}
+                                disabled={locked}
+                              />
+                              <span className="dossier-checklist__number">{itemIndex + 1}</span>
+                              <span>{label}</span>
+                              {updatingChecklist === field && <Loader size={14} className="auth-spinner" />}
+                            </label>
+                          );
+                        })}
                       </div>
                     </div>
                   );
