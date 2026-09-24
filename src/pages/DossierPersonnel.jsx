@@ -41,6 +41,10 @@ export default function DossierPersonnel() {
   }, [code_dossier, session.personnel?.role, session.token]);
 
   const backPath = getBackPath(session.personnel?.role);
+  const handleClose = () => {
+    if (window.history.length <= 1) window.close();
+    else navigate(backPath);
+  };
 
   if (loading) {
     return <div className="dossier-page-state"><Loader className="auth-spinner" size={24} /> Chargement du dossier…</div>;
@@ -62,7 +66,7 @@ export default function DossierPersonnel() {
       personnel={session.personnel}
       dossier={dossier}
       asPage
-      onClose={() => navigate(backPath)}
+      onClose={handleClose}
       onRefresh={updated => updated && setDossier(current => ({ ...current, ...updated }))}
     />
   );

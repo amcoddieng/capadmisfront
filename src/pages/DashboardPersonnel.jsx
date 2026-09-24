@@ -173,7 +173,7 @@ export default function DashboardPersonnel() {
                         <td>{dossier.status || '—'}</td>
                         <td>{dossier.status_admission || '—'}</td>
                         <td>{dossier.status_visa || '—'}</td>
-                        <td><button className="sa-btn sa-btn--blue" onClick={() => navigate(`/dashboard/dossier/${encodeURIComponent(dossier.code_dossier)}`)} title="Voir le dossier"><Eye size={14} /></button></td>
+                        <td><button className="sa-btn sa-btn--blue" onClick={() => window.open(`/dashboard/dossier/${encodeURIComponent(dossier.code_dossier)}`, '_blank', 'noopener,noreferrer')} title="Voir le dossier"><Eye size={14} /></button></td>
                       </tr>
                     ))}
                   </tbody>

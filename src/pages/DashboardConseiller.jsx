@@ -233,7 +233,6 @@ function StatusBadge({ value }) {
 }
 
 function PageDossiers({ token }) {
-  const navigate = useNavigate();
   const { openMessageModal } = useMessageModal();
   const [dossiers, setDossiers] = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -283,7 +282,7 @@ function PageDossiers({ token }) {
                   <td><StatusBadge value={d.status_visa}/></td>
                   <td>
                     <div className="sa-actions">
-                      <button className="sa-btn sa-btn--blue" onClick={() => navigate(`/dashboard/dossier/${encodeURIComponent(d.code_dossier)}`)} title="Voir détails"><Eye size={14}/></button>
+                      <button className="sa-btn sa-btn--blue" onClick={() => window.open(`/dashboard/dossier/${encodeURIComponent(d.code_dossier)}`, '_blank', 'noopener,noreferrer')} title="Voir détails"><Eye size={14}/></button>
                       {d.etudiant?.email && (
                         <button className="sa-btn sa-btn--green" onClick={() => openMessageModal(token, d.etudiant.email, `${d.etudiant.prenom} ${d.etudiant.nom}`)} title="Envoyer message"><Send size={14}/></button>
                       )}

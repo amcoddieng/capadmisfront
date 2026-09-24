@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
 import { X, Loader, AlertCircle, Send, Pencil, Eye, User, FolderOpen, CheckCircle, Upload, MessageSquare, Mail, MapPin, Phone, Globe, BookOpen, FileText, Calendar, Shield, Award, School, Trash2, Plus, Download, ArrowLeft } from 'lucide-react';
 import { apiGetInfosDossier, apiListPiecesJointes, apiGetPieceJointeUrl, apiTelechargerPiecesJointesZip, apiUpdateDossierStatus, apiAddPieceJointe, apiUpdatePieceJointeStatus, apiDeletePieceJointe, apiPutInfosDossier, apiListDossiersUniversite, apiListDossiersUniversiteByDossier, apiCreateDossierUniversite, apiUpdateDossierUniversite, apiDeleteDossierUniversite, apiGetDossierChecklist, apiUpdateDossierChecklist } from '../api/auth';
 import { useMessageModal } from '../context/MessageModalContext';
@@ -433,6 +433,20 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
   const [checklist, setChecklist] = useState(null);
   const [updatingChecklist, setUpdatingChecklist] = useState(null);
   const fileInputRef = useRef(null);
+  const scrollPositionRef = useRef(0);
+
+  useEffect(() => {
+    if (!asPage) return undefined;
+    const rememberScrollPosition = () => { scrollPositionRef.current = window.scrollY; };
+    window.addEventListener('scroll', rememberScrollPosition, { passive: true });
+    return () => window.removeEventListener('scroll', rememberScrollPosition);
+  }, [asPage]);
+
+  useLayoutEffect(() => {
+    if (asPage && Math.abs(window.scrollY - scrollPositionRef.current) > 1) {
+      window.scrollTo(0, scrollPositionRef.current);
+    }
+  });
 
   const fetchDetails = useCallback(async () => {
     setLoading(true); setError('');

@@ -187,7 +187,6 @@ function ModalSingleStatus({ token, dossier, field, onClose, onSuccess }) {
 
 /* ── Page Dossiers ── */
 function PageDossiers({ token }) {
-  const navigate = useNavigate();
   const { openMessageModal } = useMessageModal();
   const [dossiers, setDossiers] = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -283,7 +282,7 @@ function PageDossiers({ token }) {
                     )}
                   </td>
                   <td><div className="sa-actions">
-                    <button className="sa-btn sa-btn--blue" onClick={() => navigate(`/dashboard/dossier/${encodeURIComponent(d.code_dossier)}`)} title="Voir le dossier"><Eye size={14}/></button>
+                    <button className="sa-btn sa-btn--blue" onClick={() => window.open(`/dashboard/dossier/${encodeURIComponent(d.code_dossier)}`, '_blank', 'noopener,noreferrer')} title="Voir le dossier"><Eye size={14}/></button>
                     <button className="sa-btn sa-btn--orange" onClick={() => { setStatusField('status'); setStatusModal(d); }} title="Changer statut global"><Pencil size={14}/></button>
                     <button className="sa-btn sa-btn--orange" onClick={() => { setStatusField('status_admission'); setStatusModal(d); }} title="Changer statut admission"><Award size={14}/></button>
                     <button className="sa-btn sa-btn--orange" onClick={() => { setStatusField('status_visa'); setStatusModal(d); }} title="Changer statut visa"><Globe size={14}/></button>
@@ -370,7 +369,6 @@ function ModalEtudiant({ token, etudiant, onClose, onSuccess }) {
 
 /* ── Page Étudiants ── */
 function PageEtudiants({ token }) {
-  const navigate = useNavigate();
   const { openMessageModal } = useMessageModal();
   const [etudiants, setEtudiants] = useState([]);
   const [dossiers, setDossiers]   = useState([]);
@@ -399,7 +397,7 @@ function PageEtudiants({ token }) {
 
   const handleVoir = (etudiant) => {
     const dossier = dossiers.find(item => item.etudiant?.id === etudiant.id || item.etudiant?.email === etudiant.email);
-    if (dossier) navigate(`/dashboard/dossier/${encodeURIComponent(dossier.code_dossier)}`);
+    if (dossier) window.open(`/dashboard/dossier/${encodeURIComponent(dossier.code_dossier)}`, '_blank', 'noopener,noreferrer');
     else alert('Cet étudiant n\'a pas encore de dossier.');
   };
 
