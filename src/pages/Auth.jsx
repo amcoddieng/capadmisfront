@@ -32,6 +32,7 @@ const paysOrigine = ['Sénégal', 'Côte d\'Ivoire', 'Mali', 'Guinée', 'Camerou
 export default function Auth({ page = 'login' }) {
   const navigate = useNavigate();
   const isRegister = page === 'register';
+  const isLegacyRegister = page === 'legacy-register';
   const [showPwd, setShowPwd] = useState(false);
   const [step, setStep]       = useState(1);
   const [loading, setLoading] = useState(false);
@@ -218,10 +219,10 @@ export default function Auth({ page = 'login' }) {
   }
 
   return (
-    <div className="auth-page">
+    <div className={`auth-page${isLegacyRegister ? ' auth-page--register' : ''}`}>
       <Helmet>
-        <title>{isRegister ? 'Inscription étudiant' : 'Connexion étudiant'} — CapAdmis</title>
-        <meta name="description" content={isRegister ? "Créez votre compte étudiant CapAdmis pour démarrer votre procédure d'études à l'étranger." : 'Connectez-vous à votre espace étudiant CapAdmis.'} />
+        <title>{isLegacyRegister ? 'Inscription étudiant' : 'Connexion étudiant'} — CapAdmis</title>
+        <meta name="description" content={isLegacyRegister ? "Créez votre compte étudiant CapAdmis pour démarrer votre procédure d'études à l'étranger." : 'Connectez-vous à votre espace étudiant CapAdmis.'} />
         <meta name="robots" content="noindex, follow" />
       </Helmet>
 
@@ -287,7 +288,7 @@ export default function Auth({ page = 'login' }) {
             )}
 
             {/* ── LOGIN ─────────────────────────────────── */}
-            {!isRegister && (
+            {!isLegacyRegister && (
               <form onSubmit={handleLogin} className="auth-form">
                 <div className="auth-form-header">
                   <h2 className="auth-form-title">Bienvenue !</h2>
@@ -337,7 +338,7 @@ export default function Auth({ page = 'login' }) {
             )}
 
             {/* ── REGISTER ──────────────────────────────── */}
-            {isRegister && (
+            {isLegacyRegister && (
               <form onSubmit={handleRegister} className="auth-form auth-form--register">
                 <div className="auth-form-header">
                   <h2 className="auth-form-title">Créer mon compte</h2>
@@ -475,7 +476,7 @@ export default function Auth({ page = 'login' }) {
         </div>
 
         <p className="auth-footer">
-          En vous connectant, vous acceptez nos{' '}
+          {isLegacyRegister ? 'En créant un compte' : 'En vous connectant'}, vous acceptez nos{' '}
           <Link to="/confidentialite">CGU</Link> et notre{' '}
           <Link to="/confidentialite">politique de confidentialité</Link>.
         </p>
@@ -486,7 +487,7 @@ export default function Auth({ page = 'login' }) {
         </div>
         </div>
       </div>
-      {isRegister && <WhatsAppFloat />}
+      {isLegacyRegister && <WhatsAppFloat />}
     </div>
   );
 }

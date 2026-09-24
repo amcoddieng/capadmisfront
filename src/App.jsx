@@ -111,6 +111,7 @@ function App() {
           <Route path="/blog/:slug" element={<Layout><BlogArticle /></Layout>} />
           <Route path="/connexion" element={<Auth page="login" />} />
           <Route path="/inscription" element={<Auth page="register" />} />
+          <Route path="/inscription-classique" element={<Auth page="legacy-register" />} />
           <Route path="/dashboard" element={<PrivateRoute authReady={authReady}><DashboardStudent /></PrivateRoute>} />
           <Route path="/personnel" element={<AuthPersonnel />} />
           <Route path="/dashboard/admin" element={<PrivatePersonnelRoute authReady={authReady} roles={['admin']}><DashboardPersonnel /></PrivatePersonnelRoute>} />
