@@ -321,6 +321,7 @@ const PJ_TYPES = [
   { value: 'DIPLOME_MASTER', label: 'Diplôme de master' },
   { value: 'DIPLOME_DOCTORAT', label: 'Diplôme de doctorat' },
   { value: 'ATTESTATION', label: 'Attestation diverse' },
+  { value: 'ATTESTATION_ACCREDITATION', label: 'Attestation d\'accréditation' },
   { value: 'RELEVE_NOTES_BAC', label: 'Relevé de notes — baccalauréat' },
   { value: 'BULLETIN_NOTES_SECONDE', label: 'Bulletin — Seconde' },
   { value: 'BULLETIN_NOTES_PREMIERE', label: 'Bulletin — Première' },

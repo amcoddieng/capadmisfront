@@ -33,6 +33,7 @@ const PAYS_CIBLE_LISTE = ['France','Allemagne','Autre'];
 const TYPES_PJ = {
   PHOTO_PROFIL:                'Photo de profil',
   ATTESTATION:                 'Attestation',
+  ATTESTATION_ACCREDITATION:   'Attestation d\'accréditation',
   DIPLOME_BAC:                 'Diplôme du Bac',
   RELEVE_NOTES_BAC:            'Relevé de notes du Bac',
   DIPLOME_LICENCE:             'Diplôme de Licence',
