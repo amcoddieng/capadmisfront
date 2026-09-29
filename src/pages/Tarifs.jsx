@@ -68,7 +68,7 @@ const faqs = [
   { q: 'Quand dois-je payer l\'Étape 2 ?', a: "L'étape 2 (49 900 FCFA) n'est payable qu'après l'obtention d'une admission dans une université. Aucun paiement anticipé pour cette étape." },
   { q: 'Que sont les frais Campus France ?', a: "Les frais Campus France (environ 85 000 FCFA) sont des frais officiels payés directement à Campus France. Ils ne font pas partie de nos honoraires." },
   { q: 'Quels moyens de paiement acceptez-vous ?', a: "Nous acceptons Wave, Orange Money, carte bancaire et virement. Le paiement est sécurisé et visible sur votre tableau de bord." },
-  { q: 'Y a-t-il un remboursement si je ne suis pas admis ?', a: "Nous mettons tout en œuvre pour maximiser vos chances. Consultez nos <a href='/confidentialite'>CGU</a> pour les conditions de remboursement détaillées." },
+  { q: "Dois-je payer à la fin même si je ne suis pas accepté par les universités françaises ?", a: "Chez CapAdmis, l'étudiant ne paie pas les frais honoraires s'il n'est pas accepté." },
 ];
 
 export default function Tarifs() {
