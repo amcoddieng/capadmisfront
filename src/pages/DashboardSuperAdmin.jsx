@@ -380,6 +380,7 @@ function PageEtudiants({ token }) {
   const [deleting, setDeleting]   = useState(null);
   const [search, setSearch] = useState('');
   const [filterStatut, setFilterStatut] = useState('');
+  const [filterPaiement, setFilterPaiement] = useState('');
   const [selected, setSelected]   = useState(new Set());
   const fetch = useCallback(async () => {
     setLoading(true); setError('');
@@ -412,7 +413,10 @@ function PageEtudiants({ token }) {
       e.ville?.toLowerCase().includes(q) ||
       e.code_dossier?.toLowerCase().includes(q);
     const matchStatut = !filterStatut || (filterStatut === 'bloque' ? e.bloque : !e.bloque);
-    return matchSearch && matchStatut;
+    const dossier = dossiers.find(item => item.etudiant?.id === e.id || item.etudiant?.email === e.email);
+    const paiementEffectue = Boolean(dossier?.infos_dossier?.paiement);
+    const matchPaiement = !filterPaiement || (filterPaiement === 'paye' ? paiementEffectue : !paiementEffectue);
+    return matchSearch && matchStatut && matchPaiement;
   });
   const handleBlock = async (id) => {
     setToggling(id); setActionErr('');
@@ -511,15 +515,20 @@ function PageEtudiants({ token }) {
           <option value="actif">Actif</option>
           <option value="bloque">Bloqué</option>
         </select>
+        <select value={filterPaiement} onChange={e => setFilterPaiement(e.target.value)} style={{ padding: '.4rem .6rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.85rem' }}>
+          <option value="">Tous les paiements</option>
+          <option value="paye">Payé</option>
+          <option value="non_paye">Non payé</option>
+        </select>
       </div>
 
       {actionErr && <div className="auth-error" style={{margin:'0 0 .75rem'}}><AlertCircle size={15}/> {actionErr}</div>}
       <TableWrap loading={loading} error={error}>
         <div className="sa-table-wrap">
           <table className="sa-table">
-            <thead><tr><th><input type="checkbox" checked={allFilteredSelected} ref={el => el && (el.indeterminate = someFilteredSelected)} onChange={toggleSelectAll} aria-label="Tout sélectionner" /></th><th>Prénom</th><th>Nom</th><th>Email</th><th>Téléphone</th><th>Tuteur</th><th>Ville</th><th>Pays</th><th>Statut</th><th>Actions</th></tr></thead>
+            <thead><tr><th><input type="checkbox" checked={allFilteredSelected} ref={el => el && (el.indeterminate = someFilteredSelected)} onChange={toggleSelectAll} aria-label="Tout sélectionner" /></th><th>Prénom</th><th>Nom</th><th>Email</th><th>Téléphone</th><th>Tuteur</th><th>Ville</th><th>Pays</th><th>Paiement</th><th>Statut</th><th>Actions</th></tr></thead>
             <tbody>
-              {filtered.length === 0 && <tr><td colSpan={10} className="sa-empty">Aucun étudiant trouvé</td></tr>}
+              {filtered.length === 0 && <tr><td colSpan={11} className="sa-empty">Aucun étudiant trouvé</td></tr>}
               {filtered.map(e => (
                 <tr key={e.id}>
                   <td><input type="checkbox" checked={selected.has(e.id)} onChange={() => toggleSelect(e.id)} aria-label={`Sélectionner ${e.prenom} ${e.nom}`} /></td>
@@ -528,6 +537,10 @@ function PageEtudiants({ token }) {
                   <td style={{fontSize:'.8rem'}}>{e.telephone || '—'}</td>
                   <td style={{fontSize:'.8rem'}}>{e.numero_tuteur || '—'}</td>
                   <td>{e.ville||'—'}</td><td>{e.payes||'—'}</td>
+                  <td>{dossiers.find(item => item.etudiant?.id === e.id || item.etudiant?.email === e.email)?.infos_dossier?.paiement
+                    ? <span className="status-badge status-badge--green">Payé</span>
+                    : <span className="status-badge status-badge--red">Non payé</span>}
+                  </td>
                   <td><span className={`status-badge status-badge--${e.bloque?'red':'green'}`}>{e.bloque?'Bloqué':'Actif'}</span></td>
                   <td><div className="sa-actions">
                     <button className="sa-btn sa-btn--blue" onClick={() => handleVoir(e)} title="Voir le dossier"><Eye size={14}/></button>
