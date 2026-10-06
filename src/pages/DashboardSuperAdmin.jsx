@@ -74,9 +74,10 @@ function TableWrap({ loading, error, children }) {
 
 /* ── Modal assign conseiller ── */
 function ModalAssignConseiller({ token, dossier, defaultType = 'admission', onClose, onSuccess }) {
+  const assignedId = type => type === 'admission' ? dossier.conseiller_admission?.id : dossier.conseiller_visa?.id;
   const [type, setType] = useState(defaultType);
   const [conseillers, setConseillers] = useState([]);
-  const [conseillerId, setConseillerId] = useState('');
+  const [conseillerId, setConseillerId] = useState(() => String(assignedId(defaultType) || ''));
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -86,16 +87,15 @@ function ModalAssignConseiller({ token, dossier, defaultType = 'admission', onCl
   const filtered = conseillers.filter(c => c.role?.includes(type));
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!conseillerId) { setError('Sélectionnez un conseiller.'); return; }
     setSaving(true); setError('');
-    try { await apiAssignConseiller(token, dossier.id, type, Number(conseillerId)); await onSuccess(); onClose(); }
+    try { await apiAssignConseiller(token, dossier.id, type, conseillerId ? Number(conseillerId) : null); await onSuccess(); onClose(); }
     catch (e) { setError(e.message); } finally { setSaving(false); }
   };
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" style={{ maxWidth: 420 }} onClick={e => e.stopPropagation()}>
         <div className="modal__header">
-          <h3 className="modal__title">Assigner un conseiller — {dossier.code_dossier}</h3>
+          <h3 className="modal__title">Gérer le conseiller — {dossier.code_dossier}</h3>
           <button className="modal__close" onClick={onClose}><X size={18}/></button>
         </div>
         <div className="modal__body">
@@ -104,15 +104,15 @@ function ModalAssignConseiller({ token, dossier, defaultType = 'admission', onCl
             <form onSubmit={handleSubmit} style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
               <div className="form-group">
                 <label className="form-label">Type</label>
-                <select className="form-select" value={type} onChange={e => { setType(e.target.value); setConseillerId(''); }}>
+                <select className="form-select" value={type} onChange={e => { const nextType = e.target.value; setType(nextType); setConseillerId(String(assignedId(nextType) || '')); }}>
                   <option value="admission">Admission</option>
                   <option value="visa">Visa</option>
                 </select>
               </div>
               <div className="form-group">
                 <label className="form-label">Conseiller</label>
-                <select className="form-select" required value={conseillerId} onChange={e => setConseillerId(e.target.value)}>
-                  <option value="">Sélectionner</option>
+                <select className="form-select" value={conseillerId} onChange={e => setConseillerId(e.target.value)}>
+                  <option value="">Aucun conseiller</option>
                   {filtered.map(c => <option key={c.id} value={c.id}>{c.prenom} {c.nom} ({c.code})</option>)}
                 </select>
               </div>
@@ -120,7 +120,7 @@ function ModalAssignConseiller({ token, dossier, defaultType = 'admission', onCl
                 <button type="button" className="form-back" onClick={onClose}>Annuler</button>
                 <button type="submit" className="form-submit" disabled={saving}>
                   {saving ? <Loader size={14} className="auth-spinner"/> : <CheckCircle size={14}/>}
-                  {saving ? 'Assignation…' : 'Assigner'}
+                  {saving ? 'Enregistrement…' : 'Enregistrer'}
                 </button>
               </div>
             </form>
@@ -268,18 +268,14 @@ function PageDossiers({ token }) {
                   <td><StatusBadge value={d.status_admission}/></td>
                   <td><StatusBadge value={d.status_visa}/></td>
                   <td>
-                    {d.conseiller_admission ? `${d.conseiller_admission.prenom} ${d.conseiller_admission.nom}` : (
-                      <button className="sa-btn sa-btn--blue" style={{fontSize:'.75rem',padding:'.2rem .5rem'}} onClick={() => setAssignModal({ dossier: d, type: 'admission' })} title="Assigner conseiller admission">
-                        <UserCheck size={12}/> Attribuer
-                      </button>
-                    )}
+                    <button className="sa-btn sa-btn--blue" style={{fontSize:'.75rem',padding:'.2rem .5rem'}} onClick={() => setAssignModal({ dossier: d, type: 'admission' })} title={d.conseiller_admission ? 'Modifier ou retirer le conseiller admission' : 'Assigner un conseiller admission'}>
+                      {d.conseiller_admission ? <><Pencil size={12}/> {d.conseiller_admission.prenom} {d.conseiller_admission.nom}</> : <><UserCheck size={12}/> Attribuer</>}
+                    </button>
                   </td>
                   <td>
-                    {d.conseiller_visa ? `${d.conseiller_visa.prenom} ${d.conseiller_visa.nom}` : (
-                      <button className="sa-btn sa-btn--blue" style={{fontSize:'.75rem',padding:'.2rem .5rem'}} onClick={() => setAssignModal({ dossier: d, type: 'visa' })} title="Assigner conseiller visa">
-                        <UserCheck size={12}/> Attribuer
-                      </button>
-                    )}
+                    <button className="sa-btn sa-btn--blue" style={{fontSize:'.75rem',padding:'.2rem .5rem'}} onClick={() => setAssignModal({ dossier: d, type: 'visa' })} title={d.conseiller_visa ? 'Modifier ou retirer le conseiller visa' : 'Assigner un conseiller visa'}>
+                      {d.conseiller_visa ? <><Pencil size={12}/> {d.conseiller_visa.prenom} {d.conseiller_visa.nom}</> : <><UserCheck size={12}/> Attribuer</>}
+                    </button>
                   </td>
                   <td><div className="sa-actions">
                     <button className="sa-btn sa-btn--blue" onClick={() => window.open(`/dashboard/dossier/${encodeURIComponent(d.code_dossier)}`, '_blank', 'noopener,noreferrer')} title="Voir le dossier"><Eye size={14}/></button>
