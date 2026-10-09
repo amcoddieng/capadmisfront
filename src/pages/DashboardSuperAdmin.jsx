@@ -48,21 +48,21 @@ const ROLES_PERSONNEL = [
 const ROLE_LABELS_PERS = { admin: 'Admin', conseiller_admission: 'Cons. Admission', conseiller_visa: 'Cons. Visa' };
 
 const STATUS_OPTIONS      = ['non_demarre','EN_COURS_D_ETUDE','VALIDE','CHANGEMENT_A_APPORTER','DOCUMENT_MANQUANT'];
-const STATUS_ADM_OPTIONS  = ['ADMISSION_EN_COURS','ADMISSION_VALIDE','ADMISSION_INVALIDE'];
+const STATUS_ADM_OPTIONS  = ['NON_OUVERT','TRAITEMENT_EN_COURS','PAIEMENT_AUTORISE','ENTRETIEN_A_FAIRE','VALIDE','REJETE'];
 const STATUS_VISA_OPTIONS = ['DEMANDE_VISA_EN_COURS','DEMANDE_VISA_VALIDE','DEMANDE_VISA_INVALIDE'];
 const STATUS_LABELS = {
   non_demarre:'Non démarré', EN_COURS_D_ETUDE:'En cours d’étude', VALIDE:'Validé',
   CHANGEMENT_A_APPORTER:'Changement requis', DOCUMENT_MANQUANT:'Document manquant',
   INVALIDE:'Invalide', EN_ATTENTE:'En attente',
-  ADMISSION_EN_COURS:'Admission en cours', ADMISSION_VALIDE:'Admission validée', ADMISSION_INVALIDE:'Admission invalidée',
+  NON_OUVERT:'Non ouvert', TRAITEMENT_EN_COURS:'Traitement en cours', PAIEMENT_AUTORISE:'Paiement autorisé', ENTRETIEN_A_FAIRE:'Entretien à faire', REJETE:'Rejeté',
   DEMANDE_VISA_EN_COURS:'Visa en cours', DEMANDE_VISA_VALIDE:'Visa validé', DEMANDE_VISA_INVALIDE:'Visa invalidé',
 };
 function StatusBadge({ value }) {
   if (!value) return <span style={{ color:'#94a3b8' }}>—</span>;
-  const green=['VALIDE','ADMISSION_VALIDE','DEMANDE_VISA_VALIDE'];
-  const red=['INVALIDE','ADMISSION_INVALIDE','DEMANDE_VISA_INVALIDE'];
-  const orange=['EN_ATTENTE','CHANGEMENT_A_APPORTER','DOCUMENT_MANQUANT'];
-  const grey=['non_demarre'];
+  const green=['VALIDE','DEMANDE_VISA_VALIDE'];
+  const red=['INVALIDE','REJETE','DEMANDE_VISA_INVALIDE'];
+  const orange=['EN_ATTENTE','CHANGEMENT_A_APPORTER','DOCUMENT_MANQUANT','PAIEMENT_AUTORISE','ENTRETIEN_A_FAIRE'];
+  const grey=['non_demarre','NON_OUVERT'];
   const c = green.includes(value)?'green':red.includes(value)?'red':orange.includes(value)?'orange':grey.includes(value)?'grey':'blue';
   return <span className={`status-badge status-badge--${c}`}>{STATUS_LABELS[value]||value}</span>;
 }
@@ -165,7 +165,7 @@ function ModalSingleStatus({ token, dossier, field, onClose, onSuccess }) {
               <select className="form-select" value={value} onChange={e => setValue(e.target.value)}>
                 {cfg.options.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
               </select>
-              {field === 'status_admission' && value === 'ADMISSION_EN_COURS' && (
+              {field === 'status_admission' && value === 'TRAITEMENT_EN_COURS' && (
                 <p style={{ margin: '.4rem 0 0', color: '#166534', fontSize: '.78rem' }}>
                   Le statut global sera automatiquement défini sur « Validé ».
                 </p>

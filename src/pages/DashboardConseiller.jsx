@@ -220,15 +220,15 @@ function PageDashboard({ token, personnel, onOpenChat }) {
 const STATUS_LABELS = {
   EN_COURS_D_ETUDE:'En cours d\'étude', VALIDE:'Validé', INVALIDE:'Invalide',
   EN_ATTENTE:'En attente', CHANGEMENT_A_APPORTER:'Changement requis',
-  ADMISSION_EN_COURS:'Admission en cours', ADMISSION_VALIDE:'Admission validée', ADMISSION_INVALIDE:'Admission invalidée',
+  NON_OUVERT:'Non ouvert', TRAITEMENT_EN_COURS:'Traitement en cours', PAIEMENT_AUTORISE:'Paiement autorisé', ENTRETIEN_A_FAIRE:'Entretien à faire', REJETE:'Rejeté',
   DEMANDE_VISA_EN_COURS:'Visa en cours', DEMANDE_VISA_VALIDE:'Visa validé', DEMANDE_VISA_INVALIDE:'Visa invalidé',
 };
 function StatusBadge({ value }) {
   if (!value) return <span style={{ color:'#94a3b8' }}>—</span>;
-  const green=['VALIDE','ADMISSION_VALIDE','DEMANDE_VISA_VALIDE'];
-  const red=['INVALIDE','ADMISSION_INVALIDE','DEMANDE_VISA_INVALIDE'];
-  const orange=['EN_ATTENTE','CHANGEMENT_A_APPORTER'];
-  const c = green.includes(value)?'green':red.includes(value)?'red':orange.includes(value)?'orange':'blue';
+  const green=['VALIDE','DEMANDE_VISA_VALIDE'];
+  const red=['INVALIDE','REJETE','DEMANDE_VISA_INVALIDE'];
+  const orange=['EN_ATTENTE','CHANGEMENT_A_APPORTER','PAIEMENT_AUTORISE','ENTRETIEN_A_FAIRE'];
+  const c = green.includes(value)?'green':red.includes(value)?'red':orange.includes(value)?'orange':value==='NON_OUVERT'?'grey':'blue';
   return <span className={`status-badge status-badge--${c}`}>{STATUS_LABELS[value]||value}</span>;
 }
 
