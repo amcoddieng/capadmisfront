@@ -127,7 +127,7 @@ function ModalChangerStatut({ token, dossier, isAdmin, isAdmission, isVisa, mode
   };
 
   const titleByMode = {
-    status:     'Statut global',
+    status:     'Statut CapAdmis',
     admission:  'Statut admission',
     visa:       'Statut visa',
   };
@@ -648,8 +648,8 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
           }>
             <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:'.75rem'}}>
               {[
-                {label:'Statut global', val:dossier.status, icon:FileText, mode:'status'},
-                {label:'Admission', val:dossier.status_admission, icon:Award, mode:'admission'},
+                {label:'Statut CApAdmis', val:dossier.status, icon:FileText, mode:'status'},
+                {label:'Status Campus France', val:dossier.status_admission, icon:Award, mode:'admission'},
                 {label:'Visa', val:dossier.status_visa, icon:Globe, mode:'visa'},
               ].map(s => (
                 <div key={s.label} style={{background:'#f8fafc',borderRadius:'.5rem',padding:'.75rem',textAlign:'center'}}>

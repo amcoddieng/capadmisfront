@@ -133,7 +133,7 @@ function ModalAssignConseiller({ token, dossier, defaultType = 'admission', onCl
 
 /* ── Modal statut dossier (single field) ── */
 const STATUS_FIELD_CONFIG = {
-  status:           { label: 'Statut global',   options: STATUS_OPTIONS },
+  status:           { label: 'Statut CapAdmis',   options: STATUS_OPTIONS },
   status_admission: { label: 'Statut admission', options: STATUS_ADM_OPTIONS },
   status_visa:      { label: 'Statut visa',      options: STATUS_VISA_OPTIONS },
 };
@@ -742,7 +742,7 @@ function PageConseillers({ token }) {
               ) : (
                 <div className="sa-table-wrap">
                   <table className="sa-table">
-                    <thead><tr><th>Code</th><th>Étudiant</th><th>Statut global</th><th>Admission</th><th>Visa</th></tr></thead>
+                    <thead><tr><th>Code</th><th>Étudiant</th><th>Statut CapAdmis</th><th>Statut Campus France</th><th>Visa</th></tr></thead>
                     <tbody>
                       {dossiersModal.dossiers.map(d => (
                         <tr key={d.id}>

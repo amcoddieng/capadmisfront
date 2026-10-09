@@ -518,11 +518,11 @@ function PageDossier({ token, email }) {
         </div>
         <div className="info-grid">
           <div className="info-field">
-            <span className="info-field__label">Statut de mon dossier</span>
+            <span className="info-field__label">Statut CapAdmis</span>
             <StatusBadge value={dossier.status} />
           </div>
           <div className="info-field">
-            <span className="info-field__label">Admission</span>
+            <span className="info-field__label">Statut Campus France</span>
             <StatusBadge value={dossier.status_admission} />
           </div>
           <div className="info-field">
