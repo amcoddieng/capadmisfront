@@ -134,7 +134,7 @@ function ModalAssignConseiller({ token, dossier, defaultType = 'admission', onCl
 /* ── Modal statut dossier (single field) ── */
 const STATUS_FIELD_CONFIG = {
   status:           { label: 'Statut CapAdmis',   options: STATUS_OPTIONS },
-  status_admission: { label: 'Statut admission', options: STATUS_ADM_OPTIONS },
+  status_admission: { label: 'Statut Campus france', options: STATUS_ADM_OPTIONS },
   status_visa:      { label: 'Statut visa',      options: STATUS_VISA_OPTIONS },
 };
 
@@ -463,7 +463,7 @@ function PageEtudiants({ token }) {
         'Date création compte': e.createdAt ? new Date(e.createdAt).toLocaleDateString('fr-FR') : '',
         'Code dossier': d?.code_dossier || '',
         'Statut dossier': d?.status || '',
-        'Statut admission': d?.status_admission || '',
+        'Statut Campus France': d?.status_admission || '',
         'Statut visa': d?.status_visa || '',
         'Paiement': infos?.paiement ? 'Payé' : 'Non payé',
         'Conseiller admission': d?.conseiller_admission ? `${d.conseiller_admission.prenom} ${d.conseiller_admission.nom}` : '',
