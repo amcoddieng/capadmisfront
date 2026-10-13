@@ -3386,6 +3386,99 @@ a { text-decoration: none; color: inherit; }
   align-items: center;
 }
 
+.sa-students-table {
+  table-layout: fixed;
+}
+.sa-students-table th,
+.sa-students-table td {
+  padding-left: .6rem;
+  padding-right: .6rem;
+}
+.sa-students-table td {
+  overflow-wrap: anywhere;
+}
+.sa-students-table__value,
+.sa-students-table__secondary {
+  display: block;
+}
+.sa-students-table__secondary {
+  margin-top: .2rem;
+  color: var(--slate-400, #94a3b8);
+  font-size: .72rem;
+}
+.sa-students-table__badges {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .3rem;
+}
+.sa-students-table .sa-actions {
+  gap: .25rem;
+}
+
+@media (max-width: 900px) {
+  .sa-table-wrap:has(.sa-students-table) {
+    overflow-x: visible;
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+  }
+  .sa-students-table,
+  .sa-students-table tbody,
+  .sa-students-table tr,
+  .sa-students-table td {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .sa-students-table colgroup,
+  .sa-students-table thead {
+    display: none;
+  }
+  .sa-students-table tbody {
+    display: grid;
+    gap: .75rem;
+  }
+  .sa-students-table tbody tr {
+    overflow: hidden;
+    border: 1px solid var(--slate-200, #e2e8f0);
+    border-radius: .75rem;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(15,23,42,.04);
+  }
+  .sa-students-table td {
+    display: grid;
+    grid-template-columns: minmax(90px, 32%) 1fr;
+    gap: .75rem;
+    padding: .6rem .75rem;
+    border-bottom: 1px solid var(--slate-100, #f1f5f9);
+  }
+  .sa-students-table td::before {
+    content: attr(data-label);
+    color: var(--slate-500, #64748b);
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+  }
+  .sa-students-table td:last-child {
+    border-bottom: 0;
+  }
+  .sa-students-table .sa-empty {
+    display: block;
+  }
+  .sa-students-table .sa-empty::before {
+    content: none;
+  }
+  .sa-students-table__badges {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .sa-students-table .sa-actions {
+    flex-wrap: wrap;
+  }
+}
+
 .sa-btn {
   display: inline-flex;
   align-items: center;

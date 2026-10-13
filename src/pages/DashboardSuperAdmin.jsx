@@ -556,24 +556,34 @@ function PageEtudiants({ token }) {
       {actionErr && <div className="auth-error" style={{margin:'0 0 .75rem'}}><AlertCircle size={15}/> {actionErr}</div>}
       <TableWrap loading={loading} error={error}>
         <div className="sa-table-wrap">
-          <table className="sa-table">
-            <thead><tr><th><input type="checkbox" checked={allFilteredSelected} ref={el => el && (el.indeterminate = someFilteredSelected)} onChange={toggleSelectAll} aria-label="Tout sélectionner" /></th><th>Prénom</th><th>Nom</th><th>Email</th><th>Téléphone</th><th>Tuteur</th><th>Ville</th><th>Pays</th><th>Paiement</th><th>Statut</th><th>Actions</th></tr></thead>
+          <table className="sa-table sa-students-table">
+            <colgroup><col style={{width:38}}/><col style={{width:'17%'}}/><col style={{width:'24%'}}/><col style={{width:'14%'}}/><col style={{width:'13%'}}/><col style={{width:'15%'}}/><col style={{width:176}}/></colgroup>
+            <thead><tr><th><input type="checkbox" checked={allFilteredSelected} ref={el => el && (el.indeterminate = someFilteredSelected)} onChange={toggleSelectAll} aria-label="Tout sélectionner" /></th><th>Étudiant</th><th>Contact</th><th>Tuteur</th><th>Localisation</th><th>Suivi</th><th>Actions</th></tr></thead>
             <tbody>
-              {filtered.length === 0 && <tr><td colSpan={11} className="sa-empty">Aucun étudiant trouvé</td></tr>}
+              {filtered.length === 0 && <tr><td colSpan={7} className="sa-empty">Aucun étudiant trouvé</td></tr>}
               {filtered.map(e => (
                 <tr key={e.id}>
-                  <td><input type="checkbox" checked={selected.has(e.id)} onChange={() => toggleSelect(e.id)} aria-label={`Sélectionner ${e.prenom} ${e.nom}`} /></td>
-                  <td>{e.prenom}</td><td>{e.nom}</td>
-                  <td style={{fontSize:'.8rem'}}>{e.email}</td>
-                  <td style={{fontSize:'.8rem'}}>{e.telephone || '—'}</td>
-                  <td style={{fontSize:'.8rem'}}>{e.numero_tuteur || '—'}</td>
-                  <td>{e.ville||'—'}</td><td>{e.payes||'—'}</td>
-                  <td>{dossiers.find(item => item.etudiant?.id === e.id || item.etudiant?.email === e.email)?.infos_dossier?.paiement
-                    ? <span className="status-badge status-badge--green">Payé</span>
-                    : <span className="status-badge status-badge--red">Non payé</span>}
+                  <td data-label="Sélection"><input type="checkbox" checked={selected.has(e.id)} onChange={() => toggleSelect(e.id)} aria-label={`Sélectionner ${e.prenom} ${e.nom}`} /></td>
+                  <td data-label="Étudiant">
+                    <strong style={{display:'block',color:'#1e293b'}}>{e.prenom} {e.nom}</strong>
+                    <span style={{display:'block',fontSize:'.7rem',color:'#94a3b8',marginTop:'.2rem'}}>{e.createdAt ? `Créé le ${new Date(e.createdAt).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}` : 'Date inconnue'}</span>
                   </td>
-                  <td><span className={`status-badge status-badge--${e.bloque?'red':'green'}`}>{e.bloque?'Bloqué':'Actif'}</span></td>
-                  <td><div className="sa-actions">
+                  <td data-label="Contact" style={{fontSize:'.78rem'}}>
+                    <span className="sa-students-table__value">{e.email}</span>
+                    <span className="sa-students-table__secondary">{e.telephone || 'Téléphone non renseigné'}</span>
+                  </td>
+                  <td data-label="Tuteur" style={{fontSize:'.78rem'}}>{e.numero_tuteur || '—'}</td>
+                  <td data-label="Localisation">
+                    <span className="sa-students-table__value">{e.ville || '—'}</span>
+                    <span className="sa-students-table__secondary">{e.payes || '—'}</span>
+                  </td>
+                  <td data-label="Suivi"><div className="sa-students-table__badges">
+                    {dossiers.find(item => item.etudiant?.id === e.id || item.etudiant?.email === e.email)?.infos_dossier?.paiement
+                      ? <span className="status-badge status-badge--green">Payé</span>
+                      : <span className="status-badge status-badge--red">Non payé</span>}
+                    <span className={`status-badge status-badge--${e.bloque?'red':'green'}`}>{e.bloque?'Bloqué':'Actif'}</span>
+                  </div></td>
+                  <td data-label="Actions"><div className="sa-actions">
                     <button className="sa-btn sa-btn--blue" onClick={() => handleVoir(e)} title="Voir le dossier"><Eye size={14}/></button>
                     <button className="sa-btn sa-btn--blue" onClick={() => setModal(e)} title="Modifier"><Pencil size={14}/></button>
                     <button className={`sa-btn ${e.bloque?'sa-btn--green':'sa-btn--orange'}`} onClick={() => handleBlock(e.id)} disabled={toggling===e.id} title={e.bloque?'Débloquer':'Bloquer'}>
