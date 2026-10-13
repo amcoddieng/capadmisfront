@@ -503,37 +503,54 @@ function PageEtudiants({ token }) {
       <p className="cons-page__sub">{filtered.length} étudiant(s) sur {etudiants.length} enregistré(s).</p>
 
       {/* ── Recherche et filtres étudiants ── */}
-      <div style={{ display: 'flex', gap: '.75rem', flexWrap: 'wrap', alignItems: 'center', marginBottom: '1.25rem', background: '#fff', padding: '.75rem 1rem', borderRadius: '.5rem', border: '1px solid #e2e8f0' }}>
-        <input
-          type="text"
-          placeholder="Rechercher (prénom, nom, email, téléphone, tuteur, ville, code dossier...)"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{ flex: 1, minWidth: 200, padding: '.4rem .6rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.85rem' }}
-        />
-        <select value={filterStatut} onChange={e => setFilterStatut(e.target.value)} style={{ padding: '.4rem .6rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.85rem' }}>
-          <option value="">Tous statuts</option>
-          <option value="actif">Actif</option>
-          <option value="bloque">Bloqué</option>
-        </select>
-        <select value={filterPaiement} onChange={e => setFilterPaiement(e.target.value)} style={{ padding: '.4rem .6rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.85rem' }}>
-          <option value="">Tous les paiements</option>
-          <option value="paye">Payé</option>
-          <option value="non_paye">Non payé</option>
-        </select>
-        <label style={{ display: 'flex', alignItems: 'center', gap: '.4rem', fontSize: '.78rem', color: '#475569' }}>
-          Créé à partir du
-          <input type="datetime-local" step="60" value={filterCreatedFrom} max={filterCreatedTo || undefined} onChange={e => setFilterCreatedFrom(e.target.value)} style={{ padding: '.35rem .5rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.8rem' }} />
+      <div style={{ marginBottom: '1.25rem', background: '#fff', padding: '1rem', borderRadius: '.65rem', border: '1px solid #e2e8f0' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '.75rem', marginBottom: '.875rem' }}>
+          <div>
+            <div style={{ fontSize: '.9rem', fontWeight: 700, color: '#1e293b' }}>Recherche et filtres</div>
+            <div style={{ fontSize: '.75rem', color: '#64748b', marginTop: '.15rem' }}>Affinez la liste par compte, paiement ou date de création.</div>
+          </div>
+          {(search || filterStatut || filterPaiement || filterCreatedFrom || filterCreatedTo) && (
+            <button type="button" className="form-back" style={{ padding: '.4rem .7rem', fontSize: '.78rem', flexShrink: 0 }} onClick={() => { setSearch(''); setFilterStatut(''); setFilterPaiement(''); setFilterCreatedFrom(''); setFilterCreatedTo(''); }}>
+              Réinitialiser
+            </button>
+          )}
+        </div>
+        <label style={{ display: 'block', marginBottom: '.875rem' }}>
+          <span style={{ display: 'block', marginBottom: '.3rem', fontSize: '.75rem', fontWeight: 600, color: '#475569' }}>Rechercher un étudiant</span>
+          <input
+            type="text"
+            placeholder="Prénom, nom, email, téléphone, tuteur, ville ou code dossier"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ width: '100%', padding: '.55rem .7rem', border: '1px solid #cbd5e1', borderRadius: '.45rem', fontSize: '.85rem', boxSizing: 'border-box' }}
+          />
         </label>
-        <label style={{ display: 'flex', alignItems: 'center', gap: '.4rem', fontSize: '.78rem', color: '#475569' }}>
-          Jusqu’au
-          <input type="datetime-local" step="60" value={filterCreatedTo} min={filterCreatedFrom || undefined} onChange={e => setFilterCreatedTo(e.target.value)} style={{ padding: '.35rem .5rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.8rem' }} />
-        </label>
-        {(filterCreatedFrom || filterCreatedTo) && (
-          <button type="button" className="form-back" style={{ padding: '.35rem .6rem', fontSize: '.78rem' }} onClick={() => { setFilterCreatedFrom(''); setFilterCreatedTo(''); }}>
-            Effacer les dates
-          </button>
-        )}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '.75rem', alignItems: 'end' }}>
+          <label>
+            <span style={{ display: 'block', marginBottom: '.3rem', fontSize: '.75rem', fontWeight: 600, color: '#475569' }}>Statut du compte</span>
+            <select value={filterStatut} onChange={e => setFilterStatut(e.target.value)} style={{ width: '100%', padding: '.5rem .6rem', border: '1px solid #cbd5e1', borderRadius: '.45rem', fontSize: '.85rem', background: '#fff' }}>
+              <option value="">Tous les statuts</option>
+              <option value="actif">Actif</option>
+              <option value="bloque">Bloqué</option>
+            </select>
+          </label>
+          <label>
+            <span style={{ display: 'block', marginBottom: '.3rem', fontSize: '.75rem', fontWeight: 600, color: '#475569' }}>Paiement</span>
+            <select value={filterPaiement} onChange={e => setFilterPaiement(e.target.value)} style={{ width: '100%', padding: '.5rem .6rem', border: '1px solid #cbd5e1', borderRadius: '.45rem', fontSize: '.85rem', background: '#fff' }}>
+              <option value="">Tous les paiements</option>
+              <option value="paye">Payé</option>
+              <option value="non_paye">Non payé</option>
+            </select>
+          </label>
+          <label>
+            <span style={{ display: 'block', marginBottom: '.3rem', fontSize: '.75rem', fontWeight: 600, color: '#475569' }}>Créé à partir du</span>
+            <input type="datetime-local" step="60" value={filterCreatedFrom} max={filterCreatedTo || undefined} onChange={e => setFilterCreatedFrom(e.target.value)} style={{ width: '100%', padding: '.45rem .55rem', border: '1px solid #cbd5e1', borderRadius: '.45rem', fontSize: '.8rem', boxSizing: 'border-box' }} />
+          </label>
+          <label>
+            <span style={{ display: 'block', marginBottom: '.3rem', fontSize: '.75rem', fontWeight: 600, color: '#475569' }}>Créé jusqu’au</span>
+            <input type="datetime-local" step="60" value={filterCreatedTo} min={filterCreatedFrom || undefined} onChange={e => setFilterCreatedTo(e.target.value)} style={{ width: '100%', padding: '.45rem .55rem', border: '1px solid #cbd5e1', borderRadius: '.45rem', fontSize: '.8rem', boxSizing: 'border-box' }} />
+          </label>
+        </div>
       </div>
 
       {actionErr && <div className="auth-error" style={{margin:'0 0 .75rem'}}><AlertCircle size={15}/> {actionErr}</div>}
