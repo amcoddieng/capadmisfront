@@ -377,6 +377,8 @@ function PageEtudiants({ token }) {
   const [search, setSearch] = useState('');
   const [filterStatut, setFilterStatut] = useState('');
   const [filterPaiement, setFilterPaiement] = useState('');
+  const [filterCreatedFrom, setFilterCreatedFrom] = useState('');
+  const [filterCreatedTo, setFilterCreatedTo] = useState('');
   const [selected, setSelected]   = useState(new Set());
   const fetch = useCallback(async () => {
     setLoading(true); setError('');
@@ -412,7 +414,10 @@ function PageEtudiants({ token }) {
     const dossier = dossiers.find(item => item.etudiant?.id === e.id || item.etudiant?.email === e.email);
     const paiementEffectue = Boolean(dossier?.infos_dossier?.paiement);
     const matchPaiement = !filterPaiement || (filterPaiement === 'paye' ? paiementEffectue : !paiementEffectue);
-    return matchSearch && matchStatut && matchPaiement;
+    const createdAt = e.createdAt ? new Date(e.createdAt).getTime() : null;
+    const matchCreatedFrom = !filterCreatedFrom || (createdAt !== null && createdAt >= new Date(filterCreatedFrom).getTime());
+    const matchCreatedTo = !filterCreatedTo || (createdAt !== null && createdAt <= new Date(filterCreatedTo).getTime() + 59999);
+    return matchSearch && matchStatut && matchPaiement && matchCreatedFrom && matchCreatedTo;
   });
   const handleBlock = async (id) => {
     setToggling(id); setActionErr('');
@@ -516,6 +521,19 @@ function PageEtudiants({ token }) {
           <option value="paye">Payé</option>
           <option value="non_paye">Non payé</option>
         </select>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '.4rem', fontSize: '.78rem', color: '#475569' }}>
+          Créé à partir du
+          <input type="datetime-local" step="60" value={filterCreatedFrom} max={filterCreatedTo || undefined} onChange={e => setFilterCreatedFrom(e.target.value)} style={{ padding: '.35rem .5rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.8rem' }} />
+        </label>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '.4rem', fontSize: '.78rem', color: '#475569' }}>
+          Jusqu’au
+          <input type="datetime-local" step="60" value={filterCreatedTo} min={filterCreatedFrom || undefined} onChange={e => setFilterCreatedTo(e.target.value)} style={{ padding: '.35rem .5rem', border: '1px solid #cbd5e1', borderRadius: '.4rem', fontSize: '.8rem' }} />
+        </label>
+        {(filterCreatedFrom || filterCreatedTo) && (
+          <button type="button" className="form-back" style={{ padding: '.35rem .6rem', fontSize: '.78rem' }} onClick={() => { setFilterCreatedFrom(''); setFilterCreatedTo(''); }}>
+            Effacer les dates
+          </button>
+        )}
       </div>
 
       {actionErr && <div className="auth-error" style={{margin:'0 0 .75rem'}}><AlertCircle size={15}/> {actionErr}</div>}
