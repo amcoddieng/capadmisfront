@@ -28,6 +28,7 @@ const steps = [
     duration: 'Semaines 2-3',
     description: 'Vous préparez et téléchargez tous vos documents académiques sur votre espace sécurisé.',
     items: [
+      ' Vérification des informations académiques ',
       'Relevés de notes trois dernières années d\'étude',
       'Bulletins scolaires',
       'Derniers diplômes ou attestation obtenue',
