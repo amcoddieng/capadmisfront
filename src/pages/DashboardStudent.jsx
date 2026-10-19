@@ -4,14 +4,14 @@ import {
   LogOut, User, FolderOpen,
   Bell, MessageSquare, ChevronDown, Pencil, X,
   Loader, AlertCircle, CheckCircle, FolderSearch, Lock,
-  Download, Trash2, Upload, RefreshCw, Eye, School, AlertTriangle,
+  Download, Trash2, Upload, RefreshCw, Eye, School, AlertTriangle, FileText,
 } from 'lucide-react';
 import logoHeader from '../assets/les images du site/logo-horizontal-2x.png';
 import {
   getSession, clearSession, apiLogout, apiGetMe, apiUpdateMe,
   apiGetDossier, apiGetInfosDossier, apiPostInfosDossier, apiPutInfosDossier,
   apiListPiecesJointes, apiGetPieceJointeUrl, apiAddPieceJointe, apiReplacePieceJointe, apiDeletePieceJointe,
-  apiListDossiersUniversiteByDossier,
+  apiListDossiersUniversiteByDossier, apiUpdateAvisEtudiant, apiGetLettreMotivationUniversiteUrl, apiGetCvUniversiteUrl,
 } from '../api/auth';
 import { useNotifications } from '../hooks/useNotifications';
 import NotificationsPanel from '../components/NotificationsPanel';
@@ -29,6 +29,16 @@ const NAV_ITEMS = [
 const PAYS_LISTE       = ['Sénégal', 'Côte d\'Ivoire', 'Mali', 'Guinée', 'Cameroun', 'Maroc', 'Burkina Faso', 'Togo', 'Bénin', 'Niger', 'Autre'];
 const NIVEAUX_LISTE    = ['Bachelier ','Licence 1','Licence 1', 'Licence 2', 'Licence 3', 'Master 1', 'Master 2', 'Doctorat', 'BTS', 'DUT', 'Prépa', 'Autre'];
 const PAYS_CIBLE_LISTE = ['France','Allemagne','Autre'];
+
+const AVIS_ETUDIANT_OPTIONS = [
+  { value: 'CHOIX_VALIDES', label: 'Choix validés' },
+  { value: 'CHOIX_A_REVOIR', label: 'Choix à revoir' },
+];
+
+const AVIS_ETUDIANT_COLORS = {
+  CHOIX_VALIDES: { bg: '#dcfce7', text: '#166534', border: '#bbf7d0' },
+  CHOIX_A_REVOIR: { bg: '#fee2e2', text: '#991b1b', border: '#fecaca' },
+};
 
 const TYPES_PJ = {
   PHOTO_PROFIL:                'Photo de profil',
@@ -457,6 +467,7 @@ function PageDossier({ token, email }) {
   const [modalOpen, setModalOpen] = useState(false);
   const { openMessageModal } = useMessageModal();
   const [dossiersUniv, setDossiersUniv] = useState([]);
+  const [savingAvis, setSavingAvis] = useState({});
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -484,6 +495,28 @@ function PageDossier({ token, email }) {
   }, [token]);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
+
+  const handleAvisChange = async (id, avis) => {
+    if (!avis) return;
+    setSavingAvis(prev => ({ ...prev, [id]: true }));
+    try {
+      const updated = await apiUpdateAvisEtudiant(token, id, avis);
+      setDossiersUniv(prev => prev.map(u => u.id === id ? updated : u));
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setSavingAvis(prev => ({ ...prev, [id]: false }));
+    }
+  };
+
+  const handleDownloadUniversiteDoc = async (id, type) => {
+    try {
+      const url = type === 'lettre'
+        ? await apiGetLettreMotivationUniversiteUrl(token, id)
+        : await apiGetCvUniversiteUrl(token, id);
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (e) { alert(e.message); }
+  };
 
   if (loading) return (
     <div className="db-page__empty">
@@ -627,10 +660,10 @@ function PageDossier({ token, email }) {
         </div>
       </div>
 
-      {/* Dossiers université */}
+      {/* Statuts Universités */}
       <div className="info-card" style={{ marginTop: '1.25rem' }}>
         <div className="info-card__header">
-          <h2 className="info-card__title">Dossiers déposés en université ({dossiersUniv.length})</h2>
+          <h2 className="info-card__title">Statuts Universités ({dossiersUniv.length})</h2>
         </div>
         {dossiersUniv.length === 0 ? (
           <p style={{ color: 'var(--slate-400)', fontSize: '.875rem', padding: '1rem 1.5rem' }}>
@@ -643,6 +676,7 @@ function PageDossier({ token, email }) {
                               u.statut === 'refuse' ? { bg: '#fee2e2', text: '#991b1b', border: '#fecaca' } :
                               { bg: '#ffedd5', text: '#9a3412', border: '#fed7aa' };
               const stLabel = u.statut === 'accepte' ? 'Accepté' : u.statut === 'refuse' ? 'Refusé' : 'En attente';
+              const avisColor = u.avis_etudiant ? AVIS_ETUDIANT_COLORS[u.avis_etudiant] : null;
               return (
                 <div key={u.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '.75rem', background: '#f8fafc', borderRadius: '.5rem', padding: '.75rem .9rem', fontSize: '.85rem', border: '1px solid #eef2f7' }}>
                   <div style={{ width: 32, height: 32, borderRadius: '.4rem', background: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4338ca', flexShrink: 0 }}>
@@ -661,6 +695,45 @@ function PageDossier({ token, email }) {
                         « {u.message_universite} »
                       </div>
                     )}
+                    <div style={{ marginTop: '.5rem', display: 'flex', flexWrap: 'wrap', gap: '.5rem', alignItems: 'center' }}>
+                      {(u.lettre_motivation || u.cv) && (
+                        <span style={{ fontSize: '.72rem', color: '#64748b', fontWeight: 500 }}>Documents :</span>
+                      )}
+                      {u.lettre_motivation && (
+                        <button
+                          style={{ fontSize: '.72rem', fontWeight: 500, color: '#0c1c3f', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: '.4rem', padding: '.2rem .45rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '.25rem' }}
+                          onClick={() => handleDownloadUniversiteDoc(u.id, 'lettre')}
+                        >
+                          <FileText size={12}/> Lettre de motivation
+                        </button>
+                      )}
+                      {u.cv && (
+                        <button
+                          style={{ fontSize: '.72rem', fontWeight: 500, color: '#0c1c3f', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: '.4rem', padding: '.2rem .45rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '.25rem' }}
+                          onClick={() => handleDownloadUniversiteDoc(u.id, 'cv')}
+                        >
+                          <FileText size={12}/> CV
+                        </button>
+                      )}
+                    </div>
+                    <div style={{ marginTop: '.5rem', display: 'flex', flexWrap: 'wrap', gap: '.5rem', alignItems: 'center' }}>
+                      <span style={{ fontSize: '.78rem', color: '#64748b' }}>Mon avis :</span>
+                      <select
+                        className="form-select"
+                        style={{ fontSize: '.75rem', padding: '.25rem .5rem', borderRadius: '.4rem', minWidth: 150 }}
+                        value={u.avis_etudiant || ''}
+                        onChange={e => handleAvisChange(u.id, e.target.value)}
+                        disabled={savingAvis[u.id]}
+                      >
+                        <option value="">Choisir…</option>
+                        {AVIS_ETUDIANT_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                      </select>
+                      {u.avis_etudiant && avisColor && (
+                        <span style={{ fontSize: '.72rem', fontWeight: 600, background: avisColor.bg, color: avisColor.text, border: `1px solid ${avisColor.border}`, padding: '.15rem .5rem', borderRadius: '999px' }}>
+                          {AVIS_ETUDIANT_OPTIONS.find(s => s.value === u.avis_etudiant)?.label}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <span style={{ fontSize: '.72rem', fontWeight: 600, background: stColor.bg, color: stColor.text, border: `1px solid ${stColor.border}`, padding: '.15rem .5rem', borderRadius: '999px', flexShrink: 0 }}>
                     {stLabel}

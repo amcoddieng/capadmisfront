@@ -618,6 +618,61 @@ export async function apiDeleteDossierUniversite(token, id) {
   return data;
 }
 
+export async function apiUpdateAvisEtudiant(token, id, avis) {
+  const res = await authFetch(`${BASE}/dossiers-universite/${id}/avis`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, credentials: 'include',
+    body: JSON.stringify({ avis }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Erreur lors de l\'enregistrement');
+  return data.dossierUniversite;
+}
+
+export async function apiUploadLettreMotivationUniversite(token, id, file) {
+  const formData = new FormData();
+  formData.append('fichier', file);
+  const res = await authFetch(`${BASE}/dossiers-universite/${id}/lettre-motivation`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` }, credentials: 'include',
+    body: formData,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Erreur lors de l\'upload');
+  return data.dossierUniversite;
+}
+
+export async function apiUploadCvUniversite(token, id, file) {
+  const formData = new FormData();
+  formData.append('fichier', file);
+  const res = await authFetch(`${BASE}/dossiers-universite/${id}/cv`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` }, credentials: 'include',
+    body: formData,
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Erreur lors de l\'upload');
+  return data.dossierUniversite;
+}
+
+export async function apiGetLettreMotivationUniversiteUrl(token, id) {
+  const res = await authFetch(`${BASE}/dossiers-universite/${id}/lettre-motivation`, {
+    headers: { Authorization: `Bearer ${token}` }, credentials: 'include',
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Document introuvable');
+  return data.url;
+}
+
+export async function apiGetCvUniversiteUrl(token, id) {
+  const res = await authFetch(`${BASE}/dossiers-universite/${id}/cv`, {
+    headers: { Authorization: `Bearer ${token}` }, credentials: 'include',
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Document introuvable');
+  return data.url;
+}
+
 export async function apiRefresh() {
   const res = await authFetch(`${BASE}/auth/refresh`, {
     method: 'POST',

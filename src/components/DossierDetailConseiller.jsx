@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { X, Loader, AlertCircle, Send, Pencil, Eye, User, FolderOpen, CheckCircle, Upload, MessageSquare, Mail, MapPin, Phone, Globe, BookOpen, FileText, Calendar, Shield, Award, School, Trash2, Plus, Download, ArrowLeft } from 'lucide-react';
-import { apiGetInfosDossier, apiListPiecesJointes, apiGetPieceJointeUrl, apiTelechargerPiecesJointesZip, apiUpdateDossierStatus, apiAddPieceJointe, apiUpdatePieceJointeStatus, apiDeletePieceJointe, apiPutInfosDossier, apiListDossiersUniversite, apiListDossiersUniversiteByDossier, apiCreateDossierUniversite, apiUpdateDossierUniversite, apiDeleteDossierUniversite, apiGetDossierChecklist, apiUpdateDossierChecklist } from '../api/auth';
+import {
+  apiGetInfosDossier, apiListPiecesJointes, apiGetPieceJointeUrl, apiTelechargerPiecesJointesZip, apiUpdateDossierStatus,
+  apiAddPieceJointe, apiUpdatePieceJointeStatus, apiDeletePieceJointe, apiPutInfosDossier,
+  apiListDossiersUniversite, apiListDossiersUniversiteByDossier, apiCreateDossierUniversite, apiUpdateDossierUniversite, apiDeleteDossierUniversite,
+  apiGetDossierChecklist, apiUpdateDossierChecklist,
+  apiUploadLettreMotivationUniversite, apiUploadCvUniversite, apiGetLettreMotivationUniversiteUrl, apiGetCvUniversiteUrl,
+} from '../api/auth';
 import { useMessageModal } from '../context/MessageModalContext';
 
 const DOSSIER_STATUS_OPTIONS = ['non_demarre','EN_COURS_D_ETUDE','VALIDE','CHANGEMENT_A_APPORTER','DOCUMENT_MANQUANT'];
@@ -192,6 +198,16 @@ const UNIV_STATUS_OPTIONS = [
   { value: 'accepte', label: 'Accepté' },
   { value: 'refuse', label: 'Refusé' },
 ];
+
+const AVIS_ETUDIANT_OPTIONS = [
+  { value: 'CHOIX_VALIDES', label: 'Choix validés' },
+  { value: 'CHOIX_A_REVOIR', label: 'Choix à revoir' },
+];
+
+const AVIS_ETUDIANT_COLORS = {
+  CHOIX_VALIDES: { bg: '#dcfce7', text: '#166534', border: '#bbf7d0' },
+  CHOIX_A_REVOIR: { bg: '#fee2e2', text: '#991b1b', border: '#fecaca' },
+};
 
 function ModalDossierUniversite({ token, codeDossier, initial, onClose, onSuccess }) {
   const isEdit = !!initial;
@@ -453,6 +469,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
   const [univModal, setUnivModal] = useState(null);
   const [savingUniv, setSavingUniv] = useState(false);
   const [deletingUniv, setDeletingUniv] = useState(null);
+  const [uploadingUnivDocs, setUploadingUnivDocs] = useState({});
   const [preview, setPreview] = useState(null);
   const [previewLoading, setPreviewLoading] = useState(null);
   const [infosModal, setInfosModal] = useState(false);
@@ -499,6 +516,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
   };
 
   const isAdmin     = personnel.role?.includes('admin');
+  const isSuperAdmin = personnel.role === 'superadmin';
   const isAdmission = personnel.role?.includes('admission');
   const isVisa      = personnel.role?.includes('visa');
   const isConseiller = isAdmin || isAdmission || isVisa;
@@ -541,6 +559,26 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
     } catch (err) {
       alert(err.message || 'Erreur lors de la suppression');
     } finally { setDeletingPj(null); }
+  };
+
+  const handleDownloadUniversiteDoc = async (id, type) => {
+    try {
+      const url = type === 'lettre'
+        ? await apiGetLettreMotivationUniversiteUrl(token, id)
+        : await apiGetCvUniversiteUrl(token, id);
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (e) { alert(e.message); }
+  };
+
+  const handleUploadUniversiteDoc = async (id, type, file) => {
+    setUploadingUnivDocs(prev => ({ ...prev, [type + id]: true }));
+    try {
+      const updated = type === 'lettre'
+        ? await apiUploadLettreMotivationUniversite(token, id, file)
+        : await apiUploadCvUniversite(token, id, file);
+      setDossiersUniv(prev => prev.map(u => u.id === id ? updated : u));
+    } catch (e) { alert(e.message); }
+    finally { setUploadingUnivDocs(prev => ({ ...prev, [type + id]: false })); }
   };
 
   const handleDownloadAllPieces = async () => {
@@ -853,8 +891,8 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
             )}
           </SectionCard>
 
-          {/* ── Dossiers université ── */}
-          <SectionCard icon={School} title={`Dossiers université (${dossiersUniv.length})`} action={(isAdmin || isAdmission) ? (
+          {/* ── Statuts Universités ── */}
+          <SectionCard icon={School} title={`Statuts Universités (${dossiersUniv.length})`} action={(isAdmin || isAdmission) ? (
             <button style={btnPrimary} onClick={() => setUnivModal({})}><Plus size={12}/> Ajouter</button>
           ) : null}>
             {dossiersUniv.length === 0 ? (
@@ -868,6 +906,7 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
                   const stColor = u.statut === 'accepte' ? {bg:'#dcfce7',text:'#166534',border:'#bbf7d0'} :
                                   u.statut === 'refuse' ? {bg:'#fee2e2',text:'#991b1b',border:'#fecaca'} :
                                   {bg:'#ffedd5',text:'#9a3412',border:'#fed7aa'};
+                  const avisColor = u.avis_etudiant ? AVIS_ETUDIANT_COLORS[u.avis_etudiant] : null;
                   return (
                     <div key={u.id} style={{display:'flex',alignItems:'flex-start',gap:'.75rem',background:'#f8fafc',borderRadius:'.5rem',padding:'.75rem .9rem',fontSize:'.85rem',border:'1px solid #eef2f7'}}>
                       <div style={{width:32,height:32,borderRadius:'.4rem',background:'#e0e7ff',display:'flex',alignItems:'center',justifyContent:'center',color:'#4338ca',flexShrink:0}}>
@@ -886,6 +925,65 @@ export default function DossierDetailConseiller({ token, personnel, dossier, onC
                             « {u.message_universite} »
                           </div>
                         )}
+                        <div style={{marginTop:'.5rem',display:'flex',flexWrap:'wrap',gap:'.5rem',alignItems:'center'}}>
+                          {u.lettre_motivation && (
+                            <button
+                              style={{...btnGhost,padding:'.25rem .5rem',fontSize:'.72rem',color:'#0c1c3f',borderColor:'#e2e8f0'}}
+                              onClick={() => handleDownloadUniversiteDoc(u.id, 'lettre')}
+                              title="Télécharger la lettre de motivation"
+                            >
+                              <FileText size={12}/> Lettre de motivation
+                            </button>
+                          )}
+                          {u.cv && (
+                            <button
+                              style={{...btnGhost,padding:'.25rem .5rem',fontSize:'.72rem',color:'#0c1c3f',borderColor:'#e2e8f0'}}
+                              onClick={() => handleDownloadUniversiteDoc(u.id, 'cv')}
+                              title="Télécharger le CV"
+                            >
+                              <FileText size={12}/> CV
+                            </button>
+                          )}
+                          {isSuperAdmin && (
+                            <>
+                              <label style={{...btnGhost,padding:'.25rem .5rem',fontSize:'.72rem',cursor:'pointer',opacity:uploadingUnivDocs['lettre'+u.id]?0.6:1}}>
+                                <Upload size={12}/> {u.lettre_motivation ? 'Remplacer lettre' : 'Lettre de motivation'}
+                                <input
+                                  type="file"
+                                  accept="application/pdf,image/*"
+                                  style={{display:'none'}}
+                                  disabled={uploadingUnivDocs['lettre'+u.id]}
+                                  onChange={e => {
+                                    const f = e.target.files?.[0];
+                                    if (f) handleUploadUniversiteDoc(u.id, 'lettre', f);
+                                    e.target.value = '';
+                                  }}
+                                />
+                              </label>
+                              <label style={{...btnGhost,padding:'.25rem .5rem',fontSize:'.72rem',cursor:'pointer',opacity:uploadingUnivDocs['cv'+u.id]?0.6:1}}>
+                                <Upload size={12}/> {u.cv ? 'Remplacer CV' : 'CV'}
+                                <input
+                                  type="file"
+                                  accept="application/pdf,image/*"
+                                  style={{display:'none'}}
+                                  disabled={uploadingUnivDocs['cv'+u.id]}
+                                  onChange={e => {
+                                    const f = e.target.files?.[0];
+                                    if (f) handleUploadUniversiteDoc(u.id, 'cv', f);
+                                    e.target.value = '';
+                                  }}
+                                />
+                              </label>
+                            </>
+                          )}
+                          {u.avis_etudiant && avisColor ? (
+                            <span style={{fontSize:'.72rem',fontWeight:600,background:avisColor.bg,color:avisColor.text,border:`1px solid ${avisColor.border}`,padding:'.15rem .5rem',borderRadius:'999px'}}>
+                              {AVIS_ETUDIANT_OPTIONS.find(s => s.value === u.avis_etudiant)?.label}
+                            </span>
+                          ) : (
+                            <span style={{fontSize:'.72rem',color:'#94a3b8'}}>Avis étudiant : en attente</span>
+                          )}
+                        </div>
                       </div>
                       <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:'.4rem',flexShrink:0}}>
                         <span style={{fontSize:'.72rem',fontWeight:600,background:stColor.bg,color:stColor.text,border:`1px solid ${stColor.border}`,padding:'.15rem .5rem',borderRadius:'999px'}}>
